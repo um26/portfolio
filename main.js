@@ -1,6 +1,6 @@
 // scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.Fog(0x000000, 10, 100);
 
 // camera
 const camera = new THREE.PerspectiveCamera(
@@ -17,55 +17,82 @@ document.body.appendChild(renderer.domElement);
 
 // ===== LIGHT =====
 const light = new THREE.PointLight(0xffffff, 2, 100);
-light.position.set(5, 5, 5);
+light.position.set(0, 5, 5);
 scene.add(light);
 
 // ===== TRACK =====
-const trackGeometry = new THREE.PlaneGeometry(5, 200);
-const trackMaterial = new THREE.MeshStandardMaterial({
-    color: 0x111111,
-    side: THREE.DoubleSide
-});
-const track = new THREE.Mesh(trackGeometry, trackMaterial);
+const track = new THREE.Mesh(
+    new THREE.PlaneGeometry(8, 500),
+    new THREE.MeshStandardMaterial({
+        color: 0x0a0a0a,
+        emissive: 0x111111
+    })
+);
 track.rotation.x = Math.PI / 2;
 scene.add(track);
 
-// ===== TRACK LINES =====
-for (let i = 0; i < 20; i++) {
+// ===== NEON SIDE LINES =====
+function createNeonLine(x) {
     const line = new THREE.Mesh(
-        new THREE.BoxGeometry(0.2, 0.01, 2),
-        new THREE.MeshBasicMaterial({ color: 0xffffff })
+        new THREE.BoxGeometry(0.1, 0.05, 500),
+        new THREE.MeshBasicMaterial({ color: 0x00ffff })
     );
-    line.position.z = -i * 10;
+    line.position.x = x;
     scene.add(line);
 }
+createNeonLine(-3.5);
+createNeonLine(3.5);
 
-// ===== BILLBOARDS (portfolio sections) =====
-function createBoard(text, x, z) {
-    const board = new THREE.Mesh(
-        new THREE.BoxGeometry(2, 1, 0.2),
-        new THREE.MeshStandardMaterial({ color: 0x38bdf8 })
+// ===== MOVING ROAD DASHES =====
+const dashes = [];
+
+for (let i = 0; i < 50; i++) {
+    const dash = new THREE.Mesh(
+        new THREE.BoxGeometry(0.2, 0.05, 2),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
     );
-    board.position.set(x, 1, z);
+    dash.position.z = -i * 10;
+    scene.add(dash);
+    dashes.push(dash);
+}
+
+// ===== "CAR" =====
+const car = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 0.3, 2),
+    new THREE.MeshStandardMaterial({ color: 0xff0000 })
+);
+car.position.set(0, 0.2, 3);
+scene.add(car);
+
+// ===== BILLBOARDS =====
+function createBoard(text, x, z, color) {
+    const board = new THREE.Mesh(
+        new THREE.BoxGeometry(2.5, 1.5, 0.2),
+        new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color
+        })
+    );
+    board.position.set(x, 1.5, z);
     scene.add(board);
 }
 
-// add sections
-createBoard("Projects", -3, -20);
-createBoard("Mini Lab", 3, -40);
-createBoard("Leadership", -3, -60);
-createBoard("Resume", 3, -80);
+// Bigger + visible boards
+createBoard("PROJECTS", -5, -30, 0x00ffff);
+createBoard("MINI LAB", 5, -60, 0xff00ff);
+createBoard("LEADERSHIP", -5, -90, 0xffff00);
+createBoard("RESUME", 5, -120, 0x00ff00);
 
 // ===== STARS =====
 const starsGeometry = new THREE.BufferGeometry();
 const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
 
 const starsVertices = [];
-for (let i = 0; i < 3000; i++) {
+for (let i = 0; i < 5000; i++) {
     starsVertices.push(
-        (Math.random() - 0.5) * 1000,
-        (Math.random() - 0.5) * 1000,
-        (Math.random() - 0.5) * 1000
+        (Math.random() - 0.5) * 2000,
+        (Math.random() - 0.5) * 2000,
+        (Math.random() - 0.5) * 2000
     );
 }
 
@@ -77,25 +104,32 @@ starsGeometry.setAttribute(
 const stars = new THREE.Points(starsGeometry, starsMaterial);
 scene.add(stars);
 
-// ===== CAMERA START =====
-camera.position.set(0, 2, 5);
+// ===== CAMERA =====
+camera.position.set(0, 2, 6);
 
-// ===== SCROLL CONTROL =====
+// ===== SCROLL =====
 let scrollY = 0;
+document.body.style.height = "5000px";
 
 window.addEventListener("scroll", () => {
     scrollY = window.scrollY;
 });
 
-// make page scrollable
-document.body.style.height = "5000px";
-
 // ===== ANIMATION =====
 function animate() {
     requestAnimationFrame(animate);
 
-    // move camera forward
-    camera.position.z = 5 - scrollY * 0.01;
+    // camera forward
+    const targetZ = 6 - scrollY * 0.02;
+    camera.position.z += (targetZ - camera.position.z) * 0.1;
+
+    // move road dashes (speed illusion)
+    dashes.forEach(d => {
+        d.position.z += 0.5;
+        if (d.position.z > camera.position.z) {
+            d.position.z = camera.position.z - 200;
+        }
+    });
 
     renderer.render(scene, camera);
 }
