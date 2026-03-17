@@ -15,46 +15,57 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// ===== LIGHTING =====
+// ===== LIGHT =====
 const light = new THREE.PointLight(0xffffff, 2, 100);
 light.position.set(5, 5, 5);
 scene.add(light);
 
-// ===== OBJECTS =====
+// ===== TRACK =====
+const trackGeometry = new THREE.PlaneGeometry(5, 200);
+const trackMaterial = new THREE.MeshStandardMaterial({
+    color: 0x111111,
+    side: THREE.DoubleSide
+});
+const track = new THREE.Mesh(trackGeometry, trackMaterial);
+track.rotation.x = Math.PI / 2;
+scene.add(track);
 
-// Projects
-const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(),
-    new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x002222 })
-);
-cube.position.x = -2;
+// ===== TRACK LINES =====
+for (let i = 0; i < 20; i++) {
+    const line = new THREE.Mesh(
+        new THREE.BoxGeometry(0.2, 0.01, 2),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
+    );
+    line.position.z = -i * 10;
+    scene.add(line);
+}
 
-// About
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.7, 32, 32),
-    new THREE.MeshStandardMaterial({ color: 0x00ff88 })
-);
+// ===== BILLBOARDS (portfolio sections) =====
+function createBoard(text, x, z) {
+    const board = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 1, 0.2),
+        new THREE.MeshStandardMaterial({ color: 0x38bdf8 })
+    );
+    board.position.set(x, 1, z);
+    scene.add(board);
+}
 
-// Mini Lab
-const torus = new THREE.Mesh(
-    new THREE.TorusGeometry(0.6, 0.2, 16, 100),
-    new THREE.MeshStandardMaterial({ color: 0xff9900 })
-);
-torus.position.x = 2;
+// add sections
+createBoard("Projects", -3, -20);
+createBoard("Mini Lab", 3, -40);
+createBoard("Leadership", -3, -60);
+createBoard("Resume", 3, -80);
 
-scene.add(cube, sphere, torus);
-
-// ===== STARS BACKGROUND =====
+// ===== STARS =====
 const starsGeometry = new THREE.BufferGeometry();
 const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
 
 const starsVertices = [];
-
-for (let i = 0; i < 5000; i++) {
+for (let i = 0; i < 3000; i++) {
     starsVertices.push(
-        (Math.random() - 0.5) * 2000,
-        (Math.random() - 0.5) * 2000,
-        (Math.random() - 0.5) * 2000
+        (Math.random() - 0.5) * 1000,
+        (Math.random() - 0.5) * 1000,
+        (Math.random() - 0.5) * 1000
     );
 }
 
@@ -66,21 +77,25 @@ starsGeometry.setAttribute(
 const stars = new THREE.Points(starsGeometry, starsMaterial);
 scene.add(stars);
 
-// camera position
-camera.position.z = 5;
+// ===== CAMERA START =====
+camera.position.set(0, 2, 5);
+
+// ===== SCROLL CONTROL =====
+let scrollY = 0;
+
+window.addEventListener("scroll", () => {
+    scrollY = window.scrollY;
+});
+
+// make page scrollable
+document.body.style.height = "5000px";
 
 // ===== ANIMATION =====
 function animate() {
     requestAnimationFrame(animate);
 
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-
-    sphere.rotation.y += 0.01;
-
-    torus.rotation.x += 0.01;
-
-    stars.rotation.y += 0.0005;
+    // move camera forward
+    camera.position.z = 5 - scrollY * 0.01;
 
     renderer.render(scene, camera);
 }
