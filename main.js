@@ -95,7 +95,7 @@ function animate() {
     requestAnimationFrame(animate);
 
     // move camera forward
-    camera.position.z = 5 - scrollY * 0.01;
+    camera.position.z += (5 - scrollY * 0.01 - camera.position.z) * 0.1;
 
     renderer.render(scene, camera);
 }
