@@ -1,6 +1,8 @@
 // scene
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x000000, 10, 100);
+
+// ===== SKY COLOR (no black void) =====
+scene.background = new THREE.Color(0x0a0a1a);
 
 // camera
 const camera = new THREE.PerspectiveCamera(
@@ -16,39 +18,36 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // ===== LIGHT =====
-const light = new THREE.PointLight(0xffffff, 2, 100);
-light.position.set(0, 5, 5);
+const light = new THREE.PointLight(0xffffff, 3, 200);
+light.position.set(0, 20, 10);
 scene.add(light);
 
 // ===== TRACK =====
 const track = new THREE.Mesh(
-    new THREE.PlaneGeometry(8, 500),
-    new THREE.MeshStandardMaterial({
-        color: 0x0a0a0a,
-        emissive: 0x111111
-    })
+    new THREE.PlaneGeometry(20, 400),
+    new THREE.MeshStandardMaterial({ color: 0x1a1a1a })
 );
 track.rotation.x = Math.PI / 2;
 scene.add(track);
 
-// ===== NEON SIDE LINES =====
-function createNeonLine(x) {
-    const line = new THREE.Mesh(
-        new THREE.BoxGeometry(0.1, 0.05, 500),
-        new THREE.MeshBasicMaterial({ color: 0x00ffff })
+// ===== SIDE BARRIERS =====
+function barrier(x) {
+    const b = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 1, 400),
+        new THREE.MeshStandardMaterial({ color: 0xffffff })
     );
-    line.position.x = x;
-    scene.add(line);
+    b.position.set(x, 0.5, -200);
+    scene.add(b);
 }
-createNeonLine(-3.5);
-createNeonLine(3.5);
 
-// ===== MOVING ROAD DASHES =====
+barrier(-10);
+barrier(10);
+
+// ===== CENTER LINES =====
 const dashes = [];
-
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 40; i++) {
     const dash = new THREE.Mesh(
-        new THREE.BoxGeometry(0.2, 0.05, 2),
+        new THREE.BoxGeometry(0.3, 0.05, 3),
         new THREE.MeshBasicMaterial({ color: 0xffffff })
     );
     dash.position.z = -i * 10;
@@ -56,60 +55,52 @@ for (let i = 0; i < 50; i++) {
     dashes.push(dash);
 }
 
-// ===== "CAR" =====
-const car = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 0.3, 2),
+// ===== CAR (better shape) =====
+const car = new THREE.Group();
+
+const body = new THREE.Mesh(
+    new THREE.BoxGeometry(1.5, 0.3, 3),
     new THREE.MeshStandardMaterial({ color: 0xff0000 })
 );
-car.position.set(0, 0.2, 3);
+
+const top = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 0.3, 1.5),
+    new THREE.MeshStandardMaterial({ color: 0x000000 })
+);
+top.position.y = 0.3;
+
+car.add(body);
+car.add(top);
+car.position.set(0, 0.3, 5);
+
 scene.add(car);
 
-// ===== BILLBOARDS =====
+// ===== BILLBOARDS (BIG + CLOSE) =====
 function createBoard(text, x, z, color) {
     const board = new THREE.Mesh(
-        new THREE.BoxGeometry(2.5, 1.5, 0.2),
+        new THREE.BoxGeometry(4, 2, 0.5),
         new THREE.MeshStandardMaterial({
             color: color,
             emissive: color
         })
     );
-    board.position.set(x, 1.5, z);
+    board.position.set(x, 2, z);
     scene.add(board);
 }
 
-// Bigger + visible boards
-createBoard("PROJECTS", -5, -30, 0x00ffff);
-createBoard("MINI LAB", 5, -60, 0xff00ff);
-createBoard("LEADERSHIP", -5, -90, 0xffff00);
-createBoard("RESUME", 5, -120, 0x00ff00);
-
-// ===== STARS =====
-const starsGeometry = new THREE.BufferGeometry();
-const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
-
-const starsVertices = [];
-for (let i = 0; i < 5000; i++) {
-    starsVertices.push(
-        (Math.random() - 0.5) * 2000,
-        (Math.random() - 0.5) * 2000,
-        (Math.random() - 0.5) * 2000
-    );
-}
-
-starsGeometry.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(starsVertices, 3)
-);
-
-const stars = new THREE.Points(starsGeometry, starsMaterial);
-scene.add(stars);
+// bring them closer
+createBoard("PROJECTS", -8, -20, 0x00ffff);
+createBoard("MINI LAB", 8, -40, 0xff00ff);
+createBoard("LEADERSHIP", -8, -60, 0xffff00);
+createBoard("RESUME", 8, -80, 0x00ff00);
 
 // ===== CAMERA =====
-camera.position.set(0, 2, 6);
+camera.position.set(0, 3, 10);
+camera.lookAt(0, 0, 0);
 
 // ===== SCROLL =====
 let scrollY = 0;
-document.body.style.height = "5000px";
+document.body.style.height = "4000px";
 
 window.addEventListener("scroll", () => {
     scrollY = window.scrollY;
@@ -119,13 +110,12 @@ window.addEventListener("scroll", () => {
 function animate() {
     requestAnimationFrame(animate);
 
-    // camera forward
-    const targetZ = 6 - scrollY * 0.02;
+    const targetZ = 10 - scrollY * 0.03;
     camera.position.z += (targetZ - camera.position.z) * 0.1;
 
-    // move road dashes (speed illusion)
+    // move road lines
     dashes.forEach(d => {
-        d.position.z += 0.5;
+        d.position.z += 0.6;
         if (d.position.z > camera.position.z) {
             d.position.z = camera.position.z - 200;
         }
