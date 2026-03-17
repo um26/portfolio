@@ -3,1585 +3,1669 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UTKARSH MANGAL — F1 PORTFOLIO</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+<title>UTKARSH MANGAL — F1 PORTFOLIO GP</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --ac:#e10600; --bg:#050505;
-  --h:'Orbitron',sans-serif;
-  --b:'Rajdhani',sans-serif;
-}
-html,body{
-  width:100%;height:100%;
-  overflow:hidden;
-  background:var(--bg);
-  font-family:var(--b);color:#fff;
-}
+:root{--ac:#e10600;--h:'Orbitron',sans-serif;--b:'Rajdhani',sans-serif}
+html,body{width:100%;height:100%;overflow:hidden;background:#050505;font-family:var(--b);color:#fff}
 
-/* ── CANVAS ── */
+/* ── BASE ── */
 #c{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:none}
-
-/* ── SCROLL SPACE ── */
-#ss{display:none;height:9200px;position:relative;z-index:-1}
+#ss{display:none;height:200px;position:relative;z-index:-1}
 #ss.on{display:block}
 
-/* ─────────────────────────────────────────────
-   SELECTION SCREEN
-───────────────────────────────────────────── */
-#sel{
-  position:fixed;inset:0;z-index:40;
-  background:#050505;
-  display:flex;flex-direction:column;
-  align-items:center;
-  overflow-y:auto;
-  padding:3rem 1.5rem 5rem;
-  transition:opacity .85s ease,transform .85s ease;
+/* ── SCREEN BASE ── */
+.screen{
+  position:fixed;inset:0;z-index:30;
+  display:flex;flex-direction:column;align-items:center;
+  background:#050505;overflow-y:auto;padding:2.5rem 1.5rem 5rem;
+  transition:opacity .75s ease, transform .75s ease;
 }
-#sel::before{
+.screen::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -5%,rgba(225,6,0,.18) 0%,transparent 65%),
-    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,.016) 59px,rgba(255,255,255,.016) 60px),
-    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,.016) 59px,rgba(255,255,255,.016) 60px);
+    radial-gradient(ellipse 80% 45% at 50% -5%,rgba(225,6,0,.16) 0%,transparent 65%),
+    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,.014) 59px,rgba(255,255,255,.014) 60px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,.014) 59px,rgba(255,255,255,.014) 60px);
 }
-#sel.out{opacity:0;transform:scale(1.05);pointer-events:none}
-#sel>*{position:relative;z-index:1}
+.screen>*{position:relative;z-index:1}
+.screen.out{opacity:0;transform:scale(1.04);pointer-events:none}
+.screen.hidden{display:none}
 
-.sel-eyebrow{
-  font-family:var(--h);font-size:.5rem;letter-spacing:.6em;
-  color:#e10600;margin-bottom:1rem;text-transform:uppercase;
-  animation:fu .8s ease .05s both;
-}
-.sel-h1{
-  font-family:var(--h);font-size:clamp(2.2rem,6.5vw,5rem);
-  font-weight:900;letter-spacing:.06em;line-height:1;
-  text-align:center;margin-bottom:.5rem;
-  background:linear-gradient(160deg,#fff 40%,#555);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  animation:fu .8s ease .1s both;
-}
-.sel-name{
-  font-family:var(--h);font-size:clamp(.9rem,2.5vw,1.4rem);
-  font-weight:400;letter-spacing:.3em;color:var(--ac);
-  margin-bottom:.4rem;text-align:center;
-  animation:fu .8s ease .15s both;
-}
-.sel-sub{
-  font-size:.85rem;color:#333;letter-spacing:.2em;text-transform:uppercase;
-  margin-bottom:2.5rem;text-align:center;
-  animation:fu .8s ease .2s both;
-}
+/* ── TYPOGRAPHY ── */
+.eyebrow{font-family:var(--h);font-size:.5rem;letter-spacing:.55em;color:#e10600;margin-bottom:.9rem;text-transform:uppercase;animation:fu .7s ease both}
+.main-title{font-family:var(--h);font-size:clamp(2rem,6vw,4.5rem);font-weight:900;letter-spacing:.06em;line-height:1;text-align:center;margin-bottom:.5rem;background:linear-gradient(160deg,#fff 35%,#444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fu .7s ease .08s both}
+.sub-title{font-size:.82rem;color:#333;letter-spacing:.2em;text-transform:uppercase;margin-bottom:2.5rem;text-align:center;animation:fu .7s ease .12s both}
+.section-ask{font-family:var(--h);font-size:.55rem;letter-spacing:.32em;color:#444;text-transform:uppercase;margin-bottom:1.6rem;text-align:center;animation:fu .7s ease .2s both}
 
-/* Ticker */
-.ticker-wrap{
-  width:100%;overflow:hidden;border-top:1px solid rgba(225,6,0,.3);
-  border-bottom:1px solid rgba(225,6,0,.3);
-  padding:.4rem 0;margin-bottom:2.5rem;
-  animation:fu .8s ease .25s both;
-}
-.ticker-inner{
-  display:flex;white-space:nowrap;
-  animation:ticker 28s linear infinite;
-}
-.ticker-item{
-  font-family:var(--h);font-size:.5rem;letter-spacing:.2em;
-  color:#555;padding:0 2.5rem;
-}
-.ticker-item span{color:var(--ac)}
+/* ── TICKER ── */
+.ticker-wrap{width:100%;overflow:hidden;border-top:1px solid rgba(225,6,0,.25);border-bottom:1px solid rgba(225,6,0,.25);padding:.38rem 0;margin-bottom:2.2rem;animation:fu .7s ease .16s both}
+.ticker-inner{display:flex;white-space:nowrap;animation:ticker 30s linear infinite}
+.t-item{font-family:var(--h);font-size:.48rem;letter-spacing:.18em;color:#444;padding:0 2.5rem}
+.t-item span{color:var(--ac)}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-.sel-ask{
-  font-family:var(--h);font-size:.58rem;letter-spacing:.35em;
-  color:#444;text-transform:uppercase;margin-bottom:1.8rem;text-align:center;
-  animation:fu .8s ease .3s both;
-}
+/* ── DRIVER GRID ── */
+.d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.75rem;width:100%;max-width:950px;animation:fu .7s ease .3s both}
+.d-card{border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.025);padding:.95rem .85rem .8rem;cursor:pointer;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .3s,background .3s}
+.d-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--dc) 0%,transparent 55%);opacity:0;transition:opacity .3s}
+.d-card:hover{transform:translateY(-7px) scale(1.03);border-color:var(--dc);box-shadow:0 18px 50px -8px var(--dg)}
+.d-card:hover::before{opacity:.12}
+.d-card>*{position:relative;z-index:1}
+.d-num{font-family:var(--h);font-size:1.9rem;font-weight:900;color:var(--dc);line-height:1;margin-bottom:.25rem;text-shadow:0 0 18px var(--dg)}
+.d-flag{font-size:1.1rem;position:absolute;top:.85rem;right:.85rem}
+.d-team{font-size:.5rem;font-family:var(--h);letter-spacing:.12em;color:#333;margin-bottom:.18rem}
+.d-name{font-size:.9rem;font-weight:700;color:#bbb;line-height:1.2}
+.d-bar{height:2px;margin-top:.65rem;border-radius:1px;background:linear-gradient(90deg,var(--dc),transparent)}
 
-/* Driver grid */
-.dgrid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
-  gap:.8rem;width:100%;max-width:960px;
-  animation:fu .8s ease .4s both;
-}
-.dcard{
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:14px;
-  background:rgba(255,255,255,.025);
-  padding:1rem .9rem .85rem;
-  cursor:pointer;position:relative;overflow:hidden;
-  transition:transform .3s cubic-bezier(.16,1,.3,1),
-             border-color .3s,box-shadow .3s,background .3s;
-}
-.dcard::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,var(--dc) 0%,transparent 55%);
-  opacity:0;transition:opacity .3s;
-}
-.dcard:hover{
-  transform:translateY(-8px) scale(1.03);
-  border-color:var(--dc);
-  box-shadow:0 20px 55px -8px var(--dc-glow);
-  background:rgba(255,255,255,.055);
-}
-.dcard:hover::before{opacity:.12}
-.dcard>*{position:relative;z-index:1}
+/* ── CIRCUIT GRID ── */
+.c-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem;width:100%;max-width:1100px;animation:fu .7s ease .3s both}
+.c-card{border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.025);padding:1rem .9rem .85rem;cursor:pointer;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .3s,background .3s;text-align:center}
+.c-card::after{content:'';position:absolute;inset:-1px;border-radius:14px;background:linear-gradient(135deg,var(--cc) 0%,transparent 60%);opacity:0;transition:opacity .3s;z-index:0}
+.c-card:hover{transform:translateY(-8px) scale(1.03);border-color:var(--cc);box-shadow:0 20px 55px -8px var(--cg)}
+.c-card:hover::after{opacity:.1}
+.c-card>*{position:relative;z-index:1}
+.c-card svg{width:130px;height:100px;margin-bottom:.6rem;overflow:visible}
+.c-flag{font-size:1.4rem;margin-bottom:.3rem;display:block}
+.c-name{font-family:var(--h);font-size:.56rem;font-weight:700;letter-spacing:.14em;color:var(--cc);margin-bottom:.12rem}
+.c-country{font-size:.72rem;color:#333}
+.c-lap{font-size:.6rem;color:#222;letter-spacing:.1em;margin-top:.25rem;font-family:var(--h)}
 
-.d-num{
-  font-family:var(--h);font-size:2rem;font-weight:900;
-  color:var(--dc);line-height:1;margin-bottom:.3rem;
-  text-shadow:0 0 20px var(--dc-glow);
-}
-.d-flag{font-size:1.2rem;position:absolute;top:.9rem;right:.9rem}
-.d-team{font-size:.55rem;font-family:var(--h);letter-spacing:.15em;color:#444;margin-bottom:.2rem}
-.d-name{font-size:.95rem;font-weight:700;color:#ccc;line-height:1.2}
-.d-bar{
-  height:2px;margin-top:.7rem;border-radius:1px;
-  background:linear-gradient(90deg,var(--dc),transparent);
-}
-
-/* ─────────────────────────────────────────────
-   LIGHTS SCREEN
-───────────────────────────────────────────── */
-#lgts{
-  position:fixed;inset:0;z-index:50;
-  background:rgba(0,0,0,.95);
-  display:none;flex-direction:column;
-  align-items:center;justify-content:center;gap:2rem;
-}
+/* ── LIGHTS SCREEN ── */
+#lgts{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.95);display:none;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
 #lgts.on{display:flex}
-.lrow{display:flex;gap:1.8rem}
-.lcol{display:flex;flex-direction:column;align-items:center;gap:.5rem}
-.lpost{width:4px;height:50px;background:#111;border-radius:3px}
-.ldot{
-  width:44px;height:44px;border-radius:50%;
-  background:#0a0000;border:2px solid #1a0000;
-  transition:background .1s,border-color .1s,box-shadow .12s;
-}
-.ldot.on{
-  background:#e10600;border-color:#ff4422;
-  box-shadow:0 0 16px #e10600,0 0 45px #e10600,0 0 90px rgba(225,6,0,.4);
-}
-.radio-msg{
-  font-family:var(--h);font-size:.6rem;letter-spacing:.15em;
-  color:#555;text-align:center;max-width:380px;line-height:1.7;
-  padding:.75rem 1.5rem;border:1px solid #1a1a1a;border-radius:8px;
-  background:#0a0a0a;
-  transition:color .4s;
-}
-.radio-msg.active{color:#ccc;border-color:#333}
-.gotext{
-  font-family:var(--h);font-size:clamp(3.5rem,10vw,6.5rem);
-  font-weight:900;letter-spacing:.25em;color:#00e87a;
-  text-shadow:0 0 35px #00e87a,0 0 75px #00e87a;
-  opacity:0;transform:scale(.55);transition:opacity .2s,transform .25s;
-}
-.gotext.on{opacity:1;transform:scale(1)}
+.l-row{display:flex;gap:1.8rem}
+.l-col{display:flex;flex-direction:column;align-items:center;gap:.45rem}
+.l-post{width:4px;height:48px;background:#111;border-radius:3px}
+.l-dot{width:42px;height:42px;border-radius:50%;background:#0a0000;border:2px solid #1a0000;transition:background .1s,border-color .1s,box-shadow .12s}
+.l-dot.on{background:#e10600;border-color:#ff4422;box-shadow:0 0 14px #e10600,0 0 40px #e10600,0 0 80px rgba(225,6,0,.4)}
+.l-radio{font-family:var(--h);font-size:.58rem;letter-spacing:.14em;color:#333;text-align:center;max-width:360px;line-height:1.65;padding:.7rem 1.4rem;border:1px solid #111;border-radius:7px;background:#080808;transition:color .5s,border-color .4s}
+.l-radio.live{color:#bbb;border-color:#2a2a2a}
+.go-text{font-family:var(--h);font-size:clamp(3rem,9vw,6rem);font-weight:900;letter-spacing:.25em;color:#00e87a;text-shadow:0 0 30px #00e87a,0 0 70px #00e87a;opacity:0;transform:scale(.5);transition:opacity .2s,transform .25s}
+.go-text.on{opacity:1;transform:scale(1)}
 
-/* ─────────────────────────────────────────────
-   RACE HUD
-───────────────────────────────────────────── */
-
-/* Top bar */
-#topbar{
-  position:fixed;top:0;left:0;right:0;height:42px;z-index:10;
-  display:none;
-  background:rgba(0,0,0,.7);backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(255,255,255,.06);
-  padding:0 1.2rem;
-  display:none;align-items:center;gap:1.2rem;
-}
+/* ── TOP BAR ── */
+#topbar{position:fixed;top:0;left:0;right:0;height:40px;z-index:10;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:0 1rem;display:none;align-items:center;gap:1rem}
 #topbar.on{display:flex}
+.tb-flag{font-size:1rem}
+.tb-circ{font-family:var(--h);font-size:.52rem;font-weight:700;letter-spacing:.16em;color:var(--ac)}
+.tb-drv{font-family:var(--h);font-size:.6rem;font-weight:700;color:#fff;letter-spacing:.08em;padding:.16rem .65rem;border-radius:3px;background:var(--ac)}
+.tb-sep{width:1px;height:18px;background:rgba(255,255,255,.09)}
+.tb-lap{font-family:var(--h);font-size:.52rem;color:#555;letter-spacing:.15em}
+.tb-lap span{color:#fff}
+.rolex{margin-left:auto;display:flex;align-items:center;gap:.4rem}
+.rolex-l{font-family:'Times New Roman',serif;font-size:.65rem;letter-spacing:.08em;color:#c8a84b;font-weight:700}
+#rtime{font-family:'Courier New',monospace;font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.05em;background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.22);padding:.1rem .5rem;border-radius:3px;min-width:62px;text-align:center}
 
-.tb-flag{font-size:1.1rem}
-.tb-circuit{
-  font-family:var(--h);font-size:.55rem;font-weight:700;
-  letter-spacing:.18em;color:var(--ac);
-}
-.tb-driver{
-  font-family:var(--h);font-size:.65rem;font-weight:700;
-  color:#fff;letter-spacing:.1em;
-  padding:.18rem .7rem;border-radius:3px;
-  background:var(--ac);
-}
-.tb-sep{width:1px;height:20px;background:rgba(255,255,255,.1)}
+/* ── PROGRESS BAR ── */
+#pbar{position:fixed;top:40px;left:0;right:0;height:3px;z-index:11;background:rgba(255,255,255,.04);display:none}
+#pbar.on{display:block}
+#pfill{height:100%;width:0%;background:linear-gradient(90deg,var(--ac),#ff7700);box-shadow:0 0 7px var(--ac);transition:width .1s}
 
-/* Rolex clock */
-.rolex-wrap{
-  margin-left:auto;
-  display:flex;align-items:center;gap:.5rem;
-}
-.rolex-logo{
-  font-family:'Times New Roman',serif;font-size:.7rem;
-  letter-spacing:.08em;color:#c8a84b;font-weight:700;
-}
-.rolex-crown{font-size:.65rem}
-#rtime{
-  font-family:'Courier New',monospace;font-size:.75rem;
-  font-weight:700;color:#fff;letter-spacing:.05em;
-  background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.25);
-  padding:.12rem .55rem;border-radius:3px;
-  min-width:64px;text-align:center;
-}
-
-/* Left HUD panel */
-#lhud{
-  position:fixed;top:52px;left:1.2rem;z-index:10;
-  display:none;
-}
+/* ── LEFT HUD ── */
+#lhud{position:fixed;top:52px;left:1rem;z-index:10;display:none}
 #lhud.on{display:block}
+.pos-big{font-family:var(--h);font-size:2.8rem;font-weight:900;color:var(--ac);line-height:1;text-shadow:0 0 18px var(--ac)}
+.pos-lbl{font-size:.5rem;color:#222;letter-spacing:.2em;margin-bottom:.8rem}
+.tire-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem}
+.tire-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--tc);color:var(--tc);font-family:var(--h);font-size:.55rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.tire-lbl{font-size:.58rem;letter-spacing:.14em;color:var(--tc)}
+.drs{font-family:var(--h);font-size:.52rem;letter-spacing:.18em;padding:.2rem .65rem;border-radius:3px;border:1px solid #111;color:#1a1a1a;display:inline-block;margin-bottom:.5rem;transition:all .2s}
+.drs.on{background:#00e87a;border-color:#00e87a;color:#000;box-shadow:0 0 10px #00e87a}
+.gap-row{font-size:.58rem;color:#333;letter-spacing:.1em}
+.gap-row span{color:#fff;font-family:var(--h);font-size:.6rem}
+.secs{display:flex;gap:.3rem;margin-top:.6rem}
+.sec{font-family:var(--h);font-size:.48rem;letter-spacing:.08em;padding:.18rem .38rem;border-radius:2px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);color:#2a2a2a;transition:all .4s}
+.sec.p{background:rgba(140,0,200,.3);border-color:#8c00c8;color:#cc44ff}
+.sec.g{background:rgba(0,180,70,.2);border-color:#00b446;color:#00b446}
+.sec.y{background:rgba(255,190,0,.15);border-color:#ffbe00;color:#ffbe00}
 
-.lhud-pos{
-  font-family:var(--h);font-size:2.5rem;font-weight:900;
-  color:var(--ac);line-height:1;margin-bottom:.05rem;
-  text-shadow:0 0 20px var(--ac);
-}
-.lhud-label{font-size:.55rem;color:#333;letter-spacing:.2em;margin-bottom:.9rem}
-.lhud-tire{
-  display:flex;align-items:center;gap:.55rem;margin-bottom:.6rem;
-}
-.tire-circle{
-  width:28px;height:28px;border-radius:50%;
-  border:2px solid transparent;font-size:.6rem;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--h);font-weight:700;
-}
-.tire-name{font-size:.6rem;letter-spacing:.15em;color:#555}
-.drs-btn{
-  font-family:var(--h);font-size:.55rem;letter-spacing:.2em;
-  padding:.22rem .7rem;border-radius:3px;
-  border:1px solid #1a1a1a;color:#222;
-  transition:all .2s;margin-bottom:.6rem;
-  display:inline-block;
-}
-.drs-btn.active{
-  background:#00e87a;border-color:#00e87a;color:#000;
-  box-shadow:0 0 12px #00e87a;
-}
-
-.gap-display{font-size:.6rem;color:#555;letter-spacing:.12em}
-.gap-val{color:#fff;font-family:var(--h);font-size:.65rem}
-
-/* Sector timing */
-.sectors{display:flex;gap:.35rem;margin-top:.65rem}
-.sec{
-  font-family:var(--h);font-size:.5rem;letter-spacing:.1em;
-  padding:.2rem .4rem;border-radius:2px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
-  color:#444;transition:all .3s;
-}
-.sec.purple{background:rgba(160,0,210,.35);border-color:#a000d2;color:#cc44ff}
-.sec.green{background:rgba(0,200,80,.2);border-color:#00c850;color:#00c850}
-.sec.yellow{background:rgba(255,200,0,.15);border-color:#ffc800;color:#ffc800}
-
-/* Lap counter */
-.lap-ctr{
-  font-family:var(--h);font-size:.58rem;color:#555;
-  letter-spacing:.18em;margin-top:.65rem;
-}
-.lap-n{color:#fff;font-size:.75rem}
-
-/* Right HUD: speed */
-#rhud{
-  position:fixed;bottom:2.5rem;right:1.5rem;z-index:10;
-  display:none;text-align:right;
-}
+/* ── RIGHT HUD ── */
+#rhud{position:fixed;bottom:2.2rem;right:1.2rem;z-index:10;display:none;text-align:right}
 #rhud.on{display:block}
-.rpm-bar-wrap{
-  display:flex;justify-content:flex-end;gap:2px;
-  margin-bottom:.5rem;
-}
-.rpm-seg{
-  width:7px;height:22px;border-radius:1px;
-  background:rgba(255,255,255,.06);
-  transition:background .08s;
-}
-.rpm-seg.lit{background:var(--ac)}
-.rpm-seg.lit.warn{background:#ffd700}
-.rpm-seg.lit.redline{background:#fff;box-shadow:0 0 6px #fff}
-#spd-n{
-  font-family:var(--h);font-size:clamp(2rem,4.5vw,3.2rem);
-  font-weight:900;line-height:1;color:#fff;
-}
-.spd-unit{font-size:.6rem;color:#333;letter-spacing:.2em}
-#gear-n{
-  font-family:var(--h);font-size:1.4rem;font-weight:700;
-  color:var(--ac);margin-top:.1rem;
-}
-.pirelli-badge{
-  font-family:'Times New Roman',serif;font-size:.55rem;
-  letter-spacing:.12em;color:#888;margin-top:.6rem;
-  display:flex;align-items:center;justify-content:flex-end;gap:.3rem;
-}
-.pir-circle{
-  width:16px;height:16px;border-radius:50%;
-  border:2px solid;display:inline-flex;align-items:center;justify-content:center;
-  font-family:var(--h);font-size:.38rem;font-weight:700;
-}
+.rpm-segs{display:flex;justify-content:flex-end;gap:2px;margin-bottom:.4rem}
+.rpm-s{width:6px;height:20px;border-radius:1px;background:rgba(255,255,255,.05);transition:background .06s}
+.rpm-s.lit{background:var(--ac)}
+.rpm-s.lit.warn{background:#ffd700}
+.rpm-s.lit.red{background:#fff;box-shadow:0 0 5px #fff}
+#spd-n{font-family:var(--h);font-size:clamp(1.8rem,4vw,3rem);font-weight:900;line-height:1}
+.spd-u{font-size:.58rem;color:#222;letter-spacing:.2em}
+#gear{font-family:var(--h);font-size:1.3rem;font-weight:700;color:var(--ac);margin-top:.08rem}
+.pir-row{display:flex;align-items:center;justify-content:flex-end;gap:.3rem;margin-top:.5rem}
+.pir-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid;display:inline-flex;align-items:center;justify-content:center;font-family:var(--h);font-size:.35rem;font-weight:700}
+.pir-lbl{font-family:'Times New Roman',serif;font-size:.52rem;letter-spacing:.1em;color:#555}
 
-/* Radio message */
-#radio{
-  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
-  z-index:10;display:none;
-  background:rgba(0,0,0,.88);backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,.1);border-radius:8px;
-  padding:.7rem 1.4rem;min-width:min(400px,85vw);text-align:center;
-}
-#radio.on{display:block;animation:radiopop .35s cubic-bezier(.16,1,.3,1)}
-@keyframes radiopop{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.radio-icon{font-family:var(--h);font-size:.45rem;letter-spacing:.25em;color:#e10600;margin-bottom:.2rem}
-.radio-txt{font-size:.85rem;color:#bbb;line-height:1.5}
+/* ── STEERING WHEEL INDICATOR ── */
+#steer-hud{position:fixed;bottom:2.2rem;left:50%;transform:translateX(-50%);z-index:10;display:none;text-align:center}
+#steer-hud.on{display:block}
+.steer-ring{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto;transition:transform .1s}
+.steer-keys{font-size:.5rem;color:#222;letter-spacing:.2em;margin-top:.3rem;font-family:var(--h)}
 
-/* Hint */
-#hint{
-  position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);
-  z-index:9;display:none;
-}
-#hint.on{display:block}
-.hint-t{font-size:.62rem;color:#2a2a2a;letter-spacing:.25em;animation:blink 2.5s infinite}
-@keyframes blink{0%,100%{opacity:.25}50%{opacity:.8}}
+/* ── TEAM RADIO POPUP ── */
+#radio{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);z-index:15;display:none;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.65rem 1.3rem;min-width:min(380px,80vw);text-align:center}
+#radio.on{display:block;animation:rp .3s cubic-bezier(.16,1,.3,1)}
+@keyframes rp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.radio-ico{font-family:var(--h);font-size:.43rem;letter-spacing:.22em;color:var(--ac);margin-bottom:.18rem}
+.radio-msg{font-size:.82rem;color:#999;line-height:1.5}
 
-/* Progress bar at very top */
-#progress{
-  position:fixed;top:42px;left:0;right:0;height:3px;z-index:11;
-  display:none;background:rgba(255,255,255,.05);
+/* ── PIT STOP OVERLAY ── */
+#pitstop{
+  position:fixed;inset:0;z-index:60;
+  background:rgba(0,0,0,.92);backdrop-filter:blur(30px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem;
 }
-#progress.on{display:block}
-#progfill{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,var(--ac),#ff6b00);
-  box-shadow:0 0 8px var(--ac);
-  transition:width .12s;
-}
+#pitstop.on{display:flex;animation:fadein .5s ease}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.pit-header{text-align:center;margin-bottom:2rem}
+.pit-anim{font-size:3rem;margin-bottom:.5rem;animation:spin .8s linear infinite}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.pit-title{font-family:var(--h);font-size:clamp(1rem,3vw,1.6rem);font-weight:900;letter-spacing:.15em;color:#ffd700;margin-bottom:.25rem}
+.pit-sub{font-size:.72rem;color:#333;letter-spacing:.2em}
+.pit-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-left:3px solid var(--ac);border-radius:12px;padding:1.6rem 1.8rem;max-width:550px;width:100%}
+.pit-cat{font-family:var(--h);font-size:.45rem;letter-spacing:.3em;color:var(--ac);margin-bottom:.35rem}
+.pit-ctitle{font-family:var(--h);font-size:1.1rem;font-weight:700;margin-bottom:.75rem}
+.pit-body{font-size:.9rem;line-height:1.75;color:#888}
+.pit-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.85rem}
+.pit-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:.18rem .55rem;font-size:.67rem;color:#555;letter-spacing:.06em}
+.pit-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
+.pit-link{font-family:var(--h);font-size:.5rem;letter-spacing:.14em;padding:.38rem .95rem;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:#bbb;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.pit-link:hover{background:var(--ac);border-color:var(--ac);color:#fff}
+.pit-timer{font-family:var(--h);font-size:.6rem;letter-spacing:.22em;color:#333;margin-top:1.5rem;text-align:center}
+.pit-timer span{color:#fff}
 
-/* ─────────────────────────────────────────────
-   PANEL
-───────────────────────────────────────────── */
-#panel{
-  position:fixed;right:0;top:50%;z-index:20;
-  transform:translateY(-50%) translateX(106%);
-  width:min(420px,90vw);
-  background:rgba(4,4,4,.97);
-  border-left:3px solid var(--ac);
-  border-radius:16px 0 0 16px;
-  padding:2rem 1.8rem 1.8rem;
-  transition:transform .55s cubic-bezier(.16,1,.3,1);
-  backdrop-filter:blur(40px);
-}
+/* ── PANEL (billboard popup) ── */
+#panel{position:fixed;right:0;top:50%;transform:translateY(-50%) translateX(108%);z-index:20;width:min(400px,88vw);background:rgba(4,4,4,.96);border-left:3px solid var(--ac);border-radius:14px 0 0 14px;padding:1.8rem 1.6rem 1.6rem;transition:transform .5s cubic-bezier(.16,1,.3,1);backdrop-filter:blur(40px)}
 #panel.on{transform:translateY(-50%) translateX(0)}
-.p-close{
-  position:absolute;top:.8rem;right:.8rem;
-  background:none;border:1px solid rgba(255,255,255,.1);
-  color:#444;width:26px;height:26px;border-radius:6px;
-  cursor:pointer;font-size:.85rem;transition:all .2s;
-}
-.p-close:hover{color:#fff;border-color:rgba(255,255,255,.35)}
-.p-cat{font-family:var(--h);font-size:.45rem;letter-spacing:.35em;color:var(--ac);margin-bottom:.35rem}
-.p-title{font-family:var(--h);font-size:1.2rem;font-weight:700;margin-bottom:.8rem;line-height:1.2}
-.p-body{font-size:.9rem;line-height:1.75;color:#888}
-.p-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.9rem}
-.chip{
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
-  border-radius:4px;padding:.2rem .6rem;font-size:.68rem;color:#666;
-  letter-spacing:.06em;
-}
-.chip.ac{
-  border-color:var(--ac);color:var(--ac);
-  background:rgba(225,6,0,.07);
-}
-.p-links{margin-top:1rem;display:flex;flex-wrap:wrap;gap:.5rem}
-.p-link{
-  font-family:var(--h);font-size:.5rem;letter-spacing:.15em;
-  padding:.4rem 1rem;border-radius:6px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
-  color:#bbb;cursor:pointer;transition:all .25s;text-decoration:none;display:inline-block;
-}
-.p-link:hover{background:var(--ac);border-color:var(--ac);color:#fff}
+.pn-close{position:absolute;top:.75rem;right:.75rem;background:none;border:1px solid rgba(255,255,255,.09);color:#333;width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.8rem;transition:all .2s}
+.pn-close:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.pn-cat{font-family:var(--h);font-size:.43rem;letter-spacing:.3em;color:var(--ac);margin-bottom:.3rem}
+.pn-title{font-family:var(--h);font-size:1.1rem;font-weight:700;margin-bottom:.7rem}
+.pn-body{font-size:.85rem;line-height:1.75;color:#777}
+.pn-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.75rem}
+.pn-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:.16rem .52rem;font-size:.64rem;color:#555;letter-spacing:.06em}
+.pn-links{margin-top:.85rem;display:flex;flex-wrap:wrap;gap:.45rem}
+.pn-link{font-family:var(--h);font-size:.48rem;letter-spacing:.13em;padding:.35rem .9rem;border-radius:5px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#999;text-decoration:none;display:inline-block;transition:all .22s}
+.pn-link:hover{background:var(--ac);border-color:var(--ac);color:#fff}
 
-/* ─────────────────────────────────────────────
-   SPONSOR BANNERS (inline HTML overlays triggered by JS)
-───────────────────────────────────────────── */
-#sponsors{
-  position:fixed;top:52px;right:1.2rem;z-index:8;
-  display:none;flex-direction:column;gap:.4rem;
-}
-#sponsors.on{display:flex}
-.sp-badge{
-  font-size:.5rem;padding:.25rem .6rem;border-radius:4px;
-  letter-spacing:.12em;opacity:.55;
-  transition:opacity .3s;
-}
-.sp-badge:hover{opacity:1}
-.sp-rolex{
-  font-family:'Times New Roman',serif;color:#c8a84b;
-  border:1px solid rgba(200,168,75,.3);
-  background:rgba(200,168,75,.06);
-}
-.sp-dhl{
-  font-family:var(--h);font-weight:700;color:#fc0;
-  background:#d40511;padding:.25rem .7rem;
-}
-.sp-aramco{
-  font-family:var(--h);color:#00a3e0;
-  border:1px solid rgba(0,163,224,.3);background:rgba(0,163,224,.06);
-}
-.sp-pirelli{
-  font-family:'Times New Roman',serif;color:#eee;
-  border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);
-}
-.sp-aws{
-  font-family:var(--h);color:#ff9900;
-  border:1px solid rgba(255,153,0,.25);background:rgba(255,153,0,.05);
-}
+/* ── MINI MAP ── */
+#minimap{position:fixed;bottom:2.2rem;left:1rem;z-index:10;display:none;width:100px;height:80px;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:rgba(0,0,0,.6)}
+#minimap.on{display:block}
+#minimap canvas{width:100%;height:100%}
 
-/* ─────────────────────────────────────────────
-   CONFETTI
-───────────────────────────────────────────── */
-#cconf{position:fixed;inset:0;z-index:35;pointer-events:none;display:none}
-#cconf.on{display:block}
-
-/* ─────────────────────────────────────────────
-   PODIUM
-───────────────────────────────────────────── */
-#pod{
-  position:fixed;inset:0;z-index:45;
-  background:rgba(0,0,0,.93);
-  display:none;flex-direction:column;
-  align-items:center;justify-content:center;
-  opacity:0;transition:opacity .75s;
-  overflow-y:auto;padding:2rem 1rem 3rem;
-}
+/* ── PODIUM ── */
+#pod{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.93);display:none;flex-direction:column;align-items:center;justify-content:flex-start;opacity:0;transition:opacity .75s;overflow-y:auto;padding:2.5rem 1.5rem 4rem}
 #pod.on{display:flex}
 #pod.vis{opacity:1}
+.pod-eyebrow{font-family:var(--h);font-size:.48rem;letter-spacing:.5em;color:var(--ac);margin-bottom:.6rem;text-align:center}
+.pod-flag{font-size:2.5rem;margin-bottom:.4rem;text-align:center}
+.pod-h{font-family:var(--h);font-size:clamp(1.5rem,4vw,2.5rem);font-weight:900;letter-spacing:.12em;background:linear-gradient(135deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:.3rem}
+.pod-info{font-size:.7rem;color:#333;letter-spacing:.18em;text-align:center;margin-bottom:.6rem}
+.funfact{background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.18);border-radius:10px;padding:1rem 1.4rem;max-width:500px;width:100%;text-align:center;margin-bottom:2rem}
+.ff-label{font-family:var(--h);font-size:.44rem;letter-spacing:.3em;color:#ffd700;margin-bottom:.35rem}
+.ff-text{font-size:.88rem;color:#888;line-height:1.65}
+.pod-stands{display:flex;align-items:flex-end;gap:.6rem;margin-bottom:2rem}
+.pb{display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.pb:hover .pbc{transform:translateY(-5px)}
+.pbc{width:130px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:.9rem .65rem .75rem;text-align:center;transition:transform .2s,border-color .25s,box-shadow .25s;margin-bottom:.45rem}
+.pb:hover .pbc{border-color:var(--pc);box-shadow:0 10px 35px -8px var(--pc)}
+.pb-ico{font-size:1.7rem;margin-bottom:.35rem}
+.pb-cat{font-family:var(--h);font-size:.4rem;letter-spacing:.1em;color:#2a2a2a;margin-bottom:.2rem}
+.pb-name{font-size:.8rem;font-weight:600}
+.pb-stand{width:130px;background:var(--pc);border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center}
+.p1h{height:80px}.p2h{height:55px}.p3h{height:38px}
+.pb-pos{font-family:var(--h);font-size:1.5rem;font-weight:900;color:rgba(0,0,0,.55)}
+.pod-links{display:flex;gap:.85rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.5rem}
+.pod-link{font-family:var(--h);font-size:.52rem;letter-spacing:.16em;padding:.55rem 1.5rem;border-radius:7px;border:1px solid rgba(255,255,255,.11);color:#aaa;text-decoration:none;transition:all .22s}
+.pod-link:hover{background:var(--ac);border-color:var(--ac);color:#fff}
+.p-restart{font-family:var(--h);font-size:.58rem;letter-spacing:.18em;background:none;border:1px solid rgba(255,255,255,.08);color:#2a2a2a;padding:.65rem 2.2rem;border-radius:7px;cursor:pointer;transition:all .22s}
+.p-restart:hover{color:#fff;border-color:rgba(255,255,255,.3)}
 
-.pod-header{text-align:center;margin-bottom:1.8rem}
-.pod-flag{font-size:2.2rem;margin-bottom:.4rem}
-.pod-circ{font-family:var(--h);font-size:.5rem;letter-spacing:.35em;color:#444;margin-bottom:.3rem}
-.pod-h{
-  font-family:var(--h);font-size:clamp(1.5rem,4vw,2.5rem);
-  font-weight:900;letter-spacing:.12em;
-  background:linear-gradient(135deg,#ffd700,#ffaa00);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.pod-driver{font-family:var(--h);font-size:.65rem;letter-spacing:.2em;color:#555;margin-top:.3rem}
+/* ── CONFETTI ── */
+#cconf{position:fixed;inset:0;z-index:65;pointer-events:none;display:none}
+#cconf.on{display:block}
 
-.pod-stands{display:flex;align-items:flex-end;gap:.6rem;margin-bottom:2.5rem}
-.pblock{display:flex;flex-direction:column;align-items:center;cursor:pointer}
-.pblock:hover .pcard{transform:translateY(-6px)}
-.pcard{
-  width:140px;background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.09);border-radius:10px;
-  padding:1rem .7rem .75rem;text-align:center;
-  transition:transform .25s,border-color .25s,box-shadow .25s;
-  margin-bottom:.5rem;
+/* ── POSITION ALERTS ── */
+.overtake-alert{
+  position:fixed;top:55px;left:50%;transform:translateX(-50%);
+  z-index:15;font-family:var(--h);font-size:.6rem;letter-spacing:.2em;
+  padding:.4rem 1.2rem;border-radius:5px;
+  animation:alert-in .3s ease, alert-out .3s ease 2s forwards;
+  pointer-events:none;
 }
-.pblock:hover .pcard{border-color:var(--pc);box-shadow:0 12px 40px -8px var(--pc)}
-.pico{font-size:2rem;margin-bottom:.4rem}
-.plabel{font-family:var(--h);font-size:.42rem;letter-spacing:.12em;color:#333;margin-bottom:.25rem}
-.pname{font-size:.85rem;font-weight:600}
-.pstand{
-  width:140px;background:var(--pc);
-  border-radius:5px 5px 0 0;
-  display:flex;align-items:center;justify-content:center;
-}
-.p1s{height:85px}.p2s{height:58px}.p3s{height:40px}
-.ppos{font-family:var(--h);font-size:1.6rem;font-weight:900;color:rgba(0,0,0,.6)}
+@keyframes alert-in{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes alert-out{to{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+.overtake-alert.ot{background:rgba(255,0,0,.2);border:1px solid rgba(255,0,0,.4);color:#ff6666}
+.overtake-alert.pos{background:rgba(0,200,80,.15);border:1px solid rgba(0,200,80,.35);color:#00c850}
 
-/* Links below podium */
-.pod-links{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;justify-content:center}
-.pod-lnk{
-  font-family:var(--h);font-size:.55rem;letter-spacing:.18em;
-  padding:.6rem 1.6rem;border-radius:7px;
-  border:1px solid rgba(255,255,255,.12);color:#bbb;
-  text-decoration:none;transition:all .25s;
-}
-.pod-lnk:hover{background:var(--ac);border-color:var(--ac);color:#fff}
-
-.prestart{
-  font-family:var(--h);font-size:.6rem;letter-spacing:.2em;
-  background:none;border:1px solid rgba(255,255,255,.1);
-  color:#333;padding:.7rem 2.5rem;border-radius:7px;cursor:pointer;
-  transition:all .25s;
-}
-.prestart:hover{color:#fff;border-color:rgba(255,255,255,.35)}
-
-/* ─────────────────────────────────────────────
-   UTILS
-───────────────────────────────────────────── */
-@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+/* ── UTILS ── */
+@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-
 <canvas id="c"></canvas>
 <div id="ss"></div>
 
-<!-- ═══════════════ SELECTION ═══════════════ -->
-<div id="sel">
-  <div class="sel-eyebrow">2024 FIA Formula One World Championship</div>
-  <h1 class="sel-h1">PORTFOLIO<br>GRAND PRIX</h1>
-  <div class="sel-name">UTKARSH MANGAL</div>
-  <p class="sel-sub">CentraleSupélec × Mahindra University</p>
-
-  <div class="ticker-wrap">
-    <div class="ticker-inner" id="ticker"></div>
-  </div>
-
-  <div class="sel-ask">Select your favourite driver to begin</div>
-  <div class="dgrid" id="dgrid"></div>
+<!-- ═══ SCREEN 1: DRIVER ═══ -->
+<div class="screen" id="scr-d">
+  <div class="eyebrow">2024 FIA Formula One World Championship</div>
+  <h1 class="main-title">PORTFOLIO<br>GRAND PRIX</h1>
+  <div style="font-family:var(--h);font-size:.9rem;letter-spacing:.3em;color:var(--ac);margin-bottom:.4rem;animation:fu .7s ease .06s both">UTKARSH MANGAL</div>
+  <p class="sub-title">CentraleSupélec · Mahindra University</p>
+  <div class="ticker-wrap"><div class="ticker-inner" id="ticker"></div></div>
+  <div class="section-ask">Step 1 of 2 — Pick your driver</div>
+  <div class="d-grid" id="dgrid"></div>
 </div>
 
-<!-- ═══════════════ LIGHTS ═══════════════ -->
+<!-- ═══ SCREEN 2: CIRCUIT ═══ -->
+<div class="screen hidden" id="scr-c">
+  <div class="eyebrow" id="c-eyebrow">Selected: —</div>
+  <h1 class="main-title">CHOOSE YOUR<br>CIRCUIT</h1>
+  <p class="sub-title">10 legendary venues — 3 laps each</p>
+  <div class="section-ask">Step 2 of 2 — Where do you want to race?</div>
+  <div class="c-grid" id="cgrid"></div>
+</div>
+
+<!-- ═══ LIGHTS ═══ -->
 <div id="lgts">
-  <div class="radio-msg" id="radiointro">Waiting for the grid...</div>
-  <div class="lrow" id="lrow"></div>
-  <div class="gotext" id="gotxt">GO!</div>
+  <div class="l-radio" id="l-radio">Grid forming…</div>
+  <div class="l-row" id="l-row"></div>
+  <div class="go-text" id="go-txt">GO!</div>
 </div>
 
-<!-- ═══════════════ RACE HUD ═══════════════ -->
+<!-- ═══ RACE HUD ═══ -->
 <div id="topbar">
   <span class="tb-flag" id="tb-flag"></span>
-  <span class="tb-circuit" id="tb-circuit">GRAND PRIX</span>
+  <span class="tb-circ" id="tb-circ">—</span>
   <div class="tb-sep"></div>
-  <span class="tb-driver" id="tb-driver">VER</span>
-  <div class="rolex-wrap">
-    <span class="rolex-crown">♛</span>
-    <span class="rolex-logo">ROLEX</span>
-    <span id="rtime">00:00:00</span>
+  <span class="tb-drv" id="tb-drv">VER</span>
+  <div class="tb-sep"></div>
+  <span class="tb-lap">LAP <span id="lapn">1</span>/3</span>
+  <div class="rolex">
+    <span style="font-size:.7rem">♛</span>
+    <span class="rolex-l">ROLEX</span>
+    <span id="rtime">00:00.000</span>
   </div>
 </div>
-<div id="progress"><div id="progfill"></div></div>
+<div id="pbar"><div id="pfill"></div></div>
 
 <div id="lhud">
-  <div class="lhud-pos" id="lhud-pos">P1</div>
-  <div class="lhud-label">RACE POSITION</div>
-  <div class="lhud-tire">
-    <div class="tire-circle" id="tire-c"></div>
-    <span class="tire-name" id="tire-n">SOFT</span>
+  <div class="pos-big" id="pos-n">P1</div>
+  <div class="pos-lbl">RACE POSITION</div>
+  <div class="tire-row">
+    <div class="tire-dot" id="tire-dot" style="--tc:#e10600">S</div>
+    <span class="tire-lbl" id="tire-lbl" style="--tc:#e10600">SOFT</span>
   </div>
-  <div class="drs-btn" id="drs-btn">DRS</div>
-  <div class="gap-display">GAP AHEAD: <span class="gap-val" id="gap-val">—</span></div>
-  <div class="sectors" id="sectors">
-    <div class="sec" id="s1">S1</div>
-    <div class="sec" id="s2">S2</div>
-    <div class="sec" id="s3">S3</div>
+  <div class="drs" id="drs-btn">DRS</div>
+  <div class="gap-row" id="gap-row">GAP: <span id="gap-v">—</span></div>
+  <div class="secs" id="secs">
+    <div class="sec" id="sc1">S1</div>
+    <div class="sec" id="sc2">S2</div>
+    <div class="sec" id="sc3">S3</div>
   </div>
-  <div class="lap-ctr">LAP <span class="lap-n" id="lapn">1</span> / 5</div>
 </div>
 
 <div id="rhud">
-  <div class="rpm-bar-wrap" id="rpmbar"></div>
+  <div class="rpm-segs" id="rpm-segs"></div>
   <div id="spd-n">0</div>
-  <div class="spd-unit">KM/H</div>
-  <div id="gear-n">—</div>
-  <div class="pirelli-badge">
-    <div class="pir-circle" id="pir-c" style="border-color:#e10600;color:#e10600">S</div>
-    PIRELLI P ZERO
+  <div class="spd-u">KM/H</div>
+  <div id="gear">N</div>
+  <div class="pir-row">
+    <div class="pir-dot" id="pir-d" style="border-color:#e10600;color:#e10600">S</div>
+    <span class="pir-lbl">PIRELLI P ZERO</span>
   </div>
 </div>
 
-<div id="sponsors">
-  <div class="sp-badge sp-rolex">♛ ROLEX — OFFICIAL TIMEPIECE</div>
-  <div class="sp-badge sp-pirelli">PIRELLI P ZERO™</div>
-  <div class="sp-badge sp-dhl">DHL — FASTEST LAP</div>
-  <div class="sp-badge sp-aramco">ARAMCO</div>
-  <div class="sp-badge sp-aws">Powered by AWS</div>
+<div id="steer-hud">
+  <div class="steer-ring" id="steer-ring">🏎</div>
+  <div class="steer-keys">← A · D → STEER · W/↑ THROTTLE</div>
 </div>
 
-<div id="radio"><div class="radio-icon">📻 TEAM RADIO</div><div class="radio-txt" id="radio-txt"></div></div>
-<div id="hint"><div class="hint-t">↓ SCROLL · SPACE · ↑↓ ARROW KEYS</div></div>
+<div id="radio"><div class="radio-ico">📻 TEAM RADIO</div><div class="radio-msg" id="radio-txt"></div></div>
+<div id="minimap"><canvas id="mmc"></canvas></div>
 
-<!-- ═══════════════ PANEL ═══════════════ -->
+<!-- ═══ PITSTOP ═══ -->
+<div id="pitstop">
+  <div class="pit-header">
+    <div class="pit-anim" id="pit-anim">🔧</div>
+    <div class="pit-title" id="pit-title">PIT STOP — LAP 1</div>
+    <div class="pit-sub">TYRES BEING CHANGED — ENGINEERS WORKING</div>
+  </div>
+  <div class="pit-card" id="pit-card">
+    <div class="pit-cat" id="pit-cat"></div>
+    <div class="pit-ctitle" id="pit-ctitle"></div>
+    <div class="pit-body" id="pit-body"></div>
+    <div class="pit-chips" id="pit-chips"></div>
+    <div class="pit-links" id="pit-links"></div>
+  </div>
+  <div class="pit-timer">DRIVER RELEASED IN <span id="pit-count">5</span>s</div>
+</div>
+
+<!-- ═══ PANEL ═══ -->
 <div id="panel">
-  <button class="p-close" onclick="closePanel()">✕</button>
-  <div class="p-cat" id="ptag"></div>
-  <div class="p-title" id="ptit"></div>
-  <div class="p-body" id="pbod"></div>
+  <button class="pn-close" onclick="closePanel()">✕</button>
+  <div class="pn-cat" id="pn-cat"></div>
+  <div class="pn-title" id="pn-title"></div>
+  <div class="pn-body" id="pn-body"></div>
 </div>
 
-<!-- ═══════════════ CONFETTI ═══════════════ -->
+<!-- ═══ CONFETTI ═══ -->
 <canvas id="cconf"></canvas>
 
-<!-- ═══════════════ PODIUM ═══════════════ -->
+<!-- ═══ PODIUM ═══ -->
 <div id="pod">
-  <div class="pod-header">
-    <div class="pod-flag" id="pod-flag">🏆</div>
-    <div class="pod-circ" id="pod-circ">PORTFOLIO GRAND PRIX — RACE RESULT</div>
-    <div class="pod-h">CHEQUERED FLAG</div>
-    <div class="pod-driver" id="pod-driver"></div>
+  <div class="pod-eyebrow">CHEQUERED FLAG — RACE COMPLETE</div>
+  <div class="pod-flag" id="pod-flag">🏆</div>
+  <div class="pod-h">PORTFOLIO GRAND PRIX</div>
+  <div class="pod-info" id="pod-info">DRIVER: VER · CIRCUIT: MONACO</div>
+  <div class="funfact">
+    <div class="ff-label">🏎 F1 FUN FACT</div>
+    <div class="ff-text" id="ff-text">Loading fun fact...</div>
   </div>
   <div class="pod-stands">
-    <div class="pblock" style="--pc:#888">
-      <div class="pcard">
-        <div class="pico">⚙️</div>
-        <div class="plabel">P2 · RACE HISTORY</div>
-        <div class="pname">Projects</div>
-      </div>
-      <div class="pstand p2s"><span class="ppos">2</span></div>
+    <div class="pb" style="--pc:#888" onclick="window.open('https://github.com/um26','_blank')">
+      <div class="pbc"><div class="pb-ico">⚙️</div><div class="pb-cat">P2 · RACE HISTORY</div><div class="pb-name">Projects</div></div>
+      <div class="pb-stand p2h"><span class="pb-pos">2</span></div>
     </div>
-    <div class="pblock" style="--pc:#ffd700">
-      <div class="pcard" style="border-color:rgba(255,215,0,.25)">
-        <div class="pico">👤</div>
-        <div class="plabel">P1 · DRIVER PROFILE</div>
-        <div class="pname">About Me</div>
-      </div>
-      <div class="pstand p1s"><span class="ppos">1</span></div>
+    <div class="pb" style="--pc:#ffd700" onclick="window.open('https://www.linkedin.com/in/utkarsh-mangal','_blank')">
+      <div class="pbc" style="border-color:rgba(255,215,0,.2)"><div class="pb-ico">👤</div><div class="pb-cat">P1 · DRIVER PROFILE</div><div class="pb-name">About Me</div></div>
+      <div class="pb-stand p1h"><span class="pb-pos">1</span></div>
     </div>
-    <div class="pblock" style="--pc:#cd7f32">
-      <div class="pcard">
-        <div class="pico">📡</div>
-        <div class="plabel">P3 · TEAM RADIO</div>
-        <div class="pname">Contact</div>
-      </div>
-      <div class="pstand p3s"><span class="ppos">3</span></div>
+    <div class="pb" style="--pc:#cd7f32" onclick="location.href='mailto:umangal2003@gmail.com'">
+      <div class="pbc"><div class="pb-ico">📡</div><div class="pb-cat">P3 · TEAM RADIO</div><div class="pb-name">Contact</div></div>
+      <div class="pb-stand p3h"><span class="pb-pos">3</span></div>
     </div>
   </div>
   <div class="pod-links">
-    <a href="https://www.linkedin.com/in/utkarsh-mangal2" target="_blank" class="pod-lnk">💼 LinkedIn</a>
-    <a href="https://github.com/um26" target="_blank" class="pod-lnk">🐙 GitHub</a>
-    <a href="mailto:umangal2003@gmail.com" class="pod-lnk">📧 Email</a>
-    <a href="tel:+919784871049" class="pod-lnk">📞 +91-9784871049</a>
+    <a href="https://www.linkedin.com/in/utkarsh-mangal" target="_blank" class="pod-link">💼 LinkedIn</a>
+    <a href="https://github.com/um26" target="_blank" class="pod-link">🐙 GitHub</a>
+    <a href="mailto:umangal2003@gmail.com" class="pod-link">📧 Email</a>
+    <a href="tel:+919784871049" class="pod-link">📞 Call</a>
   </div>
-  <button class="prestart" onclick="restart()">↺ &nbsp;NEW RACE</button>
+  <button class="p-restart" onclick="restart()">↺ &nbsp;NEW RACE</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
 
-// ═══════════════════════════════════════════════════════════════
-//  DRIVER DATA — 2024 F1 Top 10
-// ═══════════════════════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  DATA                                                            ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+const F1_FACTS = [
+  "Michael Schumacher's 2004 Ferrari F2004 could generate over 3G of lateral force through high-speed corners.",
+  "An F1 car loses around 35kg of fuel per race hour — over 150kg for a full grand prix distance.",
+  "F1 tyres reach operating temperature of 100–140°C. Below 80°C they provide almost no grip.",
+  "Max Verstappen became the youngest F1 points scorer at 17 years, 166 days old.",
+  "Ayrton Senna won 41 races at Monaco, Interlagos, Silverstone and other iconic venues across his career.",
+  "An F1 car generates so much downforce it could drive upside-down in a tunnel at 130 mph.",
+  "DRS (Drag Reduction System) reduces drag by ~25 points, adding up to 10–12 km/h on straights.",
+  "Lewis Hamilton has 103 F1 race wins — almost 30 more than the second-highest driver.",
+  "The Monaco pit lane has a 60 km/h speed limit — the lowest on the calendar.",
+  "A modern F1 power unit (engine + ERS + gearbox) costs over $20 million per season.",
+  "Ferrari is the only constructor to have competed in every season since the 1950 world championship.",
+  "F1 steering wheels contain over 20 buttons, dials, and paddles — and cost over $60,000 each.",
+  "The fastest pit stop ever was 1.82 seconds by Red Bull at the 2023 São Paulo Grand Prix.",
+  "Monza is known as the 'Temple of Speed' — average lap speed exceeds 260 km/h.",
+  "Spa-Francorchamps' Eau Rouge/Raidillon combination involves 38m of elevation change in under 200 metres.",
+  "Singapore GP is the only night race to run on street circuits under 1,500 floodlights.",
+  "Suzuka is the only current circuit with a figure-8 layout — including an overhead crossover bridge.",
+  "Abu Dhabi's Yas Marina circuit features a hotel (Yas Viceroy) literally built over the track.",
+];
+
 const DRIVERS = {
-  verstappen:{
-    name:'MAX VERSTAPPEN',short:'VER',num:'1',
-    team:'ORACLE RED BULL RACING',flag:'🇳🇱',
-    dc:'#3671C6',dg:'rgba(54,113,198,.55)',
-    car:0x1a2c72,wing:0xff8000,floor:0x0d1940,
-    radio:'"P1, everything is in your hands. Box position understood. Go, go, go!"',
-    intro:'Outstanding work so far. Margin to P2 is growing every lap.',
-    pos:1,gap:'LEADER'
+  ver:{name:'MAX VERSTAPPEN',short:'VER',num:'1',team:'Red Bull Racing',flag:'🇳🇱',dc:'#3671C6',dg:'rgba(54,113,198,.5)',car:0x1a2c72,wing:0xff8000,radio:'"VER BOX, BOX. We have the pace. Make it count."',pos:1,gap:'LEADER'},
+  nor:{name:'LANDO NORRIS',short:'NOR',num:'4',team:'McLaren',flag:'🇬🇧',dc:'#FF8000',dg:'rgba(255,128,0,.5)',car:0xff8000,wing:0x0093d0,radio:'"NOR mega pace. Tyres in window. Yesss!"',pos:2,gap:'1.4s'},
+  lec:{name:'CHARLES LECLERC',short:'LEC',num:'16',team:'Ferrari',flag:'🇲🇨',dc:'#E8002D',dg:'rgba(232,0,45,.5)',car:0xe8002d,wing:0xffd700,radio:'"LEC — Forza Ferrari! Push now, Tifosi watching."',pos:3,gap:'3.7s'},
+  pia:{name:'OSCAR PIASTRI',short:'PIA',num:'81',team:'McLaren',flag:'🇦🇺',dc:'#FF8000',dg:'rgba(255,128,0,.4)',car:0xff8000,wing:0x0093d0,radio:'"PIA stay consistent. Sector 2 looking good."',pos:4,gap:'5.1s'},
+  sai:{name:'CARLOS SAINZ',short:'SAI',num:'55',team:'Ferrari',flag:'🇪🇸',dc:'#E8002D',dg:'rgba(232,0,45,.4)',car:0xe8002d,wing:0xffd700,radio:'"SAI push now! Vamos, the window is open."',pos:5,gap:'8.8s'},
+  rus:{name:'GEORGE RUSSELL',short:'RUS',num:'63',team:'Mercedes',flag:'🇬🇧',dc:'#27F4D2',dg:'rgba(39,244,210,.45)',car:0x00b4a0,wing:0x555,radio:'"RUS overcut is viable. Give it everything."',pos:6,gap:'11.2s'},
+  ham:{name:'LEWIS HAMILTON',short:'HAM',num:'44',team:'Mercedes',flag:'🇬🇧',dc:'#27F4D2',dg:'rgba(39,244,210,.4)',car:0x00b4a0,wing:0x555,radio:'"HAM this is your moment. Hammer time."',pos:7,gap:'14.5s'},
+  per:{name:'SERGIO PÉREZ',short:'PER',num:'11',team:'Red Bull Racing',flag:'🇲🇽',dc:'#3671C6',dg:'rgba(54,113,198,.4)',car:0x1a2c72,wing:0xff8000,radio:'"PER gap to P6 stable. Para México!"',pos:8,gap:'17.3s'},
+  alo:{name:'FERNANDO ALONSO',short:'ALO',num:'14',team:'Aston Martin',flag:'🇪🇸',dc:'#358C75',dg:'rgba(53,140,117,.5)',car:0x005b4e,wing:0x00a36c,radio:'"ALO no attack, no glory. This is what we came for."',pos:9,gap:'21.0s'},
+  str:{name:'LANCE STROLL',short:'STR',num:'18',team:'Aston Martin',flag:'🇨🇦',dc:'#358C75',dg:'rgba(53,140,117,.4)',car:0x005b4e,wing:0x00a36c,radio:'"STR keep it on the island. Clean laps."',pos:10,gap:'24.8s'}
+};
+
+const CIRCUITS = {
+  monaco:{
+    name:'MONACO',country:'Monte Carlo, MC',flag:'🇲🇨',laps:'78',len:'3.337 km',ac:'#e10600',bg:'#080820',fog:0x0d0d28,skyTop:0x0a0a1a,skyBot:0x1a0008,
+    desc:'The jewel of the crown — tight streets, legendary glamour',
+    svgPath:'M20,90 L20,50 Q20,18 50,16 L100,16 Q130,18 130,48 L130,70 Q128,90 105,90 L80,88 Q60,86 60,106 L60,128 Q60,148 82,148 L145,148',
+    landmark:'tunnel',
+    pts:[[0,0,0],[55,0,-38],[95,0,-95],[90,0,-165],[65,0,-215],[38,0,-252],[8,0,-268],[-18,0,-258],[-38,0,-238],[-58,0,-200],[-68,0,-155],[-64,0,-108],[-42,0,-62],[-12,0,-22]]
   },
-  norris:{
-    name:'LANDO NORRIS',short:'NOR',num:'4',
-    team:'MCLAREN FORMULA 1 TEAM',flag:'🇬🇧',
-    dc:'#FF8000',dg:'rgba(255,128,0,.55)',
-    car:0xff8000,wing:0x0093d0,floor:0xd46a00,
-    radio:'"Lando, car is mega. Tyres are in the window. Yesssss lets go!"',
-    intro:'You\'re on for fastest lap. Gap to Verstappen — 1.4 seconds.',
-    pos:2,gap:'GAP: 1.4s'
+  silverstone:{
+    name:'SILVERSTONE',country:'Northamptonshire, UK',flag:'🇬🇧',laps:'52',len:'5.891 km',ac:'#1f8ce0',bg:'#080f08',fog:0x111a12,skyTop:0x070d07,skyBot:0x0a1708,
+    desc:'Home of British motorsport — fast flowing corners',
+    svgPath:'M14,78 Q14,22 75,16 Q140,10 148,72 Q155,134 75,140 Q15,146 14,78',
+    landmark:'grandstand',
+    pts:[[0,0,0],[85,0,-30],[165,0,-55],[215,0,-105],[225,0,-185],[200,0,-268],[140,0,-325],[55,0,-348],[-45,0,-335],[-125,0,-292],[-178,0,-223],[-190,0,-148],[-162,0,-78],[-88,0,-28]]
   },
-  leclerc:{
-    name:'CHARLES LECLERC',short:'LEC',num:'16',
-    team:'SCUDERIA FERRARI HP',flag:'🇲🇨',
-    dc:'#E8002D',dg:'rgba(232,0,45,.55)',
-    car:0xe8002d,wing:0xffd700,floor:0xb0001f,
-    radio:'"Charles, Forza Ferrari! The Tifosi are watching. Andiamo!"',
-    intro:'Monitor the right rear temperature. Otherwise everything perfect.',
-    pos:3,gap:'GAP: 3.7s'
+  monza:{
+    name:'MONZA',country:'Lombardy, Italy',flag:'🇮🇹',laps:'53',len:'5.793 km',ac:'#009246',bg:'#070f07',fog:0x0f1a0f,skyTop:0x050e05,skyBot:0x08150a,
+    desc:'Temple of Speed — flat out, 260 km/h average',
+    svgPath:'M12,60 L150,60 Q162,60 162,72 L162,100 Q162,118 140,118 L95,118 L95,100 Q95,78 72,78 L12,78 Q2,78 2,68 L2,60',
+    landmark:'parabolica',
+    pts:[[0,0,0],[82,0,-18],[165,0,-18],[225,0,-55],[245,0,-128],[245,0,-210],[215,0,-280],[162,0,-318],[98,0,-328],[28,0,-315],[-28,0,-280],[-55,0,-215],[-60,0,-145],[-45,0,-75],[-14,0,-28]]
   },
-  piastri:{
-    name:'OSCAR PIASTRI',short:'PIA',num:'81',
-    team:'MCLAREN FORMULA 1 TEAM',flag:'🇦🇺',
-    dc:'#FF8000',dg:'rgba(255,128,0,.45)',
-    car:0xff8000,wing:0x0093d0,floor:0xd46a00,
-    radio:'"Oscar, tyre delta is looking really good. Consistent. Very nice."',
-    intro:'We\'re thinking about an early stop. Stay in the zone.',
-    pos:4,gap:'GAP: 5.1s'
+  spa:{
+    name:'SPA-FRANCORCHAMPS',country:'Ardennes, Belgium',flag:'🇧🇪',laps:'44',len:'7.004 km',ac:'#ffd700',bg:'#070d07',fog:0x0e1a0e,skyTop:0x060e06,skyBot:0x0a150a,
+    desc:'The greatest circuit on earth — Eau Rouge changes careers',
+    svgPath:'M10,50 Q10,18 50,16 L90,14 Q115,14 118,44 L118,70 Q116,92 95,102 L72,112 Q55,122 55,148 L55,162 Q55,178 72,178 L142,178',
+    landmark:'eau_rouge',
+    pts:[[0,0,0],[72,0,-52],[132,8,-124],[148,14,-190],[140,12,-260],[102,8,-315],[42,4,-360],[-32,2,-378],[-100,0,-356],[-155,0,-295],[-198,0,-218],[-188,0,-138],[-150,0,-68],[-82,0,-20]]
   },
-  sainz:{
-    name:'CARLOS SAINZ',short:'SAI',num:'55',
-    team:'SCUDERIA FERRARI HP',flag:'🇪🇸',
-    dc:'#E8002D',dg:'rgba(232,0,45,.4)',
-    car:0xe8002d,wing:0xffd700,floor:0xb0001f,
-    radio:'"Carlos, buen trabajo. Defending the undercut. Vamos!"',
-    intro:'Fuel delta is positive. Push now — window is open.',
-    pos:5,gap:'GAP: 8.8s'
+  abudhabi:{
+    name:'ABU DHABI',country:'Yas Marina, UAE',flag:'🇦🇪',laps:'58',len:'5.281 km',ac:'#00d2be',bg:'#0a0a14',fog:0x12121e,skyTop:0x080810,skyBot:0x180a04,
+    desc:'Season finale — hotel arch over track, marina at sunset',
+    svgPath:'M16,82 L16,40 Q16,14 42,14 L102,14 Q128,14 128,40 L128,64 Q128,84 104,84 L82,84 Q66,84 66,98 L66,118 Q66,132 82,132 L130,132 Q144,132 144,116 L144,84',
+    landmark:'yas_hotel',
+    pts:[[0,0,0],[72,0,-28],[145,0,-28],[192,0,-72],[200,0,-145],[185,0,-202],[150,0,-242],[100,0,-260],[48,0,-248],[12,0,-225],[-18,0,-195],[-40,0,-158],[-38,0,-102],[-18,0,-48]]
   },
-  russell:{
-    name:'GEORGE RUSSELL',short:'RUS',num:'63',
-    team:'MERCEDES-AMG PETRONAS',flag:'🇬🇧',
-    dc:'#27F4D2',dg:'rgba(39,244,210,.5)',
-    car:0x00b4a0,wing:0x444444,floor:0x007e6e,
-    radio:'"George, we need every tenth. The pace is there. Maximise it."',
-    intro:'Overcut looks viable. Hamilton is 3 seconds behind.',
-    pos:6,gap:'GAP: 11.2s'
+  suzuka:{
+    name:'SUZUKA',country:'Mie, Japan',flag:'🇯🇵',laps:'53',len:'5.807 km',ac:'#ff0000',bg:'#080808',fog:0x111111,skyTop:0x060606,skyBot:0x0a0808,
+    desc:'Figure-8 circuit — 130R and Degner define champions',
+    svgPath:'M30,50 Q85,10 130,50 Q155,80 125,115 Q95,148 60,115 Q25,80 30,50',
+    landmark:'crossover',
+    pts:[[0,0,0],[62,0,-50],[102,0,-112],[102,0,-180],[70,0,-238],[22,0,-278],[-40,0,-288],[-92,0,-265],[-120,0,-215],[-108,0,-162],[-70,0,-122],[-18,0,-112],[28,0,-132],[54,0,-165],[62,0,-205],[40,0,-248],[-2,0,-268],[-42,0,-250],[-68,0,-208],[-58,0,-165],[-28,0,-148],[12,0,-140],[42,0,-118],[60,0,-78],[38,0,-38]]
   },
-  hamilton:{
-    name:'LEWIS HAMILTON',short:'HAM',num:'44',
-    team:'MERCEDES-AMG PETRONAS',flag:'🇬🇧',
-    dc:'#27F4D2',dg:'rgba(39,244,210,.45)',
-    car:0x00b4a0,wing:0x444444,floor:0x007e6e,
-    radio:'"Lewis, this is your moment. Everything you\'ve got, now."',
-    intro:'We believe. Every lap is building the gap. Hammer time.',
-    pos:7,gap:'GAP: 14.5s'
+  interlagos:{
+    name:'INTERLAGOS',country:'São Paulo, Brazil',flag:'🇧🇷',laps:'71',len:'4.309 km',ac:'#009c3b',bg:'#080f08',fog:0x101810,skyTop:0x060d06,skyBot:0x0a1208,
+    desc:'Anti-clockwise, hilly — Senna\'s home, rain is guaranteed',
+    svgPath:'M75,20 Q125,20 148,65 Q168,110 145,155 Q120,200 75,200 Q28,200 8,155 Q-12,110 8,65 Q30,20 75,20',
+    landmark:'senna_s',
+    pts:[[0,0,0],[-52,0,-42],[-102,0,-92],[-132,0,-162],[-122,0,-242],[-82,0,-302],[-22,0,-342],[55,0,-342],[112,0,-302],[142,0,-232],[132,0,-162],[100,0,-102],[48,0,-50]]
   },
-  perez:{
-    name:'SERGIO PÉREZ',short:'PER',num:'11',
-    team:'ORACLE RED BULL RACING',flag:'🇲🇽',
-    dc:'#3671C6',dg:'rgba(54,113,198,.4)',
-    car:0x1a2c72,wing:0xff8000,floor:0x0d1940,
-    radio:'"Checo, gap to Hamilton is stable. Stay calm. Para México!"',
-    intro:'We\'re managing the situation. Tyre life looks okay.',
-    pos:8,gap:'GAP: 17.3s'
+  melbourne:{
+    name:'MELBOURNE',country:'Albert Park, Australia',flag:'🇦🇺',laps:'58',len:'5.278 km',ac:'#0055a4',bg:'#080a10',fog:0x10141c,skyTop:0x060810,skyBot:0x08100a,
+    desc:'Season opener — fast parkland circuit, Albert Park lake',
+    svgPath:'M15,80 L15,38 Q15,14 42,14 L102,14 Q128,14 128,38 L128,62 Q128,82 105,82 L85,82 Q65,80 65,100 L65,125 Q65,148 88,148 L148,148',
+    landmark:'lake',
+    pts:[[0,0,0],[72,0,-30],[142,0,-52],[192,0,-112],[192,0,-192],[162,0,-262],[92,0,-302],[10,0,-302],[-62,0,-270],[-102,0,-212],[-102,0,-142],[-72,0,-82],[-22,0,-30]]
   },
-  alonso:{
-    name:'FERNANDO ALONSO',short:'ALO',num:'14',
-    team:'ASTON MARTIN ARAMCO',flag:'🇪🇸',
-    dc:'#358C75',dg:'rgba(53,140,117,.55)',
-    car:0x005b4e,wing:0x00a36c,floor:0x003d34,
-    radio:'"Fernando — no attack, no glory. This is what we came for."',
-    intro:'Strategy call: push now before the VSC window closes.',
-    pos:9,gap:'GAP: 21.0s'
+  singapore:{
+    name:'SINGAPORE',country:'Marina Bay, Singapore',flag:'🇸🇬',laps:'62',len:'4.940 km',ac:'#ee2e24',bg:'#0a0808',fog:0x1a1010,skyTop:0x080606,skyBot:0x180808,
+    desc:'Night street circuit — 1,500 floodlights, Marina Bay Sands',
+    svgPath:'M20,80 L20,45 Q20,18 48,16 L92,16 Q118,16 120,44 L120,70 Q118,92 96,102 L72,112 Q52,122 52,148 L52,165',
+    landmark:'mbs',
+    pts:[[0,0,0],[52,0,-42],[92,0,-102],[82,0,-168],[52,0,-212],[12,0,-242],[-30,0,-242],[-65,0,-215],[-80,0,-170],[-70,0,-122],[-45,0,-80],[-10,0,-45]]
   },
-  stroll:{
-    name:'LANCE STROLL',short:'STR',num:'18',
-    team:'ASTON MARTIN ARAMCO',flag:'🇨🇦',
-    dc:'#358C75',dg:'rgba(53,140,117,.45)',
-    car:0x005b4e,wing:0x00a36c,floor:0x003d34,
-    radio:'"Lance, everything is fine. Keep the car on the island."',
-    intro:'P10 is solid. Tyre management looking good from here.',
-    pos:10,gap:'GAP: 24.8s'
+  bahrain:{
+    name:'BAHRAIN',country:'Sakhir, Bahrain',flag:'🇧🇭',laps:'57',len:'5.412 km',ac:'#e10600',bg:'#0a0806',fog:0x18120c,skyTop:0x08060a,skyBot:0x180806,
+    desc:'Desert circuit — season opener, floodlit, sand on track',
+    svgPath:'M10,80 Q10,22 75,16 Q140,10 150,72 Q158,132 75,138 Q12,142 10,80',
+    landmark:'desert',
+    pts:[[0,0,0],[72,0,-40],[132,0,-112],[142,0,-192],[112,0,-262],[52,0,-312],[-22,0,-332],[-92,0,-302],[-142,0,-242],[-152,0,-172],[-132,0,-102],[-82,0,-52]]
   }
 };
 
-// ═══════════════════════════════════════════════════════════════
-//  PORTFOLIO SECTIONS (billboard content)
-// ═══════════════════════════════════════════════════════════════
-const SECTIONS = [
+// Portfolio sections shown at pitstops
+const PITSECTIONS = [
   {
-    id:'about',tag:'DRIVER PROFILE',title:'Utkarsh Mangal',
-    color:'#e10600',z:-100,
-    radio:'"Utkarsh coming through sector 1 — this is his home ground."',
-    body:`B.Tech Computational Mathematics at Mahindra University (CGPA 8.3/10, 9.83 in 7th Sem). Currently on a semester exchange at <strong style="color:#fff">CentraleSupélec, Paris</strong> — one of France's <em>Grandes Écoles</em>.
-<br><br>Merit Scholarship recipient (2022–2024). Math Club President, event organiser, and student placement coordinator — someone who builds things and brings people together.`,
-    chips:['CentraleSupélec Paris','Mahindra University','Merit Scholar','Math Club President'],
-    links:[
-      {label:'LinkedIn',href:'https://www.linkedin.com/in/utkarsh-mangal2'},
-      {label:'GitHub',href:'https://github.com/um26'},
-      {label:'Email',href:'mailto:umangal2003@gmail.com'}
-    ]
+    cat:'DRIVER PROFILE',title:'Utkarsh Mangal',
+    color:'#e10600',ico:'👤',lap:1,
+    body:`<strong>B.Tech Computational Mathematics</strong> at Mahindra University, Hyderabad (CGPA 8.3/10 · 9.83 in 7th Sem)<br><br>
+Currently on <strong>Semester Exchange at CentraleSupélec, Paris</strong> — one of France's top engineering <em>Grandes Écoles</em>.<br><br>
+Merit Scholarship recipient (2022–2024). Math Club President (2024–25), leading 20+ members, executing major events and inter-club coordination.`,
+    chips:['CentraleSupélec Paris','Mahindra University','Computational Mathematics','Merit Scholar 2022–24','Math Club President'],
+    links:[{label:'LinkedIn',href:'https://www.linkedin.com/in/utkarsh-mangal'},{label:'GitHub',href:'https://github.com/um26'},{label:'Email',href:'mailto:umangal2003@gmail.com'}]
   },
   {
-    id:'education',tag:'TECHNICAL SPECS',title:'Education',
-    color:'#00d2be',z:-240,
-    radio:'"Sector 2 — onboard data looking exceptional. Education telemetry perfect."',
-    body:`<strong style="color:#fff">CentraleSupélec, Paris</strong> — Semester Exchange (Feb 2026 – Present)<br>
-<strong style="color:#fff">Mahindra University, Hyderabad</strong> — B.Tech Computational Mathematics (2022–Present)
-<br><br>Core coursework spans CS fundamentals, advanced mathematics, and ML theory: OS, Networks, DSA, Algorithms, Stochastic Processes, Functional Analysis, Quantum Computing, PDE, Graph Algorithms, and more.`,
-    chips:['Computer Science','Pure Mathematics','ML Theory','Quantum Computing','Cryptography'],
-    links:[]
-  },
-  {
-    id:'projects',tag:'RACE HISTORY',title:'Projects',
-    color:'#ffd700',z:-385,
-    radio:'"Pit window open — outstanding laps from the project portfolio."',
-    body:`<strong style="color:#fff">CVRP Optimization</strong> (Oct–Dec 2025)<br>
-Analysed Capacitated Vehicle Routing Problem formulations. Studied Genetic Algorithms & Simulated Annealing. Explored real-world applications in Uber, Ola, Zomato logistics at scale.
-<br><br><strong style="color:#fff">Math Club Stock Exchange (MCSE)</strong> (Feb–Apr 2025)<br>
-Conceptualised and launched Mahindra University's first-ever stock market simulation. 16 clubs, 350+ participants. Designed trading mechanics, mathematical framework, real-time volatility triggers, and managed 10 banks + reporters.`,
-    chips:['CVRP','Genetic Algorithms','Simulated Annealing','Stock Simulation','Event Design'],
+    cat:'RACE HISTORY — PROJECTS',title:'Key Projects',
+    color:'#ffd700',ico:'⚙️',lap:2,
+    body:`<strong>🚗 CVRP Optimization</strong> (Oct–Dec 2025)<br>
+Studied Capacitated Vehicle Routing Problem formulations. Explored Genetic Algorithms & Simulated Annealing for large-scale logistics — real-world applications in Uber, Ola, Zomato.<br><br>
+<strong>📈 Math Club Stock Exchange (MCSE)</strong> (Feb–Apr 2025)<br>
+Conceived & launched MU's first-ever stock market simulation — 16 clubs, 350+ participants. Custom mathematical trading framework, real-time volatility triggers, 10 banks & reporter management.`,
+    chips:['CVRP & Routing','Genetic Algorithms','Simulated Annealing','Stock Simulation','Event Design','350+ Participants'],
     links:[{label:'GitHub',href:'https://github.com/um26'}]
-  },
-  {
-    id:'skills',tag:'ENGINEERING SETUP',title:'Skills',
-    color:'#ff8c00',z:-520,
-    radio:'"Final sector — full throttle through the skills straight!"',
-    body:`<strong style="color:#fff">Languages:</strong> Java, Python, SQL, MATLAB<br>
-<strong style="color:#fff">Libraries:</strong> NumPy, Pandas, Spring Boot<br>
-<strong style="color:#fff">Tools:</strong> Git, Excel, Linux<br><br>
-<strong style="color:#fff">Soft Skills:</strong> Leadership, Team Coordination, Analytical Thinking, Communication<br><br>
-Also a Growth & Strategy Intern (Director's Office) at Bonanza Portfolio Ltd — driving business expansion, competitor benchmarking, and digital integration initiatives.`,
-    chips:['Java','Python','SQL','MATLAB','NumPy','Pandas','Spring Boot','Git'],
-    links:[]
-  },
-  {
-    id:'contact',tag:'TEAM RADIO',title:'Contact',
-    color:'#1f8ce0',z:-655,
-    radio:'"Final lap — team says copy your contact details loud and clear."',
-    body:`Open to interesting conversations — research collabs, internship opportunities, or just talking math, markets, and motorsport.
-<br><br>📧 <strong style="color:#fff">umangal2003@gmail.com</strong><br>
-📞 <strong style="color:#fff">+91-9784871049</strong><br>
-📍 <strong style="color:#fff">Paris, France</strong> (currently) / Jaipur, India`,
-    chips:['Available for Internships','Open to Collabs','Paris / India'],
-    links:[
-      {label:'Email Me',href:'mailto:umangal2003@gmail.com'},
-      {label:'LinkedIn',href:'https://www.linkedin.com/in/utkarsh-mangal2'},
-      {label:'GitHub',href:'https://github.com/um26'},
-      {label:'Call',href:'tel:+919784871049'}
-    ]
   }
 ];
 
-// ═══════════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════════
-let renderer,scene,camera,animId;
-let trackGrp,carGrp,WHEELS=[];
-let BTRIG=[];
-let curDriver=null;
-let carZ=5,camZ=10,prevCarZ=5;
-let scrY=0,manS=0;
-let podDone=false;
-let activePanelIdx=-1;
-let raceStart=0;
-let lapN=1;
-const KEYS={};
-const FINISH_Z=-730;
-const RACE_LEN=FINISH_Z-5;
+// Billboard sections (shown as you pass them on track)
+const BOARDS = [
+  {cat:'TECHNICAL SPECS',title:'Skills & Stack',color:'#00d2be',z_t:.35,
+   body:`<strong>Languages:</strong> Java, Python, SQL, MATLAB<br>
+<strong>Libraries:</strong> NumPy, Pandas, Spring Boot<br>
+<strong>Tools:</strong> Git, Excel, Linux<br><br>
+<strong>Coursework highlights:</strong> DSA, OS, Networks, Stochastic Processes, Functional Analysis, Quantum Computing, PDE, Graph Algorithms, Number Theory & Cryptography`,
+   chips:['Java','Python','SQL','MATLAB','NumPy','Pandas','Spring Boot','Git'],
+   links:[]},
+  {cat:'EXPERIENCE',title:'Growth & Strategy Intern',color:'#ff8c00',z_t:.65,
+   body:`<strong>Bonanza Portfolio Ltd</strong> — Director's Office<br>
+Jaipur, Rajasthan · June–Aug 2025<br><br>
+Assisted with strategic & operational initiatives including business expansion and digital integration. Conducted competitor benchmarking and sector analysis to deliver insights supporting leadership decisions.`,
+   chips:['Strategy','Business Expansion','Competitor Analysis','Digital Integration','Leadership'],
+   links:[]},
+  {cat:'LEADERSHIP',title:'Roles & Responsibilities',color:'#1f8ce0',z_t:.82,
+   body:`<strong>President, Math Club (2024–25)</strong><br>
+Led 20+ member team — executed Math Club Stock Exchange & Euler's Quest. Streamlined recruitment, documentation, inter-club coordination.<br><br>
+<strong>Organizer, Aeon Tech Fest (2025)</strong><br>
+Coordinated 15+ clubs — scheduling, logistics, feedback systems.<br><br>
+<strong>Student Placement Coordinator (2024–present)</strong><br>
+Resume & technical prep workshops for juniors.`,
+   chips:['Club President','Tech Fest Organizer','Placement Coordinator','Workshop Speaker'],
+   links:[{label:'LinkedIn',href:'https://www.linkedin.com/in/utkarsh-mangal'}]}
+];
 
-// ═══════════════════════════════════════════════════════════════
-//  TICKER
-// ═══════════════════════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  STATE                                                           ║
+// ╚══════════════════════════════════════════════════════════════════╝
+let curDriver=null,curCircuit=null;
+let renderer,scene,camera,animId;
+let trkGrp,carGrp,aiGrps=[];
+let WHEELS=[];
+let curve,curveLen;
+let prog=0;         // 0..3 (3 laps)
+let speed=0;        // 0..1 normalized
+let lateral=0;      // -1..1 (ratio of half-width)
+let pitDone=[false,false];
+let podDone=false;
+let raceStart=0;
+let panelActive=-1;
+let boardShown=[false,false,false];
+let boardClosed=[false,false,false];
+const KEYS={};
+const MAXSPEED=0.00085;  // progress units per frame at full throttle
+const AI_COUNT=5;
+const aiData=[];
+const TRACK_HALF=6; // half-width in world units for collision
+let audioCtx,engOsc,engGain,engFilter;
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  INIT SCREENS                                                    ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function initTicker(){
-  const items=[
-    '🏁 LIGHTS OUT — 2024 CONSTRUCTORS: <span>McLaren</span> 666pts',
-    '⚡ DRS DETECTION POINT — ZONE ACTIVE',
-    '🔴 SOFT · 🟡 MEDIUM · ⚪ HARD — PIRELLI P ZERO™',
-    '⌛ FASTEST LAP — <span>1:23.456</span>',
-    '🏎️ GRID READY — SELECT YOUR DRIVER',
-    '🏆 2024 WDC: <span>Max Verstappen</span> — 437 points',
-    '📍 PORTFOLIO GRAND PRIX — <span>UTKARSH MANGAL</span>',
-    '🔧 ENGINEERS MONITORING — ALL SYSTEMS NOMINAL',
-  ];
+  const items=['🏁 LIGHTS OUT — 2024 WDC: <span>Max Verstappen</span> 437pts','🔴 SOFT · 🟡 MEDIUM · ⚪ HARD — PIRELLI P ZERO™','⌛ FASTEST LAP — <span>1:23.456</span>','🏆 2024 WCC: <span>McLaren</span> 666pts','📍 PORTFOLIO GP — <span>UTKARSH MANGAL</span>','🔧 PIT LANE SPEED LIMIT 80 km/h','📡 DRS DETECTION ZONE ACTIVE','🏎️ SELECT DRIVER + CIRCUIT — RACE AWAITS'];
   const t=document.getElementById('ticker');
-  // Duplicate for seamless loop
   const all=[...items,...items];
-  t.innerHTML=all.map(i=>`<span class="ticker-item">${i}</span>`).join('');
+  t.innerHTML=all.map(i=>`<span class="t-item">${i}</span>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  DRIVER GRID
-// ═══════════════════════════════════════════════════════════════
 function initDriverGrid(){
   const g=document.getElementById('dgrid');
   Object.entries(DRIVERS).forEach(([k,d])=>{
     const el=document.createElement('div');
-    el.className='dcard';
-    el.style.cssText=`--dc:${d.dc};--dc-glow:${d.dg}`;
-    el.innerHTML=`
-      <span class="d-flag">${d.flag}</span>
-      <div class="d-num">${d.num}</div>
-      <div class="d-team">${d.team}</div>
-      <div class="d-name">${d.name}</div>
-      <div class="d-bar"></div>`;
-    el.onclick=()=>launch(k);
+    el.className='d-card';
+    el.style.cssText=`--dc:${d.dc};--dg:${d.dg}`;
+    el.innerHTML=`<span class="d-flag">${d.flag}</span><div class="d-num">${d.num}</div><div class="d-team">${d.team}</div><div class="d-name">${d.name}</div><div class="d-bar"></div>`;
+    el.onclick=()=>selectDriver(k);
     g.appendChild(el);
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  LAUNCH SEQUENCE
-// ═══════════════════════════════════════════════════════════════
-function launch(key){
-  curDriver=key;
-  const d=DRIVERS[key];
-  setAccent(d.dc);
-
-  document.getElementById('sel').classList.add('out');
-  document.getElementById('c').style.display='block';
-
-  if(!renderer) initThree();
-  buildScene(d);
-
-  setTimeout(()=>startLights(key),600);
+function initCircuitGrid(){
+  const g=document.getElementById('cgrid');
+  Object.entries(CIRCUITS).forEach(([k,c],ci)=>{
+    const el=document.createElement('div');
+    el.className='c-card';
+    el.style.cssText=`--cc:${c.ac};--cg:${c.ac}66`;
+    const pid=`cp_${k}`;
+    el.innerHTML=`
+      <span class="c-flag">${c.flag}</span>
+      <svg viewBox="0 0 160 195" fill="none">
+        <path id="${pid}" d="${c.svgPath}" stroke="rgba(255,255,255,.07)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${c.svgPath}" stroke="${c.ac}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" opacity=".45"/>
+        <circle r="5" fill="${c.ac}"><animateMotion dur="${1.8+ci*.25}s" repeatCount="indefinite"><mpath href="#${pid}"/></animateMotion></circle>
+        <circle r="2.5" fill="#fff" opacity=".6"><animateMotion dur="${1.8+ci*.25}s" repeatCount="indefinite" begin="-0.45s"><mpath href="#${pid}"/></animateMotion></circle>
+      </svg>
+      <div class="c-name">${c.name}</div>
+      <div class="c-country">${c.country}</div>
+      <div class="c-lap">${c.laps} LAPS · ${c.len}</div>`;
+    el.onclick=()=>selectCircuit(k);
+    g.appendChild(el);
+  });
 }
 
-function setAccent(col){
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  FLOW                                                            ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function selectDriver(key){
+  curDriver=key;
+  const d=DRIVERS[key];
+  setAc(d.dc);
+  document.getElementById('c-eyebrow').textContent=`Driver: ${d.name} #${d.num}`;
+  fadeOut('scr-d',()=>{
+    document.getElementById('scr-c').classList.remove('hidden');
+    document.getElementById('scr-c').classList.remove('out');
+  });
+}
+
+function selectCircuit(key){
+  curCircuit=key;
+  const c=CIRCUITS[key];
+  setAc(c.ac);
+  fadeOut('scr-c',()=>{
+    document.getElementById('c').style.display='block';
+    if(!renderer)initThree();
+    buildScene();
+    startLights();
+  });
+}
+
+function fadeOut(id,cb){
+  const el=document.getElementById(id);
+  el.classList.add('out');
+  setTimeout(()=>{el.classList.add('hidden');if(cb)cb()},800);
+}
+
+function setAc(col){
   document.documentElement.style.setProperty('--ac',col);
 }
 
-function startLights(key){
-  const d=DRIVERS[key];
+function startLights(){
+  const d=DRIVERS[curDriver];
   const lgts=document.getElementById('lgts');
   lgts.classList.add('on');
-
-  const ri=document.getElementById('radiointro');
-  ri.textContent=`${d.name} — Car #${d.num} — ${d.team}`;
-  setTimeout(()=>{ri.classList.add('active');ri.textContent=d.intro},400);
-
-  const row=document.getElementById('lrow');
+  const lr=document.getElementById('l-radio');
+  lr.textContent=`${d.name} — #${d.num} — ${d.team} · Starting P${d.pos}`;
+  setTimeout(()=>{lr.classList.add('live');lr.textContent=d.radio.replace(/"/g,'')},500);
+  const row=document.getElementById('l-row');
   row.innerHTML='';
-  for(let i=0;i<5;i++){
-    row.innerHTML+=`<div class="lcol">
-      <div class="lpost"></div>
-      <div class="ldot" id="ld${i}"></div>
-    </div>`;
-  }
-  for(let i=0;i<5;i++){
-    setTimeout(()=>document.getElementById(`ld${i}`).classList.add('on'),500*(i+1));
-  }
-  // Lights out
+  for(let i=0;i<5;i++) row.innerHTML+=`<div class="l-col"><div class="l-post"></div><div class="l-dot" id="ld${i}"></div></div>`;
+  for(let i=0;i<5;i++) setTimeout(()=>document.getElementById(`ld${i}`).classList.add('on'),520*(i+1));
   setTimeout(()=>{
-    document.querySelectorAll('.ldot').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.l-dot').forEach(x=>x.classList.remove('on'));
     setTimeout(()=>{
-      const g=document.getElementById('gotxt');
-      g.classList.add('on');
-      setTimeout(()=>{
-        lgts.classList.remove('on');
-        g.classList.remove('on');
-        startRace(key);
-      },950);
+      const g=document.getElementById('go-txt');g.classList.add('on');
+      setTimeout(()=>{lgts.classList.remove('on');g.classList.remove('on');startRace()},950);
     },180);
-  },4000);
+  },3900);
 }
 
-function startRace(key){
-  const d=DRIVERS[key];
-  document.body.style.background='#050505';
-  document.body.style.overflow='auto';
-  scrY=0;manS=0;carZ=5;camZ=10;prevCarZ=5;
-  podDone=false;lapN=1;raceStart=Date.now();
-  window.scrollTo(0,0);
-
-  document.getElementById('ss').classList.add('on');
-
-  // HUD elements
-  ['topbar','lhud','rhud','sponsors','hint','progress'].forEach(id=>{
-    document.getElementById(id).classList.add('on');
-  });
-  document.getElementById('tb-flag').textContent=d.flag;
-  document.getElementById('tb-circuit').textContent=d.name.split(' ').pop()+' GRAND PRIX';
-  document.getElementById('tb-driver').textContent=d.short;
-  document.getElementById('lhud-pos').textContent='P'+d.pos;
-  document.getElementById('gap-val').textContent=d.gap;
-
-  // Tire: start on soft
-  setTire('S');
-
-  // RPM bar
-  const rb=document.getElementById('rpmbar');
-  rb.innerHTML='';
-  for(let i=0;i<16;i++){
-    const s=document.createElement('div');
-    s.className='rpm-seg';s.id=`rsg${i}`;
-    rb.appendChild(s);
+function startRace(){
+  const d=DRIVERS[curDriver],c=CIRCUITS[curCircuit];
+  document.body.style.overflow='hidden';
+  prog=0;speed=0;lateral=0;podDone=false;pitDone=[false,false];
+  boardShown=[false,false,false];boardClosed=[false,false,false];
+  panelActive=-1;raceStart=Date.now();
+  // init AI
+  for(let i=0;i<AI_COUNT;i++){
+    aiData[i]={p:i*0.012+0.003,spd:MAXSPEED*(0.85+i*0.02),lat:(i-2)*0.3};
+    if(aiGrps[i]){scene.remove(aiGrps[i]);}
+    aiGrps[i]=buildAICar(i);
+    scene.add(aiGrps[i]);
   }
-
-  BTRIG=SECTIONS.map((s,i)=>({z:s.z,shown:false,closed:false,i}));
-
-  // Build sectors random times
-  updateSectors(0);
-
-  if(!animId) tick();
+  ['topbar','lhud','rhud','steer-hud','minimap','pbar'].forEach(id=>document.getElementById(id).classList.add('on'));
+  document.getElementById('tb-flag').textContent=c.flag;
+  document.getElementById('tb-circ').textContent=c.name;
+  document.getElementById('tb-drv').textContent=d.short;
+  document.getElementById('tb-drv').style.background=d.dc;
+  // RPM segs
+  const rb=document.getElementById('rpm-segs');rb.innerHTML='';
+  for(let i=0;i<16;i++){const s=document.createElement('div');s.className='rpm-s';s.id=`rs${i}`;rb.appendChild(s);}
+  setTire('S');
+  if(!animId)tick();
+  showRadio(`"${d.radio.replace(/"/g,'')}"`);
+  initAudio();
+  drawMinimap();
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  THREE.JS
-// ═══════════════════════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  THREE.JS                                                        ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function initThree(){
   renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.setSize(innerWidth,innerHeight);
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.1;
-  renderer.shadowMap.enabled=false;
-
+  renderer.toneMappingExposure=1.05;
   scene=new THREE.Scene();
-  camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1400);
-  camera.position.set(0,4,10);
-
+  camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.1,1600);
   window.addEventListener('resize',()=>{
     camera.aspect=innerWidth/innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth,innerHeight);
   });
-  window.addEventListener('scroll',()=>{scrY=window.scrollY});
   window.addEventListener('keydown',e=>{
     KEYS[e.key]=true;
-    if([' ','ArrowDown','ArrowUp','PageDown','PageUp'].includes(e.key))e.preventDefault();
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','w','s','a','d'].includes(e.key))e.preventDefault();
   });
-  window.addEventListener('keyup',e=>{KEYS[e.key]=false});
+  window.addEventListener('keyup',e=>KEYS[e.key]=false);
 }
 
-function buildScene(d){
-  scene.background=new THREE.Color('#050505');
-  scene.fog=new THREE.FogExp2(new THREE.Color('#050505'),.0035);
+const UP=new THREE.Vector3(0,1,0);
 
-  if(trackGrp){scene.remove(trackGrp)}
-  if(carGrp){scene.remove(carGrp)}
-  WHEELS=[];
+function buildScene(){
+  const c=CIRCUITS[curCircuit];
+  scene.background=new THREE.Color(c.bg);
+  scene.fog=new THREE.FogExp2(c.fog,.0032);
+  ['trkGrp','carGrp'].forEach(n=>{if(window[n]){scene.remove(window[n])}});
   scene.children.filter(o=>o.isLight).forEach(l=>scene.remove(l));
-
-  trackGrp=new THREE.Group();
-  scene.add(trackGrp);
-
-  // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff,.3));
-  const sun=new THREE.DirectionalLight(0xfff8f0,.95);
-  sun.position.set(30,60,-100);scene.add(sun);
-  const ac=new THREE.Color(d.dc);
-  const fillL=new THREE.DirectionalLight(ac,.5);
-  fillL.position.set(-20,10,0);scene.add(fillL);
-
-  buildTrack(d);
-  buildGrandstand(d);
-  buildSponsors3D(d);
-  buildBillboards(d);
-  buildFinishLine(d);
-
-  carGrp=buildCar(d);
+  trkGrp=new THREE.Group();scene.add(trkGrp);
+  // Build curve
+  const pts=c.pts.map(p=>new THREE.Vector3(p[0],p[1],p[2]));
+  curve=new THREE.CatmullRomCurve3(pts,true,'catmullrom',0.5);
+  curveLen=curve.getLength();
+  buildRoad();
+  buildBorders();
+  buildSponsorBoards();
+  buildLandmark(c);
+  buildSky(c);
+  buildLighting(c);
+  carGrp=buildCar(DRIVERS[curDriver]);
   scene.add(carGrp);
 }
 
-// ─── TRACK ───────────────────────────────────────────────────
-function buildTrack(d){
-  const L=810,W=14;
-  const mid=-(L/2)+5;
-  const ac=new THREE.Color(d.dc);
-
-  // Runoff
-  const runoff=new THREE.Mesh(
-    new THREE.PlaneGeometry(W+24,L),
-    new THREE.MeshLambertMaterial({color:0x182418})
-  );
-  runoff.rotation.x=-Math.PI/2;runoff.position.set(0,-.02,mid);
-  trackGrp.add(runoff);
-
-  // Tarmac
-  const tarmac=new THREE.Mesh(
-    new THREE.PlaneGeometry(W,L),
-    new THREE.MeshLambertMaterial({color:0x131313})
-  );
-  tarmac.rotation.x=-Math.PI/2;tarmac.position.set(0,0,mid);
-  trackGrp.add(tarmac);
-
-  // White lines
-  [-W/2+.12,W/2-.12].forEach(x=>{
-    const m=new THREE.Mesh(
-      new THREE.PlaneGeometry(.28,L),
-      new THREE.MeshLambertMaterial({color:0xffffff})
-    );
-    m.rotation.x=-Math.PI/2;m.position.set(x,.002,mid);
-    trackGrp.add(m);
-  });
-
-  // Centre dash
-  for(let z=0;z>-L;z-=24){
-    const m=new THREE.Mesh(
-      new THREE.PlaneGeometry(.14,10),
-      new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:.18})
-    );
-    m.rotation.x=-Math.PI/2;m.position.set(0,.002,z-5);
-    trackGrp.add(m);
+// ─── ROAD ────────────────────────────────────────────────────
+function buildRoad(){
+  const N=600,W=14;
+  const pts=[],uvs=[],idx=[];
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  for(let i=0;i<=N;i++){
+    const t=i/N;
+    const pos=curve.getPoint(t);
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    const lx=pos.x-tmpRight.x*W/2,lz=pos.z-tmpRight.z*W/2;
+    const rx=pos.x+tmpRight.x*W/2,rz=pos.z+tmpRight.z*W/2;
+    pts.push(lx,pos.y,lz, rx,pos.y,rz);
+    uvs.push(0,t*80, 1,t*80);
   }
-
+  for(let i=0;i<N;i++){
+    const a=i*2,b=i*2+1,c=(i+1)*2,d=(i+1)*2+1;
+    idx.push(a,b,c, b,d,c);
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+  geo.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
+  geo.setIndex(idx);geo.computeVertexNormals();
+  const mesh=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:0x141414}));
+  trkGrp.add(mesh);
   // Kerbs
-  for(let z=0;z>-L;z-=5.2){
-    const alt=Math.floor(Math.abs(z)/5.2)%2;
-    [-W/2-.4,W/2+.4].forEach(x=>{
-      const kc=alt?0xe10600:0xffffff;
-      const m=new THREE.Mesh(
-        new THREE.PlaneGeometry(.72,5.1),
-        new THREE.MeshLambertMaterial({color:kc})
-      );
-      m.rotation.x=-Math.PI/2;m.position.set(x,.002,z-2.5);
-      trackGrp.add(m);
+  buildKerbs(N,600);
+  // Centre dashes
+  buildDashes(N,600);
+  // Runoff
+  buildRunoff(N,600,W);
+}
+
+function buildKerbs(N,segs){
+  const KSEGS=segs,KSTRIP=1.0;
+  const lpts=[],rpts=[],idx=[];
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  for(let i=0;i<=KSEGS;i++){
+    const t=i/KSEGS;
+    const pos=curve.getPoint(t);
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    const off=8;
+    [lpts,rpts].forEach((arr,si)=>{
+      const sign=si===0?-1:1;
+      arr.push(pos.x+tmpRight.x*(sign*off),pos.y+.005,pos.z+tmpRight.z*(sign*off));
+      arr.push(pos.x+tmpRight.x*(sign*(off+KSTRIP)),pos.y+.005,pos.z+tmpRight.z*(sign*(off+KSTRIP)));
     });
   }
-
-  // Tyre barriers
-  const bmat=new THREE.MeshLambertMaterial({color:0x0e0e0e});
-  for(let z=2;z>-L+2;z-=1.55){
-    [-W/2-1.6,W/2+1.6].forEach(x=>{
-      const t=new THREE.Mesh(new THREE.CylinderGeometry(.65,.65,1.5,10),bmat);
-      t.position.set(x,.75,z-.77);
-      trackGrp.add(t);
-    });
-  }
-
-  // Armco behind barriers
-  [-W/2-2.5,W/2+2.5].forEach(x=>{
-    const m=new THREE.Mesh(
-      new THREE.BoxGeometry(.08,.7,L),
-      new THREE.MeshLambertMaterial({color:0x888888})
-    );
-    m.position.set(x,.35,mid);
-    trackGrp.add(m);
+  [lpts,rpts].forEach(arr=>{
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));
+    const idarr=[];
+    const S=arr.length/3;
+    for(let i=0;i<S-2;i+=2) idarr.push(i,i+1,i+2, i+1,i+3,i+2);
+    geo.setIndex(idarr);geo.computeVertexNormals();
+    // Alternating red/white kerbs done via vertex color would be complex,
+    // use simple mesh with mixed material
+    const mat=new THREE.MeshLambertMaterial({color:0xdddddd});
+    trkGrp.add(new THREE.Mesh(geo,mat));
   });
+}
 
-  // DRS zone markings
-  const drsZones=[-120,-350,-500];
-  drsZones.forEach(z=>{
-    // Blue DRS line
-    const m=new THREE.Mesh(
-      new THREE.PlaneGeometry(W,.18),
-      new THREE.MeshLambertMaterial({color:0x0088ff})
-    );
-    m.rotation.x=-Math.PI/2;m.position.set(0,.003,z);
-    trackGrp.add(m);
-  });
-
-  // Grid boxes (start)
-  for(let i=0;i<10;i++){
-    const x=(i%2===0?-.7:.7)*2.5;
-    const gz=-i*4.5-2;
-    const gm=new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:.35});
-    const g1=new THREE.Mesh(new THREE.PlaneGeometry(2.5,.08),gm);
-    g1.rotation.x=-Math.PI/2;g1.position.set(x,.003,gz);
-    trackGrp.add(g1);
-    const g2=new THREE.Mesh(new THREE.PlaneGeometry(.08,3.5),gm);
-    g2.rotation.x=-Math.PI/2;g2.position.set(x,.003,gz-1.75);
-    trackGrp.add(g2);
+function buildDashes(N,segs){
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  for(let i=0;i<segs;i+=8){
+    const t=i/segs;
+    const pos=curve.getPoint(t);
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    const geo=new THREE.PlaneGeometry(.12,3.5);
+    const m=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:.18}));
+    m.position.set(pos.x,pos.y+.005,pos.z);
+    m.rotation.y=-Math.atan2(tmpTan.z,tmpTan.x);
+    m.rotation.x=-Math.PI/2;
+    trkGrp.add(m);
   }
 }
 
-// ─── GRANDSTAND ──────────────────────────────────────────────
-function buildGrandstand(d){
-  const ac=new THREE.Color(d.dc);
-  const rows=32;
-  for(let i=0;i<rows;i++){
-    const z=-i*25-8;
-    [-1,1].forEach(side=>{
-      const x=side*22;
-      // Stand body
-      const sm=new THREE.MeshLambertMaterial({
-        color:new THREE.Color(.04+Math.random()*.03,.04,.06+Math.random()*.04)
-      });
-      const stand=new THREE.Mesh(new THREE.BoxGeometry(8,12+Math.random()*8,22),sm);
-      stand.position.set(x,stand.geometry.parameters.height/2,z);
-      trackGrp.add(stand);
-      // Roof
-      const rm=new THREE.MeshLambertMaterial({color:0x111111});
-      const roof=new THREE.Mesh(new THREE.BoxGeometry(8.5,.35,22.5),rm);
-      roof.position.set(x,stand.geometry.parameters.height+.17,z);
-      trackGrp.add(roof);
-      // Accent stripe
-      const acm=new THREE.MeshLambertMaterial({color:ac,emissive:ac,emissiveIntensity:.25});
-      const stripe=new THREE.Mesh(new THREE.BoxGeometry(.18,stand.geometry.parameters.height*.6,22),acm);
-      stripe.position.set(x-side*4.1,stand.geometry.parameters.height*.3,z);
-      trackGrp.add(stripe);
-      // Crowd dots (simplified)
-      if(i%2===0){
-        for(let ci=0;ci<6;ci++){
-          const cc=new THREE.MeshLambertMaterial({
-            color:new THREE.Color(Math.random()*.8+.2,Math.random()*.4,Math.random()*.4)
-          });
-          const crowd=new THREE.Mesh(new THREE.SphereGeometry(.3,4,4),cc);
-          crowd.position.set(
-            x+(Math.random()-0.5)*6,
-            stand.geometry.parameters.height*.3+Math.random()*3,
-            z+(Math.random()-0.5)*18
-          );
-          trackGrp.add(crowd);
-        }
-      }
+function buildRunoff(N,segs,W){
+  const RW=10,pts=[],idx=[];
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  for(let i=0;i<=segs;i++){
+    const t=i/segs;
+    const pos=curve.getPoint(t);
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    const HL=W/2+RW;
+    pts.push(pos.x-tmpRight.x*HL,pos.y-.01,pos.z-tmpRight.z*HL);
+    pts.push(pos.x+tmpRight.x*HL,pos.y-.01,pos.z+tmpRight.z*HL);
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+  const idarr=[];
+  for(let i=0;i<segs;i++){const a=i*2,b=i*2+1,c=(i+1)*2,d=(i+1)*2+1;idarr.push(a,b,c,b,d,c);}
+  geo.setIndex(idarr);geo.computeVertexNormals();
+  trkGrp.add(new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:0x1a2618})));
+}
+
+// ─── BARRIERS ────────────────────────────────────────────────
+function buildBorders(){
+  const c=CIRCUITS[curCircuit];
+  const acCol=new THREE.Color(c.ac);
+  const SEGS=400;
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  for(let i=0;i<SEGS;i++){
+    const t=i/SEGS;
+    const pos=curve.getPoint(t);
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    const alt=i%2===0;
+    [[-1,10.5],[1,10.5]].forEach(([sign,off])=>{
+      const bx=pos.x+tmpRight.x*sign*off,bz=pos.z+tmpRight.z*sign*off;
+      const col=alt?acCol:new THREE.Color(0xffffff);
+      const bm=new THREE.MeshLambertMaterial({color:col});
+      const barrier=new THREE.Mesh(new THREE.BoxGeometry(.55,.75,curveLen/SEGS*1.15),bm);
+      barrier.position.set(bx,pos.y+.375,bz);
+      barrier.rotation.y=-Math.atan2(tmpRight.z,tmpRight.x)+Math.PI/2;
+      trkGrp.add(barrier);
     });
   }
 }
 
-// ─── 3D SPONSOR BOARDS ───────────────────────────────────────
-function buildSponsors3D(d){
-  const sponsors3d=[
-    {label:'PIRELLI',col:0xffffff,z:-55,side:1},
-    {label:'ROLEX',col:0xc8a84b,z:-160,side:-1},
-    {label:'DHL',col:0xffcc00,z:-290,side:1},
-    {label:'ARAMCO',col:0x00a3e0,z:-420,side:-1},
-    {label:'AWS',col:0xff9900,z:-560,side:1},
-    {label:'HEINEKEN',col:0x00a550,z:-610,side:-1},
-  ];
-  sponsors3d.forEach(sp=>{
-    const x=sp.side*(15.5);
+// ─── SPONSOR BOARDS ──────────────────────────────────────────
+const SPONSORS=[
+  {label:'PIRELLI P ZERO',col:0xffffff,t:.08},{label:'ROLEX',col:0xc8a84b,t:.18},
+  {label:'DHL',col:0xffcc00,t:.28},{label:'ARAMCO',col:0x00a3e0,t:.42},
+  {label:'AWS',col:0xff9900,t:.55},{label:'HEINEKEN★',col:0x00a550,t:.65},
+  {label:'LENOVO',col:0xe2231a,t:.72},{label:'MSC CRUISES',col:0x00285e,t:.82},
+  {label:'QATAR AIRWAYS',col:0x5c0632,t:.9}
+];
+function buildSponsorBoards(){
+  const c=CIRCUITS[curCircuit];
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  SPONSORS.forEach(sp=>{
+    const pos=curve.getPoint(sp.t);
+    curve.getTangent(sp.t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
     const col=new THREE.Color(sp.col);
-    // Board backing
-    const bm=new THREE.MeshLambertMaterial({color:0x0a0a0a});
-    const board=new THREE.Mesh(new THREE.BoxGeometry(7,.22,1.8),bm);
-    board.position.set(x,.12,sp.z);
-    trackGrp.add(board);
-    // Colour band
-    const cm=new THREE.MeshLambertMaterial({color:col,emissive:col,emissiveIntensity:.6});
-    const band=new THREE.Mesh(new THREE.BoxGeometry(7,.24,1.8),cm);
-    band.position.set(x,.24,sp.z);
-    trackGrp.add(band);
-    // Glow light
-    const pt=new THREE.PointLight(col,1.5,25);
-    pt.position.set(x,1.5,sp.z);
-    trackGrp.add(pt);
-  });
-}
-
-// ─── SECTION BILLBOARDS ──────────────────────────────────────
-function buildBillboards(d){
-  const ac=new THREE.Color(d.dc);
-  SECTIONS.forEach(s=>{
     const grp=new THREE.Group();
-    const col=new THREE.Color(s.color);
-
-    // Poles
-    const pm=new THREE.MeshLambertMaterial({color:0x2a2a2a});
-    [-2.6,2.6].forEach(px=>{
-      const pole=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,10,8),pm);
-      pole.position.set(px,5,0);grp.add(pole);
-    });
-
     // Board
-    const brd=new THREE.Mesh(
-      new THREE.BoxGeometry(6,3.4,.14),
-      new THREE.MeshLambertMaterial({color:0x060606})
-    );
-    brd.position.set(0,8,0);grp.add(brd);
-
-    // Colour header
-    const hm=new THREE.MeshLambertMaterial({color:col,emissive:col,emissiveIntensity:.6});
-    const hdr=new THREE.Mesh(new THREE.BoxGeometry(6,.55,.16),hm);
-    hdr.position.set(0,9.98,0);grp.add(hdr);
-
-    // LED strip at bottom
-    const lm=new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:.3});
-    const led=new THREE.Mesh(new THREE.BoxGeometry(6,.12,.15),lm);
-    led.position.set(0,6.32,0);grp.add(led);
-
+    const bk=new THREE.Mesh(new THREE.BoxGeometry(7,.2,1.5),new THREE.MeshLambertMaterial({color:0x050505}));
+    bk.position.y=.11;grp.add(bk);
+    const band=new THREE.Mesh(new THREE.BoxGeometry(7,.25,1.5),new THREE.MeshLambertMaterial({color:col,emissive:col,emissiveIntensity:.55}));
+    band.position.y=.24;grp.add(band);
     // Glow
-    const pt=new THREE.PointLight(col,2.5,40);
-    pt.position.set(0,8,4);grp.add(pt);
-
-    grp.position.set(13,0,s.z);
-    grp.rotation.y=-Math.PI/6;
-    trackGrp.add(grp);
+    const pt=new THREE.PointLight(col,1.4,30);pt.position.set(0,1.5,0);grp.add(pt);
+    // Position
+    const sign=sp.t<.5?1:-1;
+    grp.position.set(pos.x+tmpRight.x*sign*12,pos.y,pos.z+tmpRight.z*sign*12);
+    grp.rotation.y=-Math.atan2(tmpTan.z,tmpTan.x);
+    trkGrp.add(grp);
   });
 }
 
-// ─── FINISH LINE ─────────────────────────────────────────────
-function buildFinishLine(d){
-  const FZ=-750;
-  const ac=new THREE.Color(d.dc);
-
-  // Chequered floor
-  for(let xi=0;xi<12;xi++){
-    for(let ri=0;ri<4;ri++){
-      const x=-7.5+xi*1.28+.64;
-      const isW=(xi+ri)%2===0;
-      const m=new THREE.Mesh(
-        new THREE.PlaneGeometry(1.22,1.45),
-        new THREE.MeshLambertMaterial({color:isW?0xffffff:0x111111})
-      );
-      m.rotation.x=-Math.PI/2;m.position.set(x,.003,FZ-ri*1.45-.72);
-      trackGrp.add(m);
-    }
-  }
-  // Gantry
-  const gm=new THREE.MeshLambertMaterial({color:0x1a1a1a});
-  [-11,11].forEach(x=>{
-    const u=new THREE.Mesh(new THREE.CylinderGeometry(.32,.32,16,8),gm);
-    u.position.set(x,8,FZ-5);trackGrp.add(u);
-  });
-  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,22.5,8),gm);
-  beam.rotation.z=Math.PI/2;beam.position.set(0,16,FZ-5);trackGrp.add(beam);
-
-  // Chequered on gantry
-  for(let bx=-9;bx<10;bx++){
-    for(let by=0;by<4;by++){
-      const isW=(bx+9+by)%2===0;
-      const bm=new THREE.Mesh(
-        new THREE.PlaneGeometry(.95,.95),
-        new THREE.MeshLambertMaterial({color:isW?0xffffff:0x111111,side:THREE.DoubleSide})
-      );
-      bm.position.set(bx+.5,15.5-by,FZ-5);trackGrp.add(bm);
-    }
-  }
-
-  // Accent lights
-  const lm=new THREE.MeshLambertMaterial({color:ac,emissive:ac,emissiveIntensity:1.4});
-  for(let lx=-10;lx<=10;lx+=2){
-    const l=new THREE.Mesh(new THREE.SphereGeometry(.24,8,8),lm);
-    l.position.set(lx,16.6,FZ-5);trackGrp.add(l);
-  }
-
-  // "POWERED BY F1" board on gantry
-  const boardM=new THREE.MeshLambertMaterial({color:0xe10600});
-  const podB=new THREE.Mesh(new THREE.BoxGeometry(6,.8,.12),boardM);
-  podB.position.set(0,14.5,FZ-5);trackGrp.add(podB);
+// ─── LANDMARKS ───────────────────────────────────────────────
+function buildLandmark(c){
+  const key=curCircuit;
+  if(key==='monaco') buildMonacoLandmarks();
+  else if(key==='abudhabi') buildYasHotel();
+  else if(key==='singapore') buildMBS();
+  else if(key==='monza') buildMonzaTrees();
+  else if(key==='spa') buildSpaForest();
+  else if(key==='suzuka') buildSuzukaArch();
+  else if(key==='interlagos') buildInterlagosSenna();
+  else if(key==='bahrain') buildBahrainDesert();
+  else if(key==='silverstone') buildSilverstoneGrandstand();
+  else if(key==='melbourne') buildMelbourneLake();
+  // Generic grandstands for all
+  buildGenericStands(c);
 }
 
-// ─── F1 CAR ──────────────────────────────────────────────────
+function buildGenericStands(c){
+  const ac=new THREE.Color(c.ac);
+  const SEGS=40;
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  for(let i=0;i<SEGS;i++){
+    const t=(i+.5)/SEGS;
+    const pos=curve.getPoint(t);
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    const side=i%2===0?1:-1;
+    const dist=20+Math.random()*6;
+    const h=8+Math.random()*14;
+    const w=16+Math.random()*10;
+    const bx=pos.x+tmpRight.x*side*dist,bz=pos.z+tmpRight.z*side*dist;
+    const sm=new THREE.MeshLambertMaterial({color:new THREE.Color(.04+Math.random()*.03,.04,.06+Math.random()*.04)});
+    const stand=new THREE.Mesh(new THREE.BoxGeometry(w,h,18),sm);
+    stand.position.set(bx,h/2,bz);
+    stand.rotation.y=-Math.atan2(tmpRight.z,tmpRight.x)+Math.PI/2;
+    trkGrp.add(stand);
+    const rm=new THREE.MeshLambertMaterial({color:0x0d0d0d});
+    const roof=new THREE.Mesh(new THREE.BoxGeometry(w+.5,.28,18.5),rm);
+    roof.position.set(bx,h+.14,bz);
+    roof.rotation.y=stand.rotation.y;
+    trkGrp.add(roof);
+    // Accent stripe
+    const acm=new THREE.MeshLambertMaterial({color:ac,emissive:ac,emissiveIntensity:.2});
+    const str=new THREE.Mesh(new THREE.BoxGeometry(.14,h*.55,18),acm);
+    str.position.set(bx-side*.06*w,h*.25,bz);
+    str.rotation.y=stand.rotation.y;
+    trkGrp.add(str);
+  }
+}
+
+function buildMonacoLandmarks(){
+  // TUNNEL — dark box covering part of track at t~0.44
+  const tp=curve.getPoint(.44);
+  const grp=new THREE.Group();
+  // Tunnel walls
+  const wallM=new THREE.MeshLambertMaterial({color:0x151520,side:THREE.BackSide});
+  const tunnel=new THREE.Mesh(new THREE.BoxGeometry(20,8,80),wallM);
+  tunnel.position.set(tp.x,tp.y+4,tp.z);grp.add(tunnel);
+  // Extra dark inside
+  const pt=new THREE.PointLight(0xffaa44,.4,50);pt.position.set(tp.x,tp.y+3,tp.z);grp.add(pt);
+  scene.add(grp);
+  // Casino building
+  const cb1M=new THREE.MeshLambertMaterial({color:0xd4af37});
+  const p2=curve.getPoint(.18);
+  const cas=new THREE.Mesh(new THREE.BoxGeometry(22,18,22),new THREE.MeshLambertMaterial({color:0xc8b464}));
+  cas.position.set(p2.x+25,9,p2.z);trkGrp.add(cas);
+  const dome=new THREE.Mesh(new THREE.SphereGeometry(7,12,8,0,Math.PI*2,0,Math.PI/2),new THREE.MeshLambertMaterial({color:0x8c7a2a}));
+  dome.position.set(p2.x+25,18,p2.z);trkGrp.add(dome);
+}
+
+function buildYasHotel(){
+  // YAS VICEROY HOTEL — arch over track at t~0.28
+  const tp=curve.getPoint(.28);
+  const tmpTan=new THREE.Vector3();
+  curve.getTangent(.28,tmpTan);tmpTan.normalize();
+  const ac=new THREE.Color(CIRCUITS.abudhabi.ac);
+  const grp=new THREE.Group();
+  // Left tower
+  const tm=new THREE.MeshLambertMaterial({color:0x1a1a2e});
+  const t1=new THREE.Mesh(new THREE.BoxGeometry(14,35,18),tm);
+  t1.position.set(-20,17.5,0);grp.add(t1);
+  // Right tower
+  const t2=new THREE.Mesh(new THREE.BoxGeometry(14,28,18),tm);
+  t2.position.set(20,14,0);grp.add(t2);
+  // Arch bridge over track (THE iconic feature)
+  const archM=new THREE.MeshLambertMaterial({color:0xffffff,emissive:ac,emissiveIntensity:.25});
+  const bridge=new THREE.Mesh(new THREE.BoxGeometry(52,5,14),archM);
+  bridge.position.set(0,28,0);grp.add(bridge);
+  // LED strips under arch
+  const ledM=new THREE.MeshLambertMaterial({color:ac,emissive:ac,emissiveIntensity:1.4});
+  const led=new THREE.Mesh(new THREE.BoxGeometry(50,.2,12),ledM);
+  led.position.set(0,25.6,0);grp.add(led);
+  // Point lights
+  const pl=new THREE.PointLight(ac,3,80);pl.position.set(0,28,0);grp.add(pl);
+  // Support pillars
+  [-16,0,16].forEach(x=>{
+    const p=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,25,8),tm);
+    p.position.set(x,12.5,0);grp.add(p);
+  });
+  grp.position.copy(tp);
+  grp.rotation.y=-Math.atan2(tmpTan.z,tmpTan.x)+Math.PI/2;
+  scene.add(grp);
+  // Marina water
+  const waterM=new THREE.MeshLambertMaterial({color:0x001428,transparent:true,opacity:.7});
+  const water=new THREE.Mesh(new THREE.PlaneGeometry(200,200),waterM);
+  water.rotation.x=-Math.PI/2;water.position.set(tp.x+60,tp.y-.1,tp.z);
+  scene.add(water);
+}
+
+function buildMBS(){
+  // Marina Bay Sands — 3 towers + boat
+  const tp=curve.getPoint(.35);
+  const grp=new THREE.Group();
+  const tm=new THREE.MeshLambertMaterial({color:0xd4c4a0});
+  const ac=new THREE.Color(CIRCUITS.singapore.ac);
+  // 3 towers
+  [-14,0,14].forEach((x,i)=>{
+    const h=45+i*5;
+    const t=new THREE.Mesh(new THREE.BoxGeometry(10,h,10),tm);
+    t.position.set(x,h/2,0);grp.add(t);
+  });
+  // "Surfboard" top
+  const sb=new THREE.Mesh(new THREE.BoxGeometry(52,2.5,16),new THREE.MeshLambertMaterial({color:0xd4af37}));
+  sb.position.set(0,55,0);grp.add(sb);
+  const pt=new THREE.PointLight(new THREE.Color('#ee2e24'),2,80);pt.position.set(0,55,10);grp.add(pt);
+  grp.position.set(tp.x+40,tp.y,tp.z);
+  scene.add(grp);
+}
+
+function buildMonzaTrees(){
+  const ac=new THREE.Color(CIRCUITS.monza.ac);
+  const SEGS=60;
+  for(let i=0;i<SEGS;i++){
+    const t=i/SEGS;
+    const pos=curve.getPoint(t);
+    const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    [1,-1].forEach(side=>{
+      const tx=pos.x+tmpRight.x*side*(16+Math.random()*8);
+      const tz=pos.z+tmpRight.z*side*(16+Math.random()*8);
+      const h=6+Math.random()*8;
+      const tr=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,h*.35,6),new THREE.MeshLambertMaterial({color:0x3a1f0a}));
+      tr.position.set(tx,h*.175,tz);trkGrp.add(tr);
+      const cg=Math.random()*.12+.18;
+      const cone=new THREE.Mesh(new THREE.ConeGeometry(1.2+Math.random()*.6,h*.68,7),new THREE.MeshLambertMaterial({color:new THREE.Color(.04+Math.random()*.04,cg,.04)}));
+      cone.position.set(tx,h*.35+h*.34,tz);trkGrp.add(cone);
+    });
+  }
+}
+
+function buildSpaForest(){
+  // Dense forest + elevation
+  const SEGS=50;
+  for(let i=0;i<SEGS;i++){
+    const t=i/SEGS;
+    const pos=curve.getPoint(t);
+    const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    for(let j=0;j<3;j++){
+      [1,-1].forEach(side=>{
+        const d=15+j*7+Math.random()*5;
+        const tx=pos.x+tmpRight.x*side*d,tz=pos.z+tmpRight.z*side*d;
+        const h=7+Math.random()*10;
+        const tr=new THREE.Mesh(new THREE.CylinderGeometry(.2,.3,h*.35,6),new THREE.MeshLambertMaterial({color:0x3a1f0a}));
+        tr.position.set(tx,h*.175+pos.y,tz);trkGrp.add(tr);
+        const cone=new THREE.Mesh(new THREE.ConeGeometry(1.4+Math.random()*.7,h*.7,7),new THREE.MeshLambertMaterial({color:new THREE.Color(.03+Math.random()*.04,.2+Math.random()*.12,.03)}));
+        cone.position.set(tx,h*.35+h*.35+pos.y,tz);trkGrp.add(cone);
+      });
+    }
+  }
+  // Eau Rouge visible elevation markers
+  const eauT=curve.getPoint(.12);
+  const grd=new THREE.Mesh(new THREE.BoxGeometry(4,25,.5),new THREE.MeshLambertMaterial({color:0xffd700,emissive:0xffd700,emissiveIntensity:.2}));
+  grd.position.set(eauT.x+15,12.5,eauT.z);scene.add(grd);
+}
+
+function buildSuzukaArch(){
+  // Figure-8 crossover bridge at t~0.38
+  const tp=curve.getPoint(.38);
+  const grp=new THREE.Group();
+  const bm=new THREE.MeshLambertMaterial({color:0x888888});
+  const bridge=new THREE.Mesh(new THREE.BoxGeometry(24,1.5,12),bm);
+  bridge.position.set(0,5,0);grp.add(bridge);
+  // Pillars
+  [-10,10].forEach(x=>{
+    const p=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,5,8),bm);
+    p.position.set(x,2.5,0);grp.add(p);
+  });
+  grp.position.copy(tp);scene.add(grp);
+  // Japanese elements: torii gate silhouette
+  const redM=new THREE.MeshLambertMaterial({color:0xff2200,emissive:0xff0000,emissiveIntensity:.3});
+  const tp2=curve.getPoint(.62);
+  const torii=new THREE.Group();
+  const v1=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,8,8),redM);v1.position.set(-5,4,0);torii.add(v1);
+  const v2=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,8,8),redM);v2.position.set(5,4,0);torii.add(v2);
+  const h1=new THREE.Mesh(new THREE.BoxGeometry(12,.5,1),redM);h1.position.set(0,8.25,0);torii.add(h1);
+  const h2=new THREE.Mesh(new THREE.BoxGeometry(10,.4,1),redM);h2.position.set(0,6.75,0);torii.add(h2);
+  torii.position.set(tp2.x+18,tp2.y,tp2.z);
+  scene.add(torii);
+}
+
+function buildInterlagosSenna(){
+  // Senna memorial + stadium
+  const tp=curve.getPoint(.5);
+  const sm=new THREE.MeshLambertMaterial({color:0xffd700,emissive:0xffd700,emissiveIntensity:.4});
+  const memorial=new THREE.Mesh(new THREE.BoxGeometry(1.5,5,.3),sm);
+  memorial.position.set(tp.x+20,2.5,tp.z);scene.add(memorial);
+  // Stadium
+  for(let i=0;i<8;i++){
+    const t=(.4+i/8*.3);
+    const p=curve.getPoint(t);
+    const tmpRight=new THREE.Vector3();
+    const tmpTan=new THREE.Vector3();
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    const h=12+Math.random()*8;
+    const m=new THREE.Mesh(new THREE.BoxGeometry(12,h,20),new THREE.MeshLambertMaterial({color:new THREE.Color(.05,.04,.02)}));
+    m.position.set(p.x+tmpRight.x*22,h/2,p.z+tmpRight.z*22);
+    m.rotation.y=-Math.atan2(tmpRight.z,tmpRight.x)+Math.PI/2;
+    trkGrp.add(m);
+  }
+}
+
+function buildBahrainDesert(){
+  // Sand dunes + gas flares + floodlights
+  const dM=new THREE.MeshLambertMaterial({color:0xc4a050});
+  const SEGS=30;
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  for(let i=0;i<SEGS;i++){
+    const t=i/SEGS;
+    const pos=curve.getPoint(t);
+    curve.getTangent(t,tmpTan);tmpTan.normalize();
+    tmpRight.crossVectors(UP,tmpTan).normalize();
+    [1,-1].forEach(side=>{
+      const d=22+Math.random()*15;
+      const dune=new THREE.Mesh(new THREE.SphereGeometry(5+Math.random()*4,8,6),dM);
+      dune.scale.y=.3;
+      dune.position.set(pos.x+tmpRight.x*side*d,-1.3+Math.random()*.5,pos.z+tmpRight.z*side*d);
+      trkGrp.add(dune);
+    });
+  }
+  // Gas flares
+  const flareM=new THREE.MeshLambertMaterial({color:0xff5500,emissive:0xff4400,emissiveIntensity:1.5});
+  [.15,.45,.75].forEach(t=>{
+    const pos=curve.getPoint(t);
+    const tmpRight2=new THREE.Vector3();
+    const tmpTan2=new THREE.Vector3();
+    curve.getTangent(t,tmpTan2);tmpTan2.normalize();
+    tmpRight2.crossVectors(UP,tmpTan2).normalize();
+    const pipe=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,18,8),new THREE.MeshLambertMaterial({color:0x888888}));
+    pipe.position.set(pos.x+tmpRight2.x*45,9,pos.z+tmpRight2.z*45);
+    const flame=new THREE.Mesh(new THREE.ConeGeometry(1,4,8),flareM);
+    flame.position.set(pos.x+tmpRight2.x*45,20,pos.z+tmpRight2.z*45);
+    const fl=new THREE.PointLight(0xff5500,2.5,60);fl.position.copy(flame.position);
+    trkGrp.add(pipe);trkGrp.add(flame);trkGrp.add(fl);
+  });
+  // Floodlights
+  const lM=new THREE.MeshLambertMaterial({color:0xfff5e0,emissive:0xfff5e0,emissiveIntensity:1});
+  [.1,.3,.5,.7,.9].forEach(t=>{
+    const pos=curve.getPoint(t);
+    const tmpRight2=new THREE.Vector3();
+    const tmpTan2=new THREE.Vector3();
+    curve.getTangent(t,tmpTan2);tmpTan2.normalize();
+    tmpRight2.crossVectors(UP,tmpTan2).normalize();
+    [1,-1].forEach(s=>{
+      const fx=pos.x+tmpRight2.x*s*14,fz=pos.z+tmpRight2.z*s*14;
+      const pole=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,15,8),new THREE.MeshLambertMaterial({color:0x888888}));
+      pole.position.set(fx,7.5,fz);trkGrp.add(pole);
+      for(let li=0;li<3;li++){
+        const bulb=new THREE.Mesh(new THREE.SphereGeometry(.2,6,6),lM);
+        bulb.position.set(fx-s*.3*li,15,fz);trkGrp.add(bulb);
+      }
+      const fl=new THREE.PointLight(0xfff5e0,.8,40);fl.position.set(fx,15,fz);scene.add(fl);
+    });
+  });
+}
+
+function buildSilverstoneGrandstand(){
+  // Wing building + big straight grandstands
+  const tp=curve.getPoint(.42);
+  const grp=new THREE.Group();
+  const wm=new THREE.MeshLambertMaterial({color:0x1a1a1a});
+  const wg=new THREE.Mesh(new THREE.BoxGeometry(60,4,20),wm);
+  wg.position.set(0,16,0);grp.add(wg);
+  [-28,28].forEach(x=>{
+    const p=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,16,8),wm);
+    p.position.set(x,8,0);grp.add(p);
+  });
+  const acM=new THREE.MeshLambertMaterial({color:0x1f8ce0,emissive:0x1f8ce0,emissiveIntensity:.3});
+  const strip=new THREE.Mesh(new THREE.BoxGeometry(60,.5,20),acM);
+  strip.position.set(0,18.2,0);grp.add(strip);
+  grp.position.copy(tp);grp.position.y+=0;
+  scene.add(grp);
+}
+
+function buildMelbourneLake(){
+  // Albert Park lake
+  const tp=curve.getPoint(.5);
+  const waterM=new THREE.MeshLambertMaterial({color:0x003050,transparent:true,opacity:.75});
+  const water=new THREE.Mesh(new THREE.CircleGeometry(70,32),waterM);
+  water.rotation.x=-Math.PI/2;water.position.set(tp.x,tp.y-.05,tp.z);
+  scene.add(water);
+  // City skyline
+  for(let i=0;i<8;i++){
+    const h=20+Math.random()*40;
+    const b=new THREE.Mesh(new THREE.BoxGeometry(8+Math.random()*10,h,8),new THREE.MeshLambertMaterial({color:new THREE.Color(.04+Math.random()*.04,.04,.1+Math.random()*.08)}));
+    b.position.set(tp.x+60+i*12,h/2,tp.z+20+Math.random()*20);
+    scene.add(b);
+  }
+}
+
+// ─── SKY / LIGHTING ──────────────────────────────────────────
+function buildSky(c){
+  // Gradient sky dome
+  const sky=new THREE.Mesh(
+    new THREE.SphereGeometry(900,16,8),
+    new THREE.MeshBasicMaterial({color:new THREE.Color(c.skyTop||c.bg),side:THREE.BackSide})
+  );
+  scene.add(sky);
+  // Horizon band
+  if(c.skyBot){
+    const hor=new THREE.Mesh(
+      new THREE.CylinderGeometry(850,850,200,24,1,true),
+      new THREE.MeshBasicMaterial({color:new THREE.Color(c.skyBot),side:THREE.BackSide,transparent:true,opacity:.6})
+    );
+    hor.position.y=-80;
+    scene.add(hor);
+  }
+}
+
+function buildLighting(c){
+  scene.add(new THREE.AmbientLight(0xffffff,.28));
+  const sun=new THREE.DirectionalLight(0xfff8f0,.9);
+  sun.position.set(30,60,-100);scene.add(sun);
+  const fill=new THREE.DirectionalLight(new THREE.Color(c.ac),.45);
+  fill.position.set(-20,10,0);scene.add(fill);
+  const back=new THREE.DirectionalLight(0xffffff,.12);
+  back.position.set(0,5,20);scene.add(back);
+}
+
+// ─── CARS ────────────────────────────────────────────────────
 function buildCar(d){
   const grp=new THREE.Group();
   const AM=new THREE.MeshLambertMaterial({color:new THREE.Color(d.car)});
   const DK=new THREE.MeshLambertMaterial({color:0x0d0d0d});
-  const FL=new THREE.MeshLambertMaterial({color:new THREE.Color(d.floor)});
   const WG=new THREE.MeshLambertMaterial({color:new THREE.Color(d.wing)});
-  const SV=new THREE.MeshLambertMaterial({color:0xcccccc});
   const WH=new THREE.MeshLambertMaterial({color:0x0e0e0e});
   const RIM=new THREE.MeshLambertMaterial({color:0xaaaaaa});
-
-  const add=(g,m,x,y,z,rx=0,ry=0,rz=0)=>{
-    const mesh=new THREE.Mesh(g,m);
-    mesh.position.set(x,y,z);
-    mesh.rotation.set(rx,ry,rz);
-    grp.add(mesh);return mesh;
-  };
-
-  // ── Body ──
-  add(new THREE.BoxGeometry(1.72,.45,4.2),AM,0,.32,0);
-  add(new THREE.BoxGeometry(1.72,.04,4.0),FL,0,.08,0);
-  // Nose cone
-  add(new THREE.BoxGeometry(.52,.22,1.2),AM,0,.16,-2.7);
-  add(new THREE.BoxGeometry(.28,.12,.7),AM,0,.12,-3.3);
-  // Cockpit
-  add(new THREE.BoxGeometry(.76,.34,1.2),DK,0,.59,.28);
-  // Halo
-  const hs=new THREE.Shape();
-  hs.absarc(0,0,.55,0,Math.PI,false);
-  add(new THREE.ShapeGeometry(hs,12),DK,0,.66,.1,-Math.PI/2);
-  // Sidepods
-  [-1,1].forEach(s=>{
-    add(new THREE.BoxGeometry(.46,.34,2.1),AM,s*.93,.18,.08);
-    // Intake
-    add(new THREE.BoxGeometry(.42,.2,.14),DK,s*.88,.28,.62);
+  const FL=new THREE.MeshLambertMaterial({color:0x111111});
+  const add=(g,m,x,y,z,ry=0)=>{const mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);mesh.rotation.y=ry;grp.add(mesh);return mesh};
+  add(new THREE.BoxGeometry(1.7,.44,4.1),AM,0,.31,0);
+  add(new THREE.BoxGeometry(1.7,.04,3.9),FL,0,.08,0);
+  add(new THREE.BoxGeometry(.5,.21,1.1),AM,0,.16,-2.65);
+  add(new THREE.BoxGeometry(.76,.33,1.15),DK,0,.58,.28);
+  const hs=new THREE.Shape();hs.absarc(0,0,.52,0,Math.PI,false);
+  const halo=new THREE.Mesh(new THREE.ShapeGeometry(hs,10),DK);
+  halo.position.set(0,.65,.1);halo.rotation.x=-Math.PI/2;grp.add(halo);
+  [-1,1].forEach(s=>add(new THREE.BoxGeometry(.44,.32,1.95),AM,s*.91,.17,.1));
+  add(new THREE.BoxGeometry(2.32,.055,.56),WG,0,.06,-2.88);
+  [-1.14,1.14].forEach(s=>add(new THREE.BoxGeometry(.05,.27,.62),DK,s,.16,-2.86));
+  add(new THREE.BoxGeometry(1.78,.07,.48),WG,0,1.1,1.9);
+  [-0.82,0.82].forEach(s=>add(new THREE.BoxGeometry(.05,.4,.52),DK,s,.93,1.9));
+  add(new THREE.BoxGeometry(.07,.56,.05),DK,0,.84,1.9);
+  add(new THREE.BoxGeometry(.34,.6,.58),DK,0,.74,.84);
+  const exM=new THREE.MeshLambertMaterial({color:0xff5500,emissive:0xff4400,emissiveIntensity:1.3});
+  const ex=new THREE.Mesh(new THREE.CylinderGeometry(.055,.08,.28,8),exM);
+  ex.position.set(.18,.49,2.15);ex.rotation.z=Math.PI/2;grp.add(ex);
+  [[- 1.03,-1.56],[1.03,-1.56],[-1.03,1.4],[1.03,1.4]].forEach(([wx,wz])=>{
+    const piv=new THREE.Group();piv.position.set(wx,.3,wz);
+    const t=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.36,16),WH);t.rotation.z=Math.PI/2;piv.add(t);
+    const r=new THREE.Mesh(new THREE.CylinderGeometry(.17,.17,.38,14),RIM);r.rotation.z=Math.PI/2;piv.add(r);
+    const pd=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.39,6),new THREE.MeshLambertMaterial({color:0xe10600,emissive:0xe10600,emissiveIntensity:.5}));pd.rotation.z=Math.PI/2;piv.add(pd);
+    grp.add(piv);WHEELS.push(piv);
   });
-  // Front wing
-  add(new THREE.BoxGeometry(2.4,.06,.62),WG,0,.06,-2.9);
-  [-1.16,1.16].forEach(s=>{
-    add(new THREE.BoxGeometry(.06,.28,.68),DK,s,.17,-2.88);
-    add(new THREE.BoxGeometry(.06,.18,.68),WG,s*.7,.1,-2.88);
-  });
-  // Rear wing
-  add(new THREE.BoxGeometry(1.8,.08,.5),WG,0,1.12,1.92);
-  add(new THREE.BoxGeometry(1.8,.06,.38),WG,0,.95,1.82);
-  [-0.85,0.85].forEach(s=>{
-    add(new THREE.BoxGeometry(.06,.42,.56),DK,s,.94,1.9);
-  });
-  add(new THREE.BoxGeometry(.07,.58,.06),DK,0,.86,1.88);
-  // Airbox
-  add(new THREE.BoxGeometry(.36,.62,.62),DK,0,.75,.84);
-  add(new THREE.BoxGeometry(.32,.28,1.3),DK,0,.58,1.1);
-  // Exhaust glow
-  const eM=new THREE.MeshLambertMaterial({color:0xff5500,emissive:0xff4400,emissiveIntensity:1.4});
-  add(new THREE.CylinderGeometry(.06,.08,.3,8),eM,.19,.49,2.18,Math.PI/2);
-
-  // ── Wheels ──
-  const WP=[
-    {x:-1.05,z:-1.58},{x:1.05,z:-1.58},
-    {x:-1.05,z:1.42},{x:1.05,z:1.42}
-  ];
-  WP.forEach(wp=>{
-    const pivot=new THREE.Group();
-    pivot.position.set(wp.x,.31,wp.z);
-    // Tire
-    const t=new THREE.Mesh(new THREE.CylinderGeometry(.31,.31,.38,18),WH);
-    t.rotation.z=Math.PI/2;pivot.add(t);
-    // Rim
-    const r=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.4,14),RIM);
-    r.rotation.z=Math.PI/2;pivot.add(r);
-    // Hub nut
-    const h=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.41,6),SV);
-    h.rotation.z=Math.PI/2;pivot.add(h);
-    // Pirelli compound dot (soft=red)
-    const pM=new THREE.MeshLambertMaterial({color:0xe10600,emissive:0xe10600,emissiveIntensity:.5});
-    const pd=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.42,6),pM);
-    pd.rotation.z=Math.PI/2;pivot.add(pd);
-
-    grp.add(pivot);
-    WHEELS.push(pivot);
-  });
-
-  // Number board
-  const nbM=new THREE.MeshLambertMaterial({color:0xffffff});
-  add(new THREE.BoxGeometry(.55,.28,.025),nbM,0,.33,-3.36);
-
   return grp;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ANIMATION LOOP
-// ═══════════════════════════════════════════════════════════════
+function buildAICar(idx){
+  const palette=[0x3671C6,0xFF8000,0xE8002D,0x27F4D2,0x358C75];
+  const grp=new THREE.Group();
+  const col=new THREE.Color(palette[idx%palette.length]);
+  const AM=new THREE.MeshLambertMaterial({color:col});
+  const DK=new THREE.MeshLambertMaterial({color:0x0d0d0d});
+  const WH=new THREE.MeshLambertMaterial({color:0x0e0e0e});
+  const add=(g,m,x,y,z)=>{const mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);grp.add(mesh)};
+  add(new THREE.BoxGeometry(1.7,.44,4.1),AM,0,.31,0);
+  add(new THREE.BoxGeometry(.76,.33,1.15),DK,0,.58,.28);
+  add(new THREE.BoxGeometry(2.32,.055,.56),AM,0,.06,-2.88);
+  add(new THREE.BoxGeometry(1.78,.07,.48),AM,0,1.1,1.9);
+  [[- 1.03,-1.56],[1.03,-1.56],[-1.03,1.4],[1.03,1.4]].forEach(([wx,wz])=>{
+    const t=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.36,16),WH);t.position.set(wx,.3,wz);t.rotation.z=Math.PI/2;grp.add(t);
+  });
+  return grp;
+}
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  MINIMAP                                                         ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function drawMinimap(){
+  const cv=document.getElementById('mmc');
+  cv.width=100;cv.height=80;
+  const ctx=cv.getContext('2d');
+  const c=CIRCUITS[curCircuit];
+  const pts2d=c.pts.map(p=>[p[0],p[2]]);
+  const xs=pts2d.map(p=>p[0]),zs=pts2d.map(p=>p[1]);
+  const minX=Math.min(...xs),maxX=Math.max(...xs);
+  const minZ=Math.min(...zs),maxZ=Math.max(...zs);
+  const pad=8,W=100-pad*2,H=80-pad*2;
+  const mx=x=>(x-minX)/(maxX-minX)*W+pad;
+  const mz=z=>(z-minZ)/(maxZ-minZ)*H+pad;
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=2;ctx.lineCap='round';
+  ctx.beginPath();
+  pts2d.forEach((p,i)=>{
+    if(i===0)ctx.moveTo(mx(p[0]),mz(p[1]));
+    else ctx.lineTo(mx(p[0]),mz(p[1]));
+  });
+  ctx.closePath();ctx.stroke();
+  // Store for live update
+  cv._mx=mx;cv._mz=mz;cv._pts=pts2d;cv._minX=minX;cv._maxX=maxX;cv._minZ=minZ;cv._maxZ=maxZ;
+}
+
+function updateMinimap(){
+  const cv=document.getElementById('mmc');
+  if(!cv._mx)return;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,100,80);
+  // Track
+  ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=2;
+  ctx.beginPath();
+  cv._pts.forEach((p,i)=>{
+    if(i===0)ctx.moveTo(cv._mx(p[0]),cv._mz(p[1]));
+    else ctx.lineTo(cv._mx(p[0]),cv._mz(p[1]));
+  });
+  ctx.closePath();ctx.stroke();
+  // AI cars
+  aiData.forEach((ai,i)=>{
+    const tp=curve.getPoint(ai.p%1);
+    ctx.fillStyle=`hsl(${i*60},80%,60%)`;
+    ctx.beginPath();ctx.arc(cv._mx(tp.x),cv._mz(tp.z),2.5,0,Math.PI*2);ctx.fill();
+  });
+  // Player
+  const cp=curve.getPoint(prog%1);
+  const c=CIRCUITS[curCircuit];
+  ctx.fillStyle=c.ac;
+  ctx.beginPath();ctx.arc(cv._mx(cp.x),cv._mz(cp.z),3.5,0,Math.PI*2);ctx.fill();
+}
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  AUDIO                                                           ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function initAudio(){
+  try{
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    engOsc=audioCtx.createOscillator();
+    engOsc.type='sawtooth';
+    engOsc.frequency.value=90;
+    engFilter=audioCtx.createBiquadFilter();
+    engFilter.type='bandpass';
+    engFilter.frequency.value=420;
+    engFilter.Q.value=2.5;
+    const dist=audioCtx.createWaveShaper();
+    const k=100;const curve2=new Float32Array(256);
+    for(let i=0;i<256;i++){const x=i*2/256-1;curve2[i]=(Math.PI+k)*x/(Math.PI+k*Math.abs(x));}
+    dist.curve=curve2;
+    engGain=audioCtx.createGain();
+    engGain.gain.value=0;
+    engOsc.connect(engFilter);engFilter.connect(dist);dist.connect(engGain);engGain.connect(audioCtx.destination);
+    engOsc.start();
+  }catch(e){}
+}
+
+function updateAudio(spd,throttle){
+  if(!audioCtx||!engOsc)return;
+  try{
+    const rpm=0.2+spd*.78;
+    engOsc.frequency.setTargetAtTime(85+rpm*260,audioCtx.currentTime,.04);
+    engGain.gain.setTargetAtTime(throttle>.1?.07:.015,audioCtx.currentTime,.12);
+  }catch(e){}
+}
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  GAME LOOP                                                       ║
+// ╚══════════════════════════════════════════════════════════════════╝
 let frameT=0;
 function tick(){
   animId=requestAnimationFrame(tick);
+  if(podDone)return;
   frameT+=.016;
 
-  // Keys
-  if(KEYS['ArrowDown']||KEYS[' ']||KEYS['PageDown']) manS=Math.min(manS+16,9200);
-  if(KEYS['ArrowUp']||KEYS['PageUp']) manS=Math.max(manS-10,0);
+  const throttle=(KEYS['w']||KEYS['W']||KEYS['ArrowUp']||KEYS[' '])?1:0;
+  const brake=(KEYS['s']||KEYS['S']||KEYS['ArrowDown'])?1:0;
+  const steerL=(KEYS['a']||KEYS['A']||KEYS['ArrowLeft'])?1:0;
+  const steerR=(KEYS['d']||KEYS['D']||KEYS['ArrowRight'])?1:0;
 
-  const eff=Math.max(scrY,manS);
+  // Physics
+  const acc=throttle*.0001;
+  const dec=brake?.00015:0;
+  const drag=.018;
+  speed=Math.max(0,Math.min(MAXSPEED,speed+acc-dec-speed*drag));
 
-  // Car position
-  const tCarZ=5-eff*.088;
-  carZ+=(tCarZ-carZ)*.09;
-  const vel=Math.abs(carZ-prevCarZ);
-  prevCarZ=carZ;
+  // Lateral steering
+  const steerRate=.012;
+  const latFriction=.06;
+  if(steerL) lateral=Math.max(-0.95,lateral-steerRate);
+  else if(steerR) lateral=Math.min(0.95,lateral+steerRate);
+  else lateral*=(1-latFriction);
 
-  // Weave / snake feel
-  const weave=Math.sin(carZ*.018)*.55+Math.sin(carZ*.038)*.2;
-  const steer=(Math.sin(carZ*.018)*.018+Math.sin(carZ*.038)*.01);
+  // Off-track penalty
+  const offTrack=Math.abs(lateral)>.88;
+  if(offTrack) speed*=.88;
 
-  if(carGrp){
-    carGrp.position.set(weave,0,carZ);
-    carGrp.rotation.y=steer+Math.PI;
+  prog+=speed;
+  const lapFrac=prog%1;
+  const lapN=Math.floor(prog)+1;
+
+  // AI cars
+  for(let i=0;i<AI_COUNT;i++){
+    aiData[i].p+=aiData[i].spd*(1+Math.sin(frameT*.1+i)*.05);
+    aiData[i].lat+=Math.sin(frameT*.18+i*1.4)*.006;
+    aiData[i].lat=Math.max(-.85,Math.min(.85,aiData[i].lat));
   }
 
-  // Camera
-  const tCamZ=carZ+10.5;
-  camZ+=(tCamZ-camZ)*.07;
-  camera.position.z=camZ;
-  camera.position.y=3.9+Math.sin(frameT*.4)*.08;
-  camera.position.x=weave*.3+Math.sin(frameT*.25)*.05;
-  camera.lookAt(weave*.45,.42,carZ-15);
-  camera.rotation.z=-weave*.013;
+  // Position calculation
+  const playerAhead=aiData.filter(a=>a.p%3>prog%3).length;
+  const racePosVal=playerAhead+1;
 
-  // Wheels
-  WHEELS.forEach(w=>{w.rotation.x-=.24});
+  // Car world position
+  const tmpTan=new THREE.Vector3(),tmpRight=new THREE.Vector3();
+  const trackPos=curve.getPoint(lapFrac);
+  curve.getTangent(lapFrac,tmpTan);tmpTan.normalize();
+  tmpRight.crossVectors(UP,tmpTan).normalize();
+  const carWorldX=trackPos.x+tmpRight.x*lateral*TRACK_HALF;
+  const carWorldZ=trackPos.z+tmpRight.z*lateral*TRACK_HALF;
+  const carWorldY=trackPos.y;
+
+  // Update car mesh
+  if(carGrp){
+    carGrp.position.set(carWorldX,carWorldY,carWorldZ);
+    carGrp.rotation.y=-Math.atan2(tmpTan.z,tmpTan.x)+Math.PI;
+    WHEELS.forEach(w=>w.rotation.x-=speed*800);
+  }
+
+  // Update AI car meshes
+  for(let i=0;i<AI_COUNT;i++){
+    if(!aiGrps[i])continue;
+    const at=aiData[i].p%1;
+    const ap=curve.getPoint(at);
+    const atan=new THREE.Vector3(),aright=new THREE.Vector3();
+    curve.getTangent(at,atan);atan.normalize();
+    aright.crossVectors(UP,atan).normalize();
+    aiGrps[i].position.set(ap.x+aright.x*aiData[i].lat*TRACK_HALF,ap.y,ap.z+aright.z*aiData[i].lat*TRACK_HALF);
+    aiGrps[i].rotation.y=-Math.atan2(atan.z,atan.x)+Math.PI;
+  }
+
+  // Camera — chase cam
+  const camBehind=8+4*(1-speed/MAXSPEED);
+  const camHeight=3.5+1.5*(1-speed/MAXSPEED);
+  const tCamX=carWorldX-tmpTan.x*camBehind;
+  const tCamZ=carWorldZ-tmpTan.z*camBehind;
+  camera.position.x+=(tCamX-camera.position.x)*.1;
+  camera.position.y+=(carWorldY+camHeight-camera.position.y)*.1;
+  camera.position.z+=(tCamZ-camera.position.z)*.1;
+  // Look ahead
+  const lookAheadT=(lapFrac+.025)%1;
+  const la=curve.getPoint(lookAheadT);
+  const laRight=new THREE.Vector3();
+  const laTan=new THREE.Vector3();
+  curve.getTangent(lookAheadT,laTan);laTan.normalize();
+  laRight.crossVectors(UP,laTan).normalize();
+  camera.lookAt(la.x+laRight.x*lateral*TRACK_HALF*.5,la.y+.5,la.z+laRight.z*lateral*TRACK_HALF*.5);
+  camera.rotation.z=lateral*.015;
 
   // ── HUD ──
-  const spd=Math.min(95+vel*3800,345);
-  document.getElementById('spd-n').textContent=Math.round(spd);
-
-  // Gear sim
-  const gear=spd<50?1:spd<90?2:spd<130?3:spd<175?4:spd<220?5:spd<270?6:7;
-  document.getElementById('gear-n').textContent='G'+gear;
+  const kmh=Math.round(50+speed/MAXSPEED*290);
+  document.getElementById('spd-n').textContent=kmh;
+  const gear=kmh<40?1:kmh<80?2:kmh<120?3:kmh<165?4:kmh<210?5:kmh<255?6:7;
+  document.getElementById('gear').textContent='G'+gear;
+  document.getElementById('pos-n').textContent='P'+racePosVal;
+  document.getElementById('pos-n').style.color=racePosVal<=3?'#ffd700':'var(--ac)';
+  document.getElementById('lapn').textContent=Math.min(lapN,3);
 
   // RPM bar
-  const rpmRat=Math.min(vel*35,.98);
-  const rpmSegs=Math.floor(rpmRat*16);
+  const rpmR=speed/MAXSPEED;
   for(let i=0;i<16;i++){
-    const s=document.getElementById(`rsg${i}`);
+    const s=document.getElementById(`rs${i}`);
     if(!s)continue;
-    s.className='rpm-seg'+(i<rpmSegs?' lit'+(i>12?' redline':i>9?' warn':''):'');
+    const lit=i/16<rpmR;
+    s.className='rpm-s'+(lit?(' lit'+(i>12?' red':i>9?' warn':'')):'');
   }
 
-  // Progress
-  const prog=Math.max(0,Math.min(1,(5-carZ)/Math.abs(FINISH_Z-5)));
-  document.getElementById('progfill').style.width=(prog*100)+'%';
-
-  // Lap counter (every ~20% progress)
-  const newLap=Math.min(5,Math.floor(prog*5)+1);
-  if(newLap!==lapN){lapN=newLap;document.getElementById('lapn').textContent=lapN}
-
-  // DRS sim
-  const drsOn=vel>0.12&&(carZ>-130&&carZ<-80||carZ>-365&&carZ<-310||carZ>-515&&carZ<-465);
-  document.getElementById('drs-btn').className='drs-btn'+(drsOn?' active':'');
-
-  // Sector colours
-  updateSectors(prog);
+  // Progress bar (total race 0-3)
+  document.getElementById('pfill').style.width=(Math.min(prog/3,1)*100)+'%';
 
   // Rolex clock
-  if(raceStart){
-    const el=Date.now()-raceStart;
-    const h=Math.floor(el/3600000).toString().padStart(2,'0');
-    const m=Math.floor((el%3600000)/60000).toString().padStart(2,'0');
-    const s=Math.floor((el%60000)/1000).toString().padStart(2,'0');
-    document.getElementById('rtime').textContent=`${h}:${m}:${s}`;
-  }
+  const el=Date.now()-raceStart;
+  const m=Math.floor(el/60000);const s2=((el%60000)/1000).toFixed(3);
+  document.getElementById('rtime').textContent=`${m}:${s2.padStart(6,'0')}`;
 
-  // Tire compound change
-  if(prog>.35&&prog<.42) setTire('M');
-  else if(prog>.7) setTire('H');
+  // Steering indicator
+  document.getElementById('steer-ring').style.transform=`rotate(${lateral*30}deg)`;
+
+  // DRS (simple: when going fast near straight sections)
+  const drsOn=speed>MAXSPEED*.75&&Math.abs(lateral)<.2;
+  document.getElementById('drs-btn').className='drs'+(drsOn?' on':'');
+
+  // Tire compound per progress
+  const totalProg=prog/3;
+  if(totalProg>.33&&totalProg<.4) setTire('M');
+  else if(totalProg>.66) setTire('H');
+
+  // Sectors
+  const s1t=.33,s2t=.66;
+  if(lapFrac>s1t&&lapFrac<s2t&&Math.random()<.012) document.getElementById('sc1').className='sec '+(Math.random()>.4?'p':'g');
+  if(lapFrac>s2t&&Math.random()<.012) document.getElementById('sc2').className='sec '+(Math.random()>.5?'g':'p');
+  if(lapFrac<.05){document.getElementById('sc1').className='sec';document.getElementById('sc2').className='sec';document.getElementById('sc3').className='sec'}
+
+  // Gap
+  const nearestAI=aiData.reduce((best,a)=>Math.abs(a.p-prog)<Math.abs(best.p-prog)?a:best,aiData[0]);
+  const gapSec=Math.abs(nearestAI.p-prog)/MAXSPEED*.016;
+  document.getElementById('gap-v').textContent=nearestAI.p>prog?'LEADER':(gapSec.toFixed(1)+'s');
 
   // Billboards
-  checkBoards(carZ);
+  checkBoards(lapFrac);
+
+  // Overtake alerts
+  checkOvertakes(racePosVal);
+
+  // Minimap
+  updateMinimap();
+
+  // Audio
+  updateAudio(speed/MAXSPEED,throttle);
+
+  // Pit stops after each lap
+  if(!pitDone[0]&&prog>=1&&prog<1.05){pitDone[0]=true;triggerPitStop(0,1);}
+  if(!pitDone[1]&&prog>=2&&prog<2.05){pitDone[1]=true;triggerPitStop(1,2);}
 
   // Finish
-  if(!podDone&&carZ<FINISH_Z+60){
-    podDone=true;
-    setTimeout(showPodium,800);
-  }
+  if(!podDone&&prog>=3){podDone=true;setTimeout(showPodium,600);}
 
   renderer.render(scene,camera);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TIRE COMPOUND
-// ═══════════════════════════════════════════════════════════════
-function setTire(compound){
-  const cfg={
-    S:{color:'#e10600',name:'SOFT',pirelliColor:'#e10600',pirelliLabel:'S'},
-    M:{color:'#ffd700',name:'MEDIUM',pirelliColor:'#ffd700',pirelliLabel:'M'},
-    H:{color:'#ffffff',name:'HARD',pirelliColor:'#ffffff',pirelliLabel:'H'}
-  };
-  const c=cfg[compound];
-  const tc=document.getElementById('tire-c');
-  tc.style.borderColor=c.color;tc.style.color=c.color;tc.textContent=compound;
-  document.getElementById('tire-n').textContent=c.name;
-  const pc=document.getElementById('pir-c');
-  pc.style.borderColor=c.pirelliColor;pc.style.color=c.pirelliColor;
-  pc.textContent=c.pirelliLabel;
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  SECTOR TIMING
-// ═══════════════════════════════════════════════════════════════
-const SEC_STATES=['purple','green','yellow',''];
-function updateSectors(prog){
-  const s1p=.3,s2p=.6,s3p=.9;
-  const s1c=prog>s1p?SEC_STATES[Math.floor(Math.random()*3)]:prog>s1p-.15?'yellow':'';
-  const s2c=prog>s2p?SEC_STATES[Math.floor(Math.random()*3)]:prog>s2p-.15?'yellow':'';
-  const s3c=prog>s3p?SEC_STATES[Math.floor(Math.random()*3)]:prog>s3p-.15?'yellow':'';
-  // Only update occasionally
-  if(Math.random()<.01){
-    if(prog>s1p)document.getElementById('s1').className='sec '+(Math.random()>.4?'purple':'green');
-    if(prog>s2p)document.getElementById('s2').className='sec '+(Math.random()>.5?'green':'purple');
-    if(prog>s3p)document.getElementById('s3').className='sec '+(Math.random()>.4?'purple':'green');
-  }
-  if(prog<.3)document.getElementById('s1').className='sec '+(prog>.15?'yellow':'');
-  if(prog<.6)document.getElementById('s2').className='sec '+(prog>.45?'yellow':'');
-  if(prog<.9)document.getElementById('s3').className='sec '+(prog>.75?'yellow':'');
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PANELS
-// ═══════════════════════════════════════════════════════════════
-function checkBoards(z){
-  BTRIG.forEach(t=>{
-    const inRange=z<t.z+30&&z>t.z-70;
-    if(!t.closed&&!t.shown&&inRange){
-      t.shown=true;
-      showPanel(t.i);
-      showRadio(SECTIONS[t.i].radio);
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  BILLBOARD PANELS                                                ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function checkBoards(lapFrac){
+  BOARDS.forEach((b,i)=>{
+    const inRange=Math.abs(lapFrac-b.z_t)<.08;
+    if(!boardClosed[i]&&!boardShown[i]&&inRange){
+      boardShown[i]=true;showPanel(i);showRadio('"Approaching '+b.title+' — check telemetry!"');
     }
-    if(t.shown&&!inRange){
-      t.shown=false;
-      if(activePanelIdx===t.i) hidePanel();
-    }
+    if(boardShown[i]&&!inRange){boardShown[i]=false;if(panelActive===i)hidePanel();}
   });
 }
 
+let lastPos=1;
+function checkOvertakes(pos){
+  if(pos>lastPos){
+    showAlert(`OVERTAKEN — P${pos}`,'ot');
+  }else if(pos<lastPos&&lastPos>1){
+    showAlert(`POSITION GAINED — P${pos}`,'pos');
+  }
+  lastPos=pos;
+}
+
+let alertTmr;
+function showAlert(msg,cls){
+  clearTimeout(alertTmr);
+  const old=document.querySelectorAll('.overtake-alert');
+  old.forEach(o=>o.remove());
+  const el=document.createElement('div');
+  el.className='overtake-alert '+cls;
+  el.textContent=msg;
+  document.body.appendChild(el);
+  alertTmr=setTimeout(()=>el.remove(),2600);
+}
+
 function showPanel(idx){
-  activePanelIdx=idx;
-  const s=SECTIONS[idx];
-  document.getElementById('ptag').textContent=s.tag;
-  document.getElementById('ptit').textContent=s.title;
-  const linksHtml=s.links.length?
-    `<div class="p-links">${s.links.map(l=>`<a class="p-link" href="${l.href}" target="_blank">${l.label}</a>`).join('')}</div>`:'';
-  document.getElementById('pbod').innerHTML=
-    `<p>${s.body}</p>
-     <div class="p-chips">${s.chips.map((c,i)=>`<span class="chip${i<2?' ac':''}">${c}</span>`).join('')}</div>
-     ${linksHtml}`;
-  document.getElementById('panel').style.borderLeftColor=s.color;
+  panelActive=idx;
+  const b=BOARDS[idx];
+  document.getElementById('pn-cat').textContent=b.cat;
+  document.getElementById('pn-title').textContent=b.title;
+  const linksHtml=b.links.length?`<div class="pn-links">${b.links.map(l=>`<a class="pn-link" href="${l.href}" target="_blank">${l.label}</a>`).join('')}</div>`:'';
+  document.getElementById('pn-body').innerHTML=`<p>${b.body}</p><div class="pn-chips">${b.chips.map(c=>`<span class="pn-chip">${c}</span>`).join('')}</div>${linksHtml}`;
+  document.getElementById('panel').style.borderLeftColor=b.color;
   document.getElementById('panel').classList.add('on');
 }
 
-function hidePanel(){
-  activePanelIdx=-1;
-  document.getElementById('panel').classList.remove('on');
+function hidePanel(){panelActive=-1;document.getElementById('panel').classList.remove('on');}
+function closePanel(){if(panelActive>=0)boardClosed[panelActive]=true;hidePanel();}
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  PIT STOP                                                        ║
+// ╚══════════════════════════════════════════════════════════════════╝
+let pitCountdown;
+function triggerPitStop(idx,lap){
+  if(audioCtx&&engGain) engGain.gain.setTargetAtTime(0,audioCtx.currentTime,.3);
+  const s=PITSECTIONS[idx];
+  document.getElementById('pit-title').textContent=`PIT STOP — END OF LAP ${lap}`;
+  document.getElementById('pit-anim').textContent=idx===0?'🔧':'🏎️';
+  document.getElementById('pit-cat').textContent=s.cat;
+  document.getElementById('pit-ctitle').textContent=s.title;
+  document.getElementById('pit-ctitle').style.color='#fff';
+  document.getElementById('pit-body').innerHTML=s.body;
+  document.getElementById('pit-chips').innerHTML=s.chips.map(c=>`<span class="pit-chip">${c}</span>`).join('');
+  document.getElementById('pit-links').innerHTML=s.links.map(l=>`<a class="pit-link" href="${l.href}" target="_blank">${l.label}</a>`).join('');
+  document.getElementById('pitstop').style.setProperty('--ac',s.color);
+  document.getElementById('pitstop').classList.add('on');
+  let cnt=6;
+  document.getElementById('pit-count').textContent=cnt;
+  clearInterval(pitCountdown);
+  pitCountdown=setInterval(()=>{
+    cnt--;
+    document.getElementById('pit-count').textContent=cnt;
+    if(cnt<=0){
+      clearInterval(pitCountdown);
+      document.getElementById('pitstop').classList.remove('on');
+      setTire(idx===0?'M':'H');
+      showRadio('"Driver released! Go, go, go! Watch the pit exit."');
+    }
+  },1000);
 }
 
-function closePanel(){
-  if(activePanelIdx>=0){BTRIG[activePanelIdx].closed=true;BTRIG[activePanelIdx].shown=false}
-  hidePanel();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  RADIO
-// ═══════════════════════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  RADIO                                                           ║
+// ╚══════════════════════════════════════════════════════════════════╝
 let radioTmr;
 function showRadio(msg){
   clearTimeout(radioTmr);
   document.getElementById('radio-txt').textContent=msg.replace(/"/g,'');
   document.getElementById('radio').classList.add('on');
-  radioTmr=setTimeout(()=>document.getElementById('radio').classList.remove('on'),4500);
+  radioTmr=setTimeout(()=>document.getElementById('radio').classList.remove('on'),4000);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PODIUM
-// ═══════════════════════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  TIRE                                                            ║
+// ╚══════════════════════════════════════════════════════════════════╝
+const TIRES={S:{col:'#e10600',name:'SOFT'},M:{col:'#ffd700',name:'MEDIUM'},H:{col:'#ffffff',name:'HARD'}};
+function setTire(k){
+  const t=TIRES[k];
+  document.getElementById('tire-dot').style.cssText=`--tc:${t.col}`;
+  document.getElementById('tire-dot').textContent=k;
+  document.getElementById('tire-lbl').style.cssText=`--tc:${t.col}`;
+  document.getElementById('tire-lbl').textContent=t.name;
+  document.getElementById('pir-d').style.cssText=`border-color:${t.col};color:${t.col}`;
+  document.getElementById('pir-d').textContent=k;
+}
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  PODIUM                                                          ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function showPodium(){
   hidePanel();
-  const d=DRIVERS[curDriver];
-  document.getElementById('pod-flag').textContent=d.flag;
-  document.getElementById('pod-driver').textContent=`${d.name} — #${d.num} — ${d.team}`;
+  if(audioCtx&&engGain) engGain.gain.setTargetAtTime(0,audioCtx.currentTime,.5);
+  const d=DRIVERS[curDriver],c=CIRCUITS[curCircuit];
+  document.getElementById('pod-flag').textContent=c.flag;
+  document.getElementById('pod-info').textContent=`DRIVER: ${d.short} · CIRCUIT: ${c.name} · ${DRIVERS[curDriver].name}`;
+  const fact=F1_FACTS[Math.floor(Math.random()*F1_FACTS.length)];
+  document.getElementById('ff-text').textContent=fact;
+  setAc(c.ac);
   startConfetti();
   document.getElementById('cconf').classList.add('on');
   const p=document.getElementById('pod');
@@ -1594,61 +1678,45 @@ function restart(){
   document.getElementById('cconf').classList.remove('on');
   stopConfetti();
   hidePanel();
+  clearInterval(pitCountdown);
+  document.getElementById('pitstop').classList.remove('on');
   document.getElementById('radio').classList.remove('on');
-  ['topbar','lhud','rhud','sponsors','hint','progress'].forEach(id=>{
-    document.getElementById(id).classList.remove('on');
-  });
-  document.getElementById('ss').classList.remove('on');
-  document.body.style.overflow='hidden';
-  window.scrollTo(0,0);
-  if(animId){cancelAnimationFrame(animId);animId=null}
-  scrY=0;manS=0;carZ=5;camZ=10;podDone=false;
-  document.getElementById('sel').classList.remove('out');
+  ['topbar','lhud','rhud','steer-hud','minimap','pbar'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  if(animId){cancelAnimationFrame(animId);animId=null;}
+  if(audioCtx&&engGain) engGain.gain.setTargetAtTime(0,audioCtx.currentTime,.3);
+  prog=0;speed=0;lateral=0;podDone=false;frameT=0;lastPos=1;
+  curDriver=null;curCircuit=null;
+  setAc('#e10600');
+  document.getElementById('scr-d').classList.remove('out','hidden');
+  document.getElementById('scr-c').classList.add('hidden');
+  document.getElementById('scr-c').classList.remove('out');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  CONFETTI
-// ═══════════════════════════════════════════════════════════════
-let cParts=[],cRaf;
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  CONFETTI                                                        ║
+// ╚══════════════════════════════════════════════════════════════════╝
+let cPs=[],cRaf;
 function startConfetti(){
   const cv=document.getElementById('cconf');
   cv.width=innerWidth;cv.height=innerHeight;
   const ctx=cv.getContext('2d');
   const cols=['#e10600','#ffd700','#00d2be','#1f8ce0','#ff6b35','#ffffff','#009246','#ff8000','#358C75'];
-  cParts=Array.from({length:200},()=>({
-    x:Math.random()*cv.width,y:-50-Math.random()*200,
-    w:4+Math.random()*8,h:8+Math.random()*7,
-    c:cols[Math.floor(Math.random()*cols.length)],
-    vx:-2+Math.random()*4,vy:2.5+Math.random()*4,
-    r:Math.random()*360,vr:-5+Math.random()*10
-  }));
+  cPs=Array.from({length:220},()=>({x:Math.random()*cv.width,y:-60-Math.random()*200,w:4+Math.random()*8,h:8+Math.random()*7,c:cols[Math.floor(Math.random()*cols.length)],vx:-2+Math.random()*4,vy:2.5+Math.random()*4.5,r:Math.random()*360,vr:-5+Math.random()*10}));
   const draw=()=>{
     ctx.clearRect(0,0,cv.width,cv.height);
-    cParts.forEach(p=>{
-      p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
-      if(p.y>cv.height+30){p.y=-30;p.x=Math.random()*cv.width}
-      ctx.save();
-      ctx.translate(p.x,p.y);ctx.rotate(p.r*Math.PI/180);
-      ctx.fillStyle=p.c;
-      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
-      ctx.restore();
-    });
+    cPs.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;if(p.y>cv.height+30){p.y=-30;p.x=Math.random()*cv.width}ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r*Math.PI/180);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});
     cRaf=requestAnimationFrame(draw);
   };
   draw();
 }
+function stopConfetti(){if(cRaf)cancelAnimationFrame(cRaf);const cv=document.getElementById('cconf');cv.getContext('2d').clearRect(0,0,cv.width,cv.height);}
 
-function stopConfetti(){
-  if(cRaf)cancelAnimationFrame(cRaf);
-  const cv=document.getElementById('cconf');
-  cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  BOOT
-// ═══════════════════════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  BOOT                                                            ║
+// ╚══════════════════════════════════════════════════════════════════╝
 initTicker();
 initDriverGrid();
+initCircuitGrid();
 </script>
 </body>
 </html>
