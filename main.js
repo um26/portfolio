@@ -81,7 +81,7 @@ function createBoard(text, x, z, color) {
         new THREE.BoxGeometry(4, 2, 0.5),
         new THREE.MeshStandardMaterial({
             color: color,
-            emissive: color
+            emissive: 0x000000   // FIXED
         })
     );
     board.position.set(x, 2, z);
