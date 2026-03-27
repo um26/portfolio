@@ -466,7 +466,7 @@ function initDriverGrid(){
   const g=document.getElementById('dgrid');
   Object.entries(DRIVERS).forEach(([k,d])=>{
     const el=document.createElement('div');
-    el.className='dc';el.style.cssText='--dc:'+d.dc+';--dg:'+d.dg;
+    el.className='dc';el.style.setProperty('--dc',d.dc);el.style.setProperty('--dg',d.dg);
     el.innerHTML='<span class="dc-flag">'+(FLAGS[d.flag]||'🏎')+'</span><div class="dc-num">'+d.num+'</div><div class="dc-team">'+d.team+'</div><div class="dc-name">'+d.name+'</div><div class="dc-bar"></div>';
     el.onclick=()=>pickDriver(k);g.appendChild(el);
   });
@@ -476,7 +476,7 @@ function initCircuitGrid(){
   const g=document.getElementById('cgrid');
   Object.entries(CIRCUITS).forEach(([k,c],ci)=>{
     const el=document.createElement('div');
-    el.className='cc';el.style.cssText='--cc:'+c.ac+';--cg:'+c.ac+'66';
+    el.className='cc';el.style.setProperty('--cc',c.ac);el.style.setProperty('--cg',c.ac+'66');
     const pid='cp_'+k;
     el.innerHTML='<span class="cc-flag">'+c.flag+'</span><svg viewBox="0 0 160 200" fill="none"><path id="'+pid+'" d="'+c.svg+'" stroke="rgba(255,255,255,.07)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="'+c.svg+'" stroke="'+c.ac+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" opacity=".4"/><circle r="5" fill="'+c.ac+'"><animateMotion dur="'+(1.7+ci*.22)+'s" repeatCount="indefinite"><mpath href="#'+pid+'"/></animateMotion></circle><circle r="2.5" fill="#fff" opacity=".55"><animateMotion dur="'+(1.7+ci*.22)+'s" repeatCount="indefinite" begin="-0.42s"><mpath href="#'+pid+'"/></animateMotion></circle></svg><div class="cc-name">'+c.name+'</div><div class="cc-sub">'+c.country+'</div><div class="cc-meta">'+c.laps+' LAPS · '+c.len+'</div>';
     el.onclick=()=>pickCircuit(k);g.appendChild(el);
@@ -967,8 +967,8 @@ function showRadio(msg){
 const TIRES={S:{c:'#e10600',n:'SOFT'},M:{c:'#ffd700',n:'MEDIUM'},H:{c:'#ffffff',n:'HARD'}};
 function setTire(k){
   const t=TIRES[k];
-  document.getElementById('tdot').style.cssText='--tc:'+t.c;document.getElementById('tdot').textContent=k;
-  document.getElementById('tlbl').style.cssText='--tc:'+t.c;document.getElementById('tlbl').textContent=t.n;
+  document.getElementById('tdot').style.setProperty('--tc',t.c);document.getElementById('tdot').textContent=k;
+  document.getElementById('tlbl').style.setProperty('--tc',t.c);document.getElementById('tlbl').textContent=t.n;
   document.getElementById('pirdot').style.cssText='border-color:'+t.c+';color:'+t.c;document.getElementById('pirdot').textContent=k;
 }
 
