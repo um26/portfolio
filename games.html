@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>F1 Mini Games — Utkarsh Mangal</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--red:#e10600;--gold:#ffd700;--teal:#00d2be;--bg:#030303;--H:'Orbitron',sans-serif;--B:'Barlow Condensed',sans-serif;--T:'Barlow',sans-serif}
+html,body{min-height:100%;background:var(--bg);color:#fff;font-family:var(--T);overflow-x:hidden}
+body{background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:40px 40px}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(3,3,3,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:.7rem 1.4rem;display:flex;align-items:center;gap:1rem}
+.nav-back{font-family:var(--H);font-size:.42rem;letter-spacing:.18em;color:#444;text-decoration:none;padding:.3rem .7rem;border:1px solid rgba(255,255,255,.07);border-radius:4px;transition:all .18s}
+.nav-back:hover{color:#fff;border-color:rgba(255,255,255,.2)}
+.nav-title{font-family:var(--H);font-size:.56rem;letter-spacing:.22em;color:var(--red);margin-left:.4rem}
+.nav-sub{font-family:var(--B);font-size:.72rem;color:#2a2a2a;margin-left:auto;letter-spacing:.1em}
+
+/* HERO */
+.hero{text-align:center;padding:3rem 1rem 2.5rem;position:relative}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0,rgba(225,6,0,.1),transparent 65%);pointer-events:none;z-index:0}
+.hero>*{position:relative;z-index:1}
+.hero-eye{font-family:var(--H);font-size:.44rem;letter-spacing:.5em;color:var(--red);margin-bottom:.7rem;animation:rise .6s ease both}
+.hero-h{font-family:var(--H);font-size:clamp(2rem,5.5vw,4rem);font-weight:900;letter-spacing:.06em;background:linear-gradient(160deg,#fff 40%,#444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:rise .6s .06s ease both}
+.hero-sub{font-family:var(--B);font-size:.82rem;color:#333;letter-spacing:.16em;margin-top:.35rem;animation:rise .6s .1s ease both}
+
+/* GAME TABS */
+.tabs{display:flex;justify-content:center;gap:.5rem;padding:0 1rem 1.8rem;flex-wrap:wrap}
+.tab{font-family:var(--H);font-size:.45rem;letter-spacing:.18em;padding:.4rem 1.1rem;border-radius:5px;border:1px solid rgba(255,255,255,.07);color:#333;cursor:pointer;transition:all .2s;background:none}
+.tab:hover{color:#aaa;border-color:rgba(255,255,255,.18)}
+.tab.active{background:var(--red);border-color:var(--red);color:#fff}
+
+/* GAME PANELS */
+.game-wrap{max-width:680px;margin:0 auto;padding:0 1rem 5rem}
+.game-panel{display:none;animation:rise .45s ease}
+.game-panel.active{display:block}
+
+/* ── SHARED CARD ── */
+.g-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:clamp(1.4rem,3.5vw,2rem);margin-bottom:1.2rem}
+.g-tag{font-family:var(--H);font-size:.4rem;letter-spacing:.3em;color:var(--red);margin-bottom:.3rem}
+.g-h{font-family:var(--H);font-size:clamp(.9rem,2.5vw,1.3rem);font-weight:700;margin-bottom:.5rem}
+.g-desc{font-family:var(--T);font-size:clamp(.75rem,1.9vw,.88rem);color:#555;line-height:1.6;margin-bottom:1.2rem}
+.g-status{font-family:var(--H);font-size:.5rem;letter-spacing:.18em;min-height:1.4em;margin-bottom:1rem;text-align:center}
+.g-status.win{color:#00e87a}
+.g-status.lose{color:var(--red)}
+.g-status.draw{color:var(--gold)}
+.g-status.info{color:#555}
+.g-btn{font-family:var(--H);font-size:.45rem;letter-spacing:.16em;padding:.45rem 1.1rem;border-radius:5px;border:1px solid rgba(255,255,255,.1);color:#888;background:none;cursor:pointer;transition:all .2s}
+.g-btn:hover,.g-btn:active{background:var(--red);border-color:var(--red);color:#fff}
+.g-btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.g-btn.primary:hover{background:#ff1a0e}
+.score-row{display:flex;gap:1.2rem;justify-content:center;margin-bottom:1.2rem}
+.score-box{text-align:center}
+.score-lbl{font-family:var(--H);font-size:.38rem;letter-spacing:.2em;color:#2a2a2a;margin-bottom:.12rem}
+.score-val{font-family:var(--H);font-size:1.4rem;font-weight:900}
+
+/* ══ TIC TAC TOE ══ */
+.ttt-board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:280px;margin:0 auto 1.2rem}
+.ttt-cell{aspect-ratio:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;cursor:pointer;transition:all .18s;user-select:none}
+.ttt-cell:hover:not(.taken){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)}
+.ttt-cell.taken{cursor:default}
+.ttt-cell.X{color:#e10600;text-shadow:0 0 12px rgba(225,6,0,.5)}
+.ttt-cell.O{color:#00d2be;text-shadow:0 0 12px rgba(0,210,190,.5)}
+.ttt-cell.win-cell{background:rgba(255,215,0,.08);border-color:rgba(255,215,0,.35)}
+.ttt-legend{display:flex;justify-content:center;gap:2rem;margin-bottom:1rem;font-family:var(--H);font-size:.42rem;letter-spacing:.1em;color:#333}
+.ttt-legend span{display:flex;align-items:center;gap:.4rem}
+.ttt-legend .dot{width:10px;height:10px;border-radius:50%}
+
+/* ══ GUESS THE NUMBER ══ */
+.pit-display{text-align:center;margin-bottom:1.4rem}
+.pit-time{font-family:var(--H);font-size:clamp(2rem,6vw,3.5rem);font-weight:900;color:var(--gold);letter-spacing:.06em;line-height:1}
+.pit-unit{font-family:var(--B);font-size:.72rem;color:#333;letter-spacing:.18em;margin-top:.2rem}
+.range-hint{font-family:var(--H);font-size:.42rem;letter-spacing:.14em;color:#2a2a2a;margin-bottom:1rem;text-align:center}
+.guess-input{display:flex;gap:.6rem;justify-content:center;align-items:center;margin-bottom:1rem}
+.guess-input input{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;font-family:var(--H);font-size:.9rem;width:100px;text-align:center;padding:.5rem;outline:none;transition:border-color .2s}
+.guess-input input:focus{border-color:var(--red)}
+.guess-history{display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center;margin-bottom:1rem;min-height:2rem}
+.g-tag-small{font-family:var(--H);font-size:.38rem;letter-spacing:.12em;padding:.18rem .5rem;border-radius:3px}
+.g-high{background:rgba(225,6,0,.15);color:#e10600;border:1px solid rgba(225,6,0,.3)}
+.g-low{background:rgba(0,136,255,.12);color:#0088ff;border:1px solid rgba(0,136,255,.28)}
+.g-close{background:rgba(255,215,0,.12);color:#ffd700;border:1px solid rgba(255,215,0,.28)}
+.g-correct{background:rgba(0,232,122,.12);color:#00e87a;border:1px solid rgba(0,232,122,.28)}
+.fuel-bar{width:100%;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:.4rem}
+.fuel-fill{height:100%;background:linear-gradient(90deg,var(--red),#ff8000);border-radius:3px;transition:width .4s}
+
+/* ══ WORDLE ══ */
+.wordle-grid{display:grid;grid-template-rows:repeat(6,1fr);gap:5px;max-width:300px;margin:0 auto 1.2rem}
+.wordle-row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.wordle-cell{aspect-ratio:1;border:1.5px solid rgba(255,255,255,.1);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--H);font-size:clamp(1rem,3.5vw,1.35rem);font-weight:700;transition:border-color .1s,transform .1s;user-select:none}
+.wordle-cell.filled{border-color:rgba(255,255,255,.28);transform:scale(1.04)}
+.wordle-cell.correct{background:#18a148;border-color:#18a148;color:#fff}
+.wordle-cell.present{background:#b58a00;border-color:#b58a00;color:#fff}
+.wordle-cell.absent{background:#1e1e1e;border-color:#1e1e1e;color:#444}
+.wordle-keyboard{display:flex;flex-direction:column;gap:5px;max-width:340px;margin:0 auto}
+.kb-row{display:flex;justify-content:center;gap:4px}
+.kb-key{font-family:var(--H);font-size:.38rem;letter-spacing:.06em;min-width:clamp(26px,7vw,34px);height:clamp(36px,9vw,44px);border-radius:4px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#aaa;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0 4px}
+.kb-key:hover{background:rgba(255,255,255,.14)}
+.kb-key.wide{min-width:clamp(44px,11vw,54px);font-size:.32rem}
+.kb-key.correct{background:#18a148;border-color:#18a148;color:#fff}
+.kb-key.present{background:#b58a00;border-color:#b58a00;color:#fff}
+.kb-key.absent{background:#111;border-color:#111;color:#333}
+.wordle-hint{font-family:var(--B);font-size:.72rem;color:#2a2a2a;letter-spacing:.12em;text-align:center;margin-bottom:.5rem;min-height:1.2em}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-back">← BACK TO PORTFOLIO</a>
+  <span class="nav-title">🎮 F1 MINI GAMES</span>
+  <span class="nav-sub">Utkarsh Mangal</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-eye">Formula 1 — Interactive Entertainment Zone</div>
+  <h1 class="hero-h">F1 MINI GAMES</h1>
+  <p class="hero-sub">Three F1-themed games — race your brain not your car</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchGame('ttt')">🏎 Tic-Tac-Toe</button>
+  <button class="tab" onclick="switchGame('pit')">⏱ Pit Stop Challenge</button>
+  <button class="tab" onclick="switchGame('wordle')">🔤 F1 Wordle</button>
+</div>
+
+<div class="game-wrap">
+
+  <!-- ═══ TTT ═══ -->
+  <div class="game-panel active" id="game-ttt">
+    <div class="g-card">
+      <div class="g-tag">RACE TO THREE</div>
+      <div class="g-h">Tic-Tac-Toe GP</div>
+      <div class="g-desc">Ferrari vs Mercedes — You play as 🔴 Ferrari. AI plays as 🔵 Mercedes. First to three in a row wins the constructors' title.</div>
+      <div class="ttt-legend">
+        <span><span class="dot" style="background:#e10600"></span>YOU — Ferrari</span>
+        <span><span class="dot" style="background:#00d2be"></span>AI — Mercedes</span>
+      </div>
+      <div class="score-row">
+        <div class="score-box"><div class="score-lbl">YOU</div><div class="score-val" id="ttt-pscore" style="color:#e10600">0</div></div>
+        <div class="score-box"><div class="score-lbl">DRAWS</div><div class="score-val" id="ttt-dscore" style="color:#555">0</div></div>
+        <div class="score-box"><div class="score-lbl">AI</div><div class="score-val" id="ttt-ascore" style="color:#00d2be">0</div></div>
+      </div>
+      <div class="g-status info" id="ttt-status">Your move — pick a cell</div>
+      <div class="ttt-board" id="ttt-board"></div>
+      <div style="display:flex;justify-content:center;gap:.6rem">
+        <button class="g-btn primary" onclick="tttReset()">NEW RACE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PIT STOP CHALLENGE ═══ -->
+  <div class="game-panel" id="game-pit">
+    <div class="g-card">
+      <div class="g-tag">TIMING IS EVERYTHING</div>
+      <div class="g-h">Pit Stop Challenge</div>
+      <div class="g-desc">A pit crew target time has been set. Guess the exact pit stop duration in tenths of a second (1–99). You have 6 attempts — the fuel bar shows how many guesses remain.</div>
+      <div class="pit-display">
+        <div class="pit-time" id="pit-display">??.?</div>
+        <div class="pit-unit">SECONDS TARGET</div>
+      </div>
+      <div class="fuel-bar"><div class="fuel-fill" id="fuel-fill" style="width:100%"></div></div>
+      <div class="range-hint" id="pit-hint">GUESS A NUMBER FROM 1.0 TO 9.9 SECONDS</div>
+      <div class="guess-history" id="pit-history"></div>
+      <div class="guess-input">
+        <input type="number" id="pit-input" min="1" max="99" placeholder="e.g. 23" step="1">
+        <button class="g-btn primary" onclick="pitGuess()">GUESS</button>
+      </div>
+      <div class="g-status" id="pit-status"></div>
+      <div style="text-align:center">
+        <button class="g-btn" onclick="pitReset()">NEW TARGET</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ WORDLE ═══ -->
+  <div class="game-panel" id="game-wordle">
+    <div class="g-card">
+      <div class="g-tag">FIVE LETTER FLAG</div>
+      <div class="g-h">F1 Wordle</div>
+      <div class="g-desc">Guess the hidden 5-letter F1 word in 6 tries. 🟩 = right letter, right spot. 🟨 = right letter, wrong spot. ⬛ = not in the word.</div>
+      <div class="wordle-hint" id="w-hint"></div>
+      <div class="wordle-grid" id="w-grid"></div>
+      <div class="wordle-keyboard" id="w-kbd"></div>
+      <div class="g-status" id="w-status" style="margin-top:.8rem"></div>
+      <div style="text-align:center;margin-top:.8rem">
+        <button class="g-btn" onclick="wordleReset()">NEW WORD</button>
+      </div>
+    </div>
+    <div class="g-card" style="background:rgba(255,215,0,.03);border-color:rgba(255,215,0,.1)">
+      <div class="g-tag" style="color:var(--gold)">WORD CATEGORIES</div>
+      <div style="font-family:var(--B);font-size:.78rem;color:#2a2a2a;line-height:2;letter-spacing:.06em">
+        Drivers · Circuits · Teams · F1 Terms — All words are 5 letters from the world of Formula 1
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+// ════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════
+function switchGame(id) {
+  document.querySelectorAll(".tab").forEach((t,i) => t.classList.toggle("active", ["ttt","pit","wordle"][i] === id));
+  document.querySelectorAll(".game-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("game-" + id).classList.add("active");
+}
+
+// ════════════════════════════════════════
+// TIC-TAC-TOE (minimax AI)
+// ════════════════════════════════════════
+let tttBoard = Array(9).fill(null);
+let tttActive = true;
+let tttScores = { player: 0, ai: 0, draw: 0 };
+const WIN_LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function tttInit() {
+  const board = document.getElementById("ttt-board");
+  board.innerHTML = "";
+  tttBoard = Array(9).fill(null);
+  tttActive = true;
+  document.getElementById("ttt-status").textContent = "Your move — pick a cell";
+  document.getElementById("ttt-status").className = "g-status info";
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement("div");
+    cell.className = "ttt-cell";
+    cell.id = `ttt-${i}`;
+    cell.onclick = () => tttMove(i);
+    board.appendChild(cell);
+  }
+}
+
+function tttMove(idx) {
+  if (!tttActive || tttBoard[idx]) return;
+  tttBoard[idx] = "X";
+  tttRender();
+  const win = tttCheck(tttBoard);
+  if (win) { tttEnd(win, "X"); return; }
+  if (tttBoard.every(c => c)) { tttEnd(null, null); return; }
+  document.getElementById("ttt-status").textContent = "AI is thinking…";
+  document.getElementById("ttt-status").className = "g-status info";
+  tttActive = false;
+  setTimeout(() => {
+    const best = tttBestMove(tttBoard);
+    tttBoard[best] = "O";
+    tttRender();
+    const win2 = tttCheck(tttBoard);
+    if (win2) { tttEnd(win2, "O"); return; }
+    if (tttBoard.every(c => c)) { tttEnd(null, null); return; }
+    tttActive = true;
+    document.getElementById("ttt-status").textContent = "Your move — pick a cell";
+    document.getElementById("ttt-status").className = "g-status info";
+  }, 420);
+}
+
+function tttRender() {
+  const symbols = { X: "🔴", O: "🔵" };
+  tttBoard.forEach((v, i) => {
+    const cell = document.getElementById(`ttt-${i}`);
+    cell.textContent = v ? symbols[v] : "";
+    cell.className = "ttt-cell" + (v ? ` taken ${v}` : "");
+  });
+}
+
+function tttEnd(line, winner) {
+  tttActive = false;
+  if (line) line.forEach(i => document.getElementById(`ttt-${i}`).classList.add("win-cell"));
+  const status = document.getElementById("ttt-status");
+  if (winner === "X") { status.textContent = "🏆 YOU WIN — Forza Ferrari!"; status.className = "g-status win"; tttScores.player++; }
+  else if (winner === "O") { status.textContent = "🔵 AI WINS — Mercedes takes P1"; status.className = "g-status lose"; tttScores.ai++; }
+  else { status.textContent = "🤝 DRAW — Points shared!"; status.className = "g-status draw"; tttScores.draw++; }
+  document.getElementById("ttt-pscore").textContent = tttScores.player;
+  document.getElementById("ttt-ascore").textContent = tttScores.ai;
+  document.getElementById("ttt-dscore").textContent = tttScores.draw;
+}
+
+function tttReset() { tttInit(); }
+
+function tttCheck(board) {
+  for (const line of WIN_LINES) {
+    const [a,b,c] = line;
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) return line;
+  }
+  return null;
+}
+
+function tttScore(board) {
+  const w = tttCheck(board);
+  if (w) return board[w[0]] === "O" ? 10 : -10;
+  return 0;
+}
+
+function minimax(board, depth, isMax) {
+  const score = tttScore(board);
+  if (score !== 0) return score;
+  if (board.every(c => c)) return 0;
+  if (isMax) {
+    let best = -Infinity;
+    board.forEach((c, i) => { if (!c) { board[i]="O"; best=Math.max(best, minimax(board,depth+1,false)); board[i]=null; } });
+    return best;
+  } else {
+    let best = Infinity;
+    board.forEach((c, i) => { if (!c) { board[i]="X"; best=Math.min(best, minimax(board,depth+1,true)); board[i]=null; } });
+    return best;
+  }
+}
+
+function tttBestMove(board) {
+  let best = -Infinity, move = -1;
+  board.forEach((c, i) => {
+    if (!c) { board[i]="O"; const s=minimax(board,0,false); board[i]=null; if(s>best){best=s;move=i;} }
+  });
+  return move;
+}
+
+// ════════════════════════════════════════
+// PIT STOP CHALLENGE (guess the number)
+// ════════════════════════════════════════
+// Numbers 10–99 represent tenths: 10 = 1.0s, 99 = 9.9s
+// Display as X.X seconds
+let pitTarget = 0, pitGuesses = 0, pitMax = 6, pitActive = true;
+
+const PIT_FLAVORS = [
+  "Red Bull crew is ready — ultra fast target set!",
+  "Ferrari pit wall has the clock — can you match it?",
+  "McLaren's papaya crew challenges you — find the time!",
+  "Mercedes engineers have a target — guess it exactly!",
+  "Aston Martin's crew is waiting — what's the stop time?",
+];
+
+function pitInit() {
+  pitTarget = Math.floor(Math.random() * 90) + 10; // 10–99 (1.0–9.9s)
+  pitGuesses = 0; pitActive = true;
+  document.getElementById("pit-display").textContent = "??.?";
+  document.getElementById("pit-history").innerHTML = "";
+  document.getElementById("pit-status").textContent = "";
+  document.getElementById("pit-status").className = "g-status";
+  document.getElementById("pit-input").value = "";
+  document.getElementById("fuel-fill").style.width = "100%";
+  document.getElementById("pit-hint").textContent = PIT_FLAVORS[Math.floor(Math.random() * PIT_FLAVORS.length)];
+}
+
+function fmtPit(n) { return Math.floor(n/10) + "." + (n % 10); }
+
+function pitGuess() {
+  if (!pitActive) return;
+  const raw = parseInt(document.getElementById("pit-input").value);
+  if (isNaN(raw) || raw < 10 || raw > 99) { document.getElementById("pit-status").textContent = "Enter a number 10–99 (= 1.0–9.9s)"; document.getElementById("pit-status").className = "g-status lose"; return; }
+  pitGuesses++;
+  const fuel = Math.max(0, (pitMax - pitGuesses) / pitMax * 100);
+  document.getElementById("fuel-fill").style.width = fuel + "%";
+  document.getElementById("pit-input").value = "";
+  const hist = document.getElementById("pit-history");
+  const diff = raw - pitTarget;
+  let cls, label;
+  if (diff === 0) { cls = "g-correct"; label = fmtPit(raw) + "s ✓"; }
+  else if (Math.abs(diff) <= 3) { cls = "g-close"; label = fmtPit(raw) + "s " + (diff > 0 ? "▲ HOT" : "▼ CLOSE"); }
+  else if (diff > 0) { cls = "g-high"; label = fmtPit(raw) + "s ▲ TOO SLOW"; }
+  else { cls = "g-low"; label = fmtPit(raw) + "s ▼ TOO FAST"; }
+  hist.innerHTML += `<span class="g-tag-small ${cls}">${label}</span>`;
+  const status = document.getElementById("pit-status");
+  if (diff === 0) {
+    document.getElementById("pit-display").textContent = fmtPit(pitTarget) + "s";
+    status.textContent = `🏆 PERFECT STOP in ${pitGuesses} guess${pitGuesses > 1 ? "es" : ""}! Fastest crew on the grid!`;
+    status.className = "g-status win"; pitActive = false;
+  } else if (pitGuesses >= pitMax) {
+    document.getElementById("pit-display").textContent = fmtPit(pitTarget) + "s";
+    status.textContent = `❌ Target was ${fmtPit(pitTarget)}s — better luck next stop!`;
+    status.className = "g-status lose"; pitActive = false;
+  } else {
+    status.textContent = `${pitMax - pitGuesses} attempt${pitMax - pitGuesses !== 1 ? "s" : ""} remaining`;
+    status.className = "g-status info";
+    document.getElementById("pit-hint").textContent = diff > 0 ? "▲ Your guess is SLOWER than target" : "▼ Your guess is FASTER than target";
+  }
+}
+
+function pitReset() { pitInit(); }
+
+// Enter key support
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("pit-input").addEventListener("keydown", e => { if (e.key === "Enter") pitGuess(); });
+});
+
+// ════════════════════════════════════════
+// F1 WORDLE
+// ════════════════════════════════════════
+const F1_WORDS = [
+  // Drivers (5 letters)
+  "SAINZ","SENNA","LAUDA","ALBON","PEREZ",
+  // Circuits / locations  
+  "MONZA","IMOLA","MIAMI","CHINA","JAPAN","SPAIN","ITALY","QATAR",
+  // F1 terms
+  "BRAKE","TYRES","TURBO","WHEEL","DRIVE","TRACK","KERBS","GRAND",
+  "AMBER","SLICK","DELTA","SPEED","FRONT","DRAFT","CHAMP","PODIU",
+  // Teams/other
+  "HAAS","MERC",
+  // Extra
+  "RACES","VISOR","PACKS","RADIO","FLAGS","BURNS","GUARD",
+].filter(w => w.length === 5);
+
+// Remove duplicates, ensure all 5 letters
+const WORDLE_WORDS = [...new Set(F1_WORDS.filter(w => /^[A-Z]{5}$/.test(w)))];
+
+let wAnswer = "", wCurrentRow = 0, wCurrentGuess = "", wGuesses = [], wFinished = false;
+const wKeyMap = {};
+
+function wordleInit() {
+  wAnswer = WORDLE_WORDS[Math.floor(Math.random() * WORDLE_WORDS.length)];
+  wCurrentRow = 0; wCurrentGuess = ""; wGuesses = []; wFinished = false;
+  Object.keys(wKeyMap).forEach(k => delete wKeyMap[k]);
+  document.getElementById("w-hint").textContent = "";
+  document.getElementById("w-status").textContent = "";
+  document.getElementById("w-status").className = "g-status";
+  buildWordleGrid(); buildWordleKeyboard();
+}
+
+function buildWordleGrid() {
+  const grid = document.getElementById("w-grid");
+  grid.innerHTML = "";
+  for (let r = 0; r < 6; r++) {
+    const row = document.createElement("div"); row.className = "wordle-row"; row.id = `wrow-${r}`;
+    for (let c = 0; c < 5; c++) {
+      const cell = document.createElement("div"); cell.className = "wordle-cell"; cell.id = `wc-${r}-${c}`; row.appendChild(cell);
+    }
+    grid.appendChild(row);
+  }
+}
+
+const KB_ROWS = [
+  ["Q","W","E","R","T","Y","U","I","O","P"],
+  ["A","S","D","F","G","H","J","K","L"],
+  ["ENTER","Z","X","C","V","B","N","M","⌫"],
+];
+
+function buildWordleKeyboard() {
+  const kbd = document.getElementById("w-kbd"); kbd.innerHTML = "";
+  KB_ROWS.forEach(row => {
+    const r = document.createElement("div"); r.className = "kb-row";
+    row.forEach(k => {
+      const btn = document.createElement("button");
+      btn.className = "kb-key" + (k.length > 1 ? " wide" : "");
+      btn.textContent = k; btn.id = `kb-${k}`;
+      btn.onclick = () => wKeyPress(k);
+      r.appendChild(btn);
+    });
+    kbd.appendChild(r);
+  });
+}
+
+function wKeyPress(key) {
+  if (wFinished) return;
+  if (key === "⌫" || key === "Backspace") { if (wCurrentGuess.length > 0) { wCurrentGuess = wCurrentGuess.slice(0,-1); wRenderCurrent(); } return; }
+  if (key === "ENTER" || key === "Enter") { if (wCurrentGuess.length === 5) wSubmit(); else document.getElementById("w-hint").textContent = "Need 5 letters!"; return; }
+  if (/^[A-Za-z]$/.test(key) && wCurrentGuess.length < 5) { wCurrentGuess += key.toUpperCase(); wRenderCurrent(); }
+}
+
+document.addEventListener("keydown", e => {
+  if (document.getElementById("game-wordle").classList.contains("active")) wKeyPress(e.key);
+});
+
+function wRenderCurrent() {
+  for (let c = 0; c < 5; c++) {
+    const cell = document.getElementById(`wc-${wCurrentRow}-${c}`);
+    cell.textContent = wCurrentGuess[c] || "";
+    cell.className = "wordle-cell" + (wCurrentGuess[c] ? " filled" : "");
+  }
+  document.getElementById("w-hint").textContent = "";
+}
+
+function wSubmit() {
+  const guess = wCurrentGuess;
+  const result = wEval(guess, wAnswer);
+  // Animate reveal
+  for (let c = 0; c < 5; c++) {
+    setTimeout(() => {
+      const cell = document.getElementById(`wc-${wCurrentRow}-${c}`);
+      cell.className = "wordle-cell " + result[c];
+      cell.textContent = guess[c];
+    }, c * 120);
+  }
+  // Update key colors after reveal
+  setTimeout(() => {
+    for (let c = 0; c < 5; c++) {
+      const k = guess[c];
+      const cur = wKeyMap[k];
+      if (!cur || cur !== "correct") {
+        if (result[c] === "correct") wKeyMap[k] = "correct";
+        else if (result[c] === "present" && cur !== "correct") wKeyMap[k] = "present";
+        else if (!cur) wKeyMap[k] = "absent";
+      }
+      const btn = document.getElementById(`kb-${k}`);
+      if (btn) btn.className = "kb-key " + (k.length > 1 ? "wide " : "") + (wKeyMap[k] || "");
+    }
+    wGuesses.push(guess); wCurrentRow++; wCurrentGuess = "";
+    const won = result.every(r => r === "correct");
+    const status = document.getElementById("w-status");
+    if (won) {
+      const msgs = ["🏆 POLE POSITION! Perfect word!","🥇 P1! Race winner!", "🚀 Fastest lap!","🏁 Chequered flag!"];
+      status.textContent = msgs[Math.floor(Math.random()*msgs.length)] + ` (${wCurrentRow}/6)`;
+      status.className = "g-status win"; wFinished = true;
+    } else if (wCurrentRow >= 6) {
+      status.textContent = `❌ Race over — the word was ${wAnswer}`;
+      status.className = "g-status lose"; wFinished = true;
+    } else {
+      const left = 6 - wCurrentRow;
+      document.getElementById("w-hint").textContent = `${left} attempt${left !== 1 ? "s" : ""} remaining`;
+    }
+  }, 5 * 120 + 200);
+}
+
+function wEval(guess, answer) {
+  const result = Array(5).fill("absent");
+  const aCopy = answer.split(""), used = Array(5).fill(false);
+  // First pass: correct
+  for (let i = 0; i < 5; i++) { if (guess[i] === answer[i]) { result[i] = "correct"; aCopy[i] = null; used[i] = true; } }
+  // Second pass: present
+  for (let i = 0; i < 5; i++) {
+    if (result[i] !== "correct") {
+      const j = aCopy.indexOf(guess[i]);
+      if (j !== -1) { result[i] = "present"; aCopy[j] = null; }
+    }
+  }
+  return result;
+}
+
+function wordleReset() { wordleInit(); }
+
+// ════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════
+tttInit();
+pitInit();
+wordleInit();
+</script>
+</body>
+</html>
