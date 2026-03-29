@@ -2,869 +2,1653 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Utkarsh Mangal — Formula Portfolio</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTKARSH MANGAL — F1 PORTFOLIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --r:#e10600;--g:#00e87a;--t:#00d2be;--y:#ffd700;
-  --bg:#020204;--fg:#ffffff;
-  --H:'Orbitron',monospace;--M:'Space Mono',monospace;--B:'Barlow',sans-serif;
+  --ac:#e10600; --bg:#050505;
+  --h:'Orbitron',sans-serif;
+  --b:'Rajdhani',sans-serif;
 }
-html,body{width:100%;height:100%;background:var(--bg);color:var(--fg);font-family:var(--B);overflow:hidden;cursor:default}
-#cv{position:fixed;inset:0;z-index:0}
-
-/* ═══ LOADING ═══ */
-#loading{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6rem;transition:opacity .8s,visibility .8s}
-#loading.done{opacity:0;visibility:hidden}
-.ld-logo{font-family:var(--H);font-size:clamp(1rem,3.5vw,1.8rem);font-weight:900;letter-spacing:.12em;color:var(--r);animation:pulse 1.2s infinite alternate}
-.ld-bar-wrap{width:clamp(200px,35vw,320px);height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden}
-.ld-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--r),var(--t));border-radius:1px;transition:width .15s}
-.ld-txt{font-family:var(--M);font-size:.62rem;color:#333;letter-spacing:.2em}
-@keyframes pulse{from{opacity:.5}to{opacity:1}}
-
-/* ═══ HEADER ═══ */
-#hdr{position:fixed;top:0;left:0;right:0;height:52px;z-index:20;display:flex;align-items:center;padding:0 clamp(1rem,3vw,2.4rem);gap:1.2rem;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(2,2,4,.7);backdrop-filter:blur(20px);transform:translateY(-60px);transition:transform .7s cubic-bezier(.16,1,.3,1)}
-#hdr.in{transform:translateY(0)}
-.hdr-dot{width:6px;height:6px;border-radius:50%;background:var(--r);box-shadow:0 0 8px var(--r);animation:pulse 1.4s infinite alternate;flex-shrink:0}
-.hdr-name{font-family:var(--H);font-size:clamp(.5rem,1.3vw,.72rem);font-weight:700;letter-spacing:.16em;color:#fff}
-.hdr-title{font-family:var(--M);font-size:clamp(.38rem,1vw,.54rem);color:#333;letter-spacing:.12em;font-style:italic}
-.hdr-nav{margin-left:auto;display:flex;gap:clamp(.3rem,.8vw,.6rem);align-items:center}
-.nav-pill{font-family:var(--H);font-size:clamp(.3rem,.65vw,.42rem);letter-spacing:.12em;padding:.26rem .7rem;border-radius:3px;border:1px solid rgba(255,255,255,.06);color:#333;cursor:pointer;transition:all .2s;background:none;white-space:nowrap}
-.nav-pill:hover,.nav-pill.active{border-color:var(--r);color:var(--r);background:rgba(225,6,0,.08);box-shadow:0 0 12px rgba(225,6,0,.12)}
-.nav-pill.games-pill{border-color:rgba(0,210,190,.25);color:var(--t)}
-.nav-pill.games-pill:hover{background:rgba(0,210,190,.08);box-shadow:0 0 12px rgba(0,210,190,.12)}
-
-/* ═══ HUD CORNERS ═══ */
-.corner{position:fixed;z-index:15;width:60px;height:60px;opacity:0;transition:opacity 1s .8s}
-.corner.in{opacity:1}
-.corner svg{position:absolute}
-#c-tl{top:58px;left:0}.c-tl-line{stroke:var(--r);stroke-width:1.5;fill:none}
-#c-tr{top:58px;right:0}
-#c-bl{bottom:0;left:0}
-#c-br{bottom:0;right:0}
-
-/* ═══ CENTER HUD ═══ */
-#center-hud{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .8s}
-#center-hud.in{opacity:1}
-.ch-name{font-family:var(--H);font-size:clamp(2rem,6vw,5.5rem);font-weight:900;letter-spacing:.08em;text-align:center;line-height:.95;pointer-events:none;user-select:none}
-.ch-name .line1{display:block;background:linear-gradient(135deg,#fff 30%,rgba(255,255,255,.35));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:slide-in .9s .3s cubic-bezier(.16,1,.3,1) both}
-.ch-name .line2{display:block;background:linear-gradient(135deg,var(--r) 0%,#ff6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:slide-in .9s .45s cubic-bezier(.16,1,.3,1) both}
-.ch-sub{font-family:var(--M);font-size:clamp(.52rem,1.3vw,.78rem);color:rgba(255,255,255,.25);letter-spacing:.22em;margin-top:.7rem;text-align:center;animation:fade-up .9s .65s ease both}
-.ch-scroll{font-family:var(--H);font-size:.36rem;letter-spacing:.3em;color:rgba(255,255,255,.15);margin-top:2.5rem;animation:blink 2.5s infinite 1.5s}
-.ch-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(255,255,255,.12),transparent);margin:.4rem auto;animation:fade-up .9s .9s ease both}
-
-@keyframes slide-in{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
-@keyframes fade-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes blink{0%,100%{opacity:.1}50%{opacity:.55}}
-
-/* ═══ SECTION BUTTONS (floating around center) ═══ */
-#orbs{position:fixed;inset:0;z-index:6;pointer-events:none}
-.orb-btn{position:absolute;transform:translate(-50%,-50%);pointer-events:all;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.35rem;opacity:0;transition:opacity .6s,transform .3s}
-.orb-btn.in{opacity:1}
-.orb-btn:hover .orb-ring{transform:scale(1.18);box-shadow:0 0 24px var(--oc),0 0 48px rgba(var(--ocr),.25)}
-.orb-btn:hover .orb-label{color:#fff;opacity:1}
-.orb-ring{width:clamp(48px,6vw,70px);height:clamp(48px,6vw,70px);border-radius:50%;border:1.5px solid var(--oc);background:rgba(var(--ocr),.06);display:flex;align-items:center;justify-content:center;font-size:clamp(1.1rem,2.5vw,1.6rem);transition:all .28s cubic-bezier(.16,1,.3,1);box-shadow:0 0 12px rgba(var(--ocr),.15);backdrop-filter:blur(8px)}
-.orb-ring.active-orb{background:rgba(var(--ocr),.18);box-shadow:0 0 28px var(--oc),0 0 60px rgba(var(--ocr),.2)}
-.orb-label{font-family:var(--H);font-size:clamp(.3rem,.7vw,.44rem);letter-spacing:.2em;color:rgba(255,255,255,.35);opacity:.7;transition:all .22s;text-align:center;white-space:nowrap}
-
-/* ═══ CONTENT PANEL ═══ */
-#panel-wrap{position:fixed;inset:52px 0 0 0;z-index:25;display:flex;align-items:center;justify-content:flex-end;padding:clamp(1rem,2.5vw,1.8rem);pointer-events:none}
-#content-panel{width:min(480px,90vw);max-height:calc(100vh - 100px);background:rgba(2,2,4,.88);border:1px solid rgba(255,255,255,.08);border-radius:16px;backdrop-filter:blur(40px);transform:translateX(calc(100% + 2rem));opacity:0;transition:transform .55s cubic-bezier(.16,1,.3,1),opacity .55s;overflow:hidden;pointer-events:none;position:relative}
-#content-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--pc,var(--r)),transparent);opacity:.7}
-#content-panel.open{transform:translateX(0);opacity:1;pointer-events:all}
-.panel-scroll{overflow-y:auto;overflow-x:hidden;max-height:calc(100vh - 120px);padding:clamp(1.2rem,3vw,1.8rem)}
-.panel-scroll::-webkit-scrollbar{width:3px}
-.panel-scroll::-webkit-scrollbar-track{background:transparent}
-.panel-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
-.p-close{position:absolute;top:.75rem;right:.75rem;width:24px;height:24px;border-radius:4px;border:1px solid rgba(255,255,255,.08);background:none;color:#333;cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;transition:all .16s;z-index:2}
-.p-close:hover{color:#fff;border-color:rgba(255,255,255,.22)}
-.p-tag{font-family:var(--H);font-size:.38rem;letter-spacing:.32em;color:var(--pc,var(--r));margin-bottom:.3rem}
-.p-title{font-family:var(--H);font-size:clamp(.9rem,2.5vw,1.25rem);font-weight:700;margin-bottom:.9rem;line-height:1.2}
-/* About section */
-.about-hero{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.2rem}
-.about-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--r),#ff6600);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:2px solid rgba(225,6,0,.3)}
-.about-info{flex:1}
-.ai-name{font-family:var(--H);font-size:.78rem;font-weight:700;margin-bottom:.18rem}
-.ai-role{font-size:.78rem;color:#555;line-height:1.5}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:.9rem 0}
-.stat-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:.6rem .75rem}
-.stat-v{font-family:var(--H);font-size:clamp(.9rem,2.5vw,1.2rem);font-weight:700;color:var(--r)}
-.stat-l{font-size:.64rem;color:#3a3a3a;letter-spacing:.1em;margin-top:.1rem}
-.links-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.9rem}
-.link-btn{font-family:var(--H);font-size:.38rem;letter-spacing:.1em;padding:.3rem .8rem;border-radius:4px;border:1px solid rgba(255,255,255,.09);color:#888;text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;transition:all .18s}
-.link-btn:hover{background:var(--r);border-color:var(--r);color:#fff}
-/* Skills */
-.skill-category{margin-bottom:1rem}
-.skill-cat-label{font-family:var(--H);font-size:.38rem;letter-spacing:.22em;color:#2a2a2a;margin-bottom:.5rem}
-.skill-item{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem}
-.skill-name{font-family:var(--M);font-size:.62rem;color:#666;width:80px;flex-shrink:0}
-.skill-track{flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
-.skill-fill{height:100%;border-radius:2px;transform-origin:left;transform:scaleX(0);transition:transform .8s cubic-bezier(.16,1,.3,1)}
-.skill-pct{font-family:var(--M);font-size:.5rem;color:#333;width:28px;text-align:right}
-.course-chips{display:flex;flex-wrap:wrap;gap:.28rem;margin-top:.7rem}
-.cchip{font-size:.58rem;padding:.14rem .48rem;border-radius:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:#3a3a3a;font-family:var(--M)}
-/* Experience */
-.exp-timeline{position:relative;padding-left:1.2rem}
-.exp-timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--r),rgba(225,6,0,.1))}
-.exp-item{position:relative;margin-bottom:1.4rem;padding-left:.9rem}
-.exp-item::before{content:'';position:absolute;left:-1.25rem;top:.35rem;width:7px;height:7px;border-radius:50%;background:var(--r);box-shadow:0 0 8px var(--r)}
-.exp-date{font-family:var(--M);font-size:.52rem;color:#333;letter-spacing:.1em;margin-bottom:.18rem}
-.exp-role{font-family:var(--H);font-size:.72rem;font-weight:700;margin-bottom:.12rem}
-.exp-co{font-size:.72rem;color:var(--r);margin-bottom:.4rem}
-.exp-body{font-size:.78rem;color:#555;line-height:1.65}
-.exp-chips{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.55rem}
-.exp-chip{font-size:.54rem;padding:.12rem .42rem;border-radius:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:#3a3a3a}
-/* Projects */
-.proj-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:1rem;margin-bottom:.75rem;transition:border-color .2s,box-shadow .2s;cursor:pointer}
-.proj-card:hover{border-color:rgba(225,6,0,.25);box-shadow:0 4px 24px rgba(225,6,0,.08)}
-.proj-icon{font-size:1.4rem;margin-bottom:.4rem}
-.proj-name{font-family:var(--H);font-size:.7rem;font-weight:700;margin-bottom:.3rem}
-.proj-desc{font-size:.76rem;color:#555;line-height:1.6;margin-bottom:.5rem}
-.proj-chips{display:flex;flex-wrap:wrap;gap:.22rem}
-.proj-chip{font-size:.52rem;padding:.1rem .38rem;border-radius:3px;background:rgba(225,6,0,.08);border:1px solid rgba(225,6,0,.18);color:rgba(225,6,0,.7)}
-/* Contact */
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem}
-.contact-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.75rem;text-decoration:none;display:flex;flex-direction:column;gap:.2rem;transition:all .2s}
-.contact-item:hover{border-color:var(--t);background:rgba(0,210,190,.05)}
-.ci-ico{font-size:1.2rem}
-.ci-lbl{font-family:var(--H);font-size:.38rem;letter-spacing:.16em;color:#2a2a2a}
-.ci-val{font-size:.72rem;color:#777;word-break:break-all}
-.contact-note{font-size:.76rem;color:#333;line-height:1.65;text-align:center;padding:.75rem;border:1px solid rgba(0,210,190,.12);border-radius:8px;background:rgba(0,210,190,.04)}
-/* Education */
-.edu-card{background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);border-radius:9px;padding:1rem;margin-bottom:.7rem}
-.edu-school{font-family:var(--H);font-size:.72rem;font-weight:700;color:var(--y);margin-bottom:.18rem}
-.edu-deg{font-size:.76rem;color:#888;margin-bottom:.3rem}
-.edu-meta{font-family:var(--M);font-size:.56rem;color:#3a3a3a;line-height:1.8}
-.edu-badge{display:inline-flex;align-items:center;gap:.3rem;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.18);border-radius:4px;padding:.16rem .52rem;font-family:var(--H);font-size:.38rem;letter-spacing:.1em;color:var(--y);margin-top:.5rem}
-
-/* ═══ STATUS BAR ═══ */
-#status{position:fixed;bottom:0;left:0;right:0;height:28px;z-index:20;background:rgba(2,2,4,.7);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.04);display:flex;align-items:center;padding:0 clamp(.8rem,2vw,1.6rem);gap:1.4rem;transform:translateY(32px);transition:transform .7s 1s cubic-bezier(.16,1,.3,1)}
-#status.in{transform:translateY(0)}
-.st-item{font-family:var(--M);font-size:.44rem;color:#252525;letter-spacing:.1em;display:flex;align-items:center;gap:.35rem}
-.st-dot{width:4px;height:4px;border-radius:50%}
-.st-dot.green{background:var(--g);box-shadow:0 0 6px var(--g)}
-.st-dot.red{background:var(--r);box-shadow:0 0 6px var(--r)}
-.st-dot.teal{background:var(--t);box-shadow:0 0 6px var(--t)}
-#st-time{margin-left:auto;font-family:var(--M);font-size:.44rem;color:#222;letter-spacing:.12em}
-#st-fps{font-family:var(--M);font-size:.44rem;color:#1c1c1c;letter-spacing:.1em}
-
-/* ═══ SCAN LINE EFFECT ═══ */
-#scanlines{position:fixed;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.035) 0px,rgba(0,0,0,.035) 1px,transparent 1px,transparent 2px);animation:scanmove 8s linear infinite}
-@keyframes scanmove{from{background-position:0 0}to{background-position:0 100vh}}
-
-/* ═══ VIGNETTE ═══ */
-#vignette{position:fixed;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 40%,rgba(0,0,0,.65) 100%)}
-
-/* Mobile */
-@media(max-width:600px){
-  .hdr-title,.nav-pill:not(.games-pill){display:none}
-  #panel-wrap{justify-content:center;padding:.5rem}
-  #content-panel{width:95vw}
-  .orb-ring{width:42px;height:42px;font-size:.95rem}
-  .orb-label{font-size:.28rem}
-  .contact-grid{grid-template-columns:1fr}
+html,body{
+  width:100%;height:100%;
+  overflow:hidden;
+  background:var(--bg);
+  font-family:var(--b);color:#fff;
 }
+
+/* ── CANVAS ── */
+#c{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:none}
+
+/* ── SCROLL SPACE ── */
+#ss{display:none;height:9200px;position:relative;z-index:-1}
+#ss.on{display:block}
+
+/* ─────────────────────────────────────────────
+   SELECTION SCREEN
+───────────────────────────────────────────── */
+#sel{
+  position:fixed;inset:0;z-index:40;
+  background:#050505;
+  display:flex;flex-direction:column;
+  align-items:center;
+  overflow-y:auto;
+  padding:3rem 1.5rem 5rem;
+  transition:opacity .85s ease,transform .85s ease;
+}
+#sel::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -5%,rgba(225,6,0,.18) 0%,transparent 65%),
+    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,.016) 59px,rgba(255,255,255,.016) 60px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,.016) 59px,rgba(255,255,255,.016) 60px);
+}
+#sel.out{opacity:0;transform:scale(1.05);pointer-events:none}
+#sel>*{position:relative;z-index:1}
+
+.sel-eyebrow{
+  font-family:var(--h);font-size:.5rem;letter-spacing:.6em;
+  color:#e10600;margin-bottom:1rem;text-transform:uppercase;
+  animation:fu .8s ease .05s both;
+}
+.sel-h1{
+  font-family:var(--h);font-size:clamp(2.2rem,6.5vw,5rem);
+  font-weight:900;letter-spacing:.06em;line-height:1;
+  text-align:center;margin-bottom:.5rem;
+  background:linear-gradient(160deg,#fff 40%,#555);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:fu .8s ease .1s both;
+}
+.sel-name{
+  font-family:var(--h);font-size:clamp(.9rem,2.5vw,1.4rem);
+  font-weight:400;letter-spacing:.3em;color:var(--ac);
+  margin-bottom:.4rem;text-align:center;
+  animation:fu .8s ease .15s both;
+}
+.sel-sub{
+  font-size:.85rem;color:#333;letter-spacing:.2em;text-transform:uppercase;
+  margin-bottom:2.5rem;text-align:center;
+  animation:fu .8s ease .2s both;
+}
+
+/* Ticker */
+.ticker-wrap{
+  width:100%;overflow:hidden;border-top:1px solid rgba(225,6,0,.3);
+  border-bottom:1px solid rgba(225,6,0,.3);
+  padding:.4rem 0;margin-bottom:2.5rem;
+  animation:fu .8s ease .25s both;
+}
+.ticker-inner{
+  display:flex;white-space:nowrap;
+  animation:ticker 28s linear infinite;
+}
+.ticker-item{
+  font-family:var(--h);font-size:.5rem;letter-spacing:.2em;
+  color:#555;padding:0 2.5rem;
+}
+.ticker-item span{color:var(--ac)}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.sel-ask{
+  font-family:var(--h);font-size:.58rem;letter-spacing:.35em;
+  color:#444;text-transform:uppercase;margin-bottom:1.8rem;text-align:center;
+  animation:fu .8s ease .3s both;
+}
+
+/* Driver grid */
+.dgrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+  gap:.8rem;width:100%;max-width:960px;
+  animation:fu .8s ease .4s both;
+}
+.dcard{
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;
+  background:rgba(255,255,255,.025);
+  padding:1rem .9rem .85rem;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .3s cubic-bezier(.16,1,.3,1),
+             border-color .3s,box-shadow .3s,background .3s;
+}
+.dcard::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--dc) 0%,transparent 55%);
+  opacity:0;transition:opacity .3s;
+}
+.dcard:hover{
+  transform:translateY(-8px) scale(1.03);
+  border-color:var(--dc);
+  box-shadow:0 20px 55px -8px var(--dc-glow);
+  background:rgba(255,255,255,.055);
+}
+.dcard:hover::before{opacity:.12}
+.dcard>*{position:relative;z-index:1}
+
+.d-num{
+  font-family:var(--h);font-size:2rem;font-weight:900;
+  color:var(--dc);line-height:1;margin-bottom:.3rem;
+  text-shadow:0 0 20px var(--dc-glow);
+}
+.d-flag{font-size:1.2rem;position:absolute;top:.9rem;right:.9rem}
+.d-team{font-size:.55rem;font-family:var(--h);letter-spacing:.15em;color:#444;margin-bottom:.2rem}
+.d-name{font-size:.95rem;font-weight:700;color:#ccc;line-height:1.2}
+.d-bar{
+  height:2px;margin-top:.7rem;border-radius:1px;
+  background:linear-gradient(90deg,var(--dc),transparent);
+}
+
+/* ─────────────────────────────────────────────
+   LIGHTS SCREEN
+───────────────────────────────────────────── */
+#lgts{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(0,0,0,.95);
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:2rem;
+}
+#lgts.on{display:flex}
+.lrow{display:flex;gap:1.8rem}
+.lcol{display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.lpost{width:4px;height:50px;background:#111;border-radius:3px}
+.ldot{
+  width:44px;height:44px;border-radius:50%;
+  background:#0a0000;border:2px solid #1a0000;
+  transition:background .1s,border-color .1s,box-shadow .12s;
+}
+.ldot.on{
+  background:#e10600;border-color:#ff4422;
+  box-shadow:0 0 16px #e10600,0 0 45px #e10600,0 0 90px rgba(225,6,0,.4);
+}
+.radio-msg{
+  font-family:var(--h);font-size:.6rem;letter-spacing:.15em;
+  color:#555;text-align:center;max-width:380px;line-height:1.7;
+  padding:.75rem 1.5rem;border:1px solid #1a1a1a;border-radius:8px;
+  background:#0a0a0a;
+  transition:color .4s;
+}
+.radio-msg.active{color:#ccc;border-color:#333}
+.gotext{
+  font-family:var(--h);font-size:clamp(3.5rem,10vw,6.5rem);
+  font-weight:900;letter-spacing:.25em;color:#00e87a;
+  text-shadow:0 0 35px #00e87a,0 0 75px #00e87a;
+  opacity:0;transform:scale(.55);transition:opacity .2s,transform .25s;
+}
+.gotext.on{opacity:1;transform:scale(1)}
+
+/* ─────────────────────────────────────────────
+   RACE HUD
+───────────────────────────────────────────── */
+
+/* Top bar */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:42px;z-index:10;
+  display:none;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  padding:0 1.2rem;
+  display:none;align-items:center;gap:1.2rem;
+}
+#topbar.on{display:flex}
+
+.tb-flag{font-size:1.1rem}
+.tb-circuit{
+  font-family:var(--h);font-size:.55rem;font-weight:700;
+  letter-spacing:.18em;color:var(--ac);
+}
+.tb-driver{
+  font-family:var(--h);font-size:.65rem;font-weight:700;
+  color:#fff;letter-spacing:.1em;
+  padding:.18rem .7rem;border-radius:3px;
+  background:var(--ac);
+}
+.tb-sep{width:1px;height:20px;background:rgba(255,255,255,.1)}
+
+/* Rolex clock */
+.rolex-wrap{
+  margin-left:auto;
+  display:flex;align-items:center;gap:.5rem;
+}
+.rolex-logo{
+  font-family:'Times New Roman',serif;font-size:.7rem;
+  letter-spacing:.08em;color:#c8a84b;font-weight:700;
+}
+.rolex-crown{font-size:.65rem}
+#rtime{
+  font-family:'Courier New',monospace;font-size:.75rem;
+  font-weight:700;color:#fff;letter-spacing:.05em;
+  background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.25);
+  padding:.12rem .55rem;border-radius:3px;
+  min-width:64px;text-align:center;
+}
+
+/* Left HUD panel */
+#lhud{
+  position:fixed;top:52px;left:1.2rem;z-index:10;
+  display:none;
+}
+#lhud.on{display:block}
+
+.lhud-pos{
+  font-family:var(--h);font-size:2.5rem;font-weight:900;
+  color:var(--ac);line-height:1;margin-bottom:.05rem;
+  text-shadow:0 0 20px var(--ac);
+}
+.lhud-label{font-size:.55rem;color:#333;letter-spacing:.2em;margin-bottom:.9rem}
+.lhud-tire{
+  display:flex;align-items:center;gap:.55rem;margin-bottom:.6rem;
+}
+.tire-circle{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid transparent;font-size:.6rem;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--h);font-weight:700;
+}
+.tire-name{font-size:.6rem;letter-spacing:.15em;color:#555}
+.drs-btn{
+  font-family:var(--h);font-size:.55rem;letter-spacing:.2em;
+  padding:.22rem .7rem;border-radius:3px;
+  border:1px solid #1a1a1a;color:#222;
+  transition:all .2s;margin-bottom:.6rem;
+  display:inline-block;
+}
+.drs-btn.active{
+  background:#00e87a;border-color:#00e87a;color:#000;
+  box-shadow:0 0 12px #00e87a;
+}
+
+.gap-display{font-size:.6rem;color:#555;letter-spacing:.12em}
+.gap-val{color:#fff;font-family:var(--h);font-size:.65rem}
+
+/* Sector timing */
+.sectors{display:flex;gap:.35rem;margin-top:.65rem}
+.sec{
+  font-family:var(--h);font-size:.5rem;letter-spacing:.1em;
+  padding:.2rem .4rem;border-radius:2px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  color:#444;transition:all .3s;
+}
+.sec.purple{background:rgba(160,0,210,.35);border-color:#a000d2;color:#cc44ff}
+.sec.green{background:rgba(0,200,80,.2);border-color:#00c850;color:#00c850}
+.sec.yellow{background:rgba(255,200,0,.15);border-color:#ffc800;color:#ffc800}
+
+/* Lap counter */
+.lap-ctr{
+  font-family:var(--h);font-size:.58rem;color:#555;
+  letter-spacing:.18em;margin-top:.65rem;
+}
+.lap-n{color:#fff;font-size:.75rem}
+
+/* Right HUD: speed */
+#rhud{
+  position:fixed;bottom:2.5rem;right:1.5rem;z-index:10;
+  display:none;text-align:right;
+}
+#rhud.on{display:block}
+.rpm-bar-wrap{
+  display:flex;justify-content:flex-end;gap:2px;
+  margin-bottom:.5rem;
+}
+.rpm-seg{
+  width:7px;height:22px;border-radius:1px;
+  background:rgba(255,255,255,.06);
+  transition:background .08s;
+}
+.rpm-seg.lit{background:var(--ac)}
+.rpm-seg.lit.warn{background:#ffd700}
+.rpm-seg.lit.redline{background:#fff;box-shadow:0 0 6px #fff}
+#spd-n{
+  font-family:var(--h);font-size:clamp(2rem,4.5vw,3.2rem);
+  font-weight:900;line-height:1;color:#fff;
+}
+.spd-unit{font-size:.6rem;color:#333;letter-spacing:.2em}
+#gear-n{
+  font-family:var(--h);font-size:1.4rem;font-weight:700;
+  color:var(--ac);margin-top:.1rem;
+}
+.pirelli-badge{
+  font-family:'Times New Roman',serif;font-size:.55rem;
+  letter-spacing:.12em;color:#888;margin-top:.6rem;
+  display:flex;align-items:center;justify-content:flex-end;gap:.3rem;
+}
+.pir-circle{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid;display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--h);font-size:.38rem;font-weight:700;
+}
+
+/* Radio message */
+#radio{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  z-index:10;display:none;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);border-radius:8px;
+  padding:.7rem 1.4rem;min-width:min(400px,85vw);text-align:center;
+}
+#radio.on{display:block;animation:radiopop .35s cubic-bezier(.16,1,.3,1)}
+@keyframes radiopop{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.radio-icon{font-family:var(--h);font-size:.45rem;letter-spacing:.25em;color:#e10600;margin-bottom:.2rem}
+.radio-txt{font-size:.85rem;color:#bbb;line-height:1.5}
+
+/* Hint */
+#hint{
+  position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);
+  z-index:9;display:none;
+}
+#hint.on{display:block}
+.hint-t{font-size:.62rem;color:#2a2a2a;letter-spacing:.25em;animation:blink 2.5s infinite}
+@keyframes blink{0%,100%{opacity:.25}50%{opacity:.8}}
+
+/* Progress bar at very top */
+#progress{
+  position:fixed;top:42px;left:0;right:0;height:3px;z-index:11;
+  display:none;background:rgba(255,255,255,.05);
+}
+#progress.on{display:block}
+#progfill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--ac),#ff6b00);
+  box-shadow:0 0 8px var(--ac);
+  transition:width .12s;
+}
+
+/* ─────────────────────────────────────────────
+   PANEL
+───────────────────────────────────────────── */
+#panel{
+  position:fixed;right:0;top:50%;z-index:20;
+  transform:translateY(-50%) translateX(106%);
+  width:min(420px,90vw);
+  background:rgba(4,4,4,.97);
+  border-left:3px solid var(--ac);
+  border-radius:16px 0 0 16px;
+  padding:2rem 1.8rem 1.8rem;
+  transition:transform .55s cubic-bezier(.16,1,.3,1);
+  backdrop-filter:blur(40px);
+}
+#panel.on{transform:translateY(-50%) translateX(0)}
+.p-close{
+  position:absolute;top:.8rem;right:.8rem;
+  background:none;border:1px solid rgba(255,255,255,.1);
+  color:#444;width:26px;height:26px;border-radius:6px;
+  cursor:pointer;font-size:.85rem;transition:all .2s;
+}
+.p-close:hover{color:#fff;border-color:rgba(255,255,255,.35)}
+.p-cat{font-family:var(--h);font-size:.45rem;letter-spacing:.35em;color:var(--ac);margin-bottom:.35rem}
+.p-title{font-family:var(--h);font-size:1.2rem;font-weight:700;margin-bottom:.8rem;line-height:1.2}
+.p-body{font-size:.9rem;line-height:1.75;color:#888}
+.p-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.9rem}
+.chip{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+  border-radius:4px;padding:.2rem .6rem;font-size:.68rem;color:#666;
+  letter-spacing:.06em;
+}
+.chip.ac{
+  border-color:var(--ac);color:var(--ac);
+  background:rgba(225,6,0,.07);
+}
+.p-links{margin-top:1rem;display:flex;flex-wrap:wrap;gap:.5rem}
+.p-link{
+  font-family:var(--h);font-size:.5rem;letter-spacing:.15em;
+  padding:.4rem 1rem;border-radius:6px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+  color:#bbb;cursor:pointer;transition:all .25s;text-decoration:none;display:inline-block;
+}
+.p-link:hover{background:var(--ac);border-color:var(--ac);color:#fff}
+
+/* ─────────────────────────────────────────────
+   SPONSOR BANNERS (inline HTML overlays triggered by JS)
+───────────────────────────────────────────── */
+#sponsors{
+  position:fixed;top:52px;right:1.2rem;z-index:8;
+  display:none;flex-direction:column;gap:.4rem;
+}
+#sponsors.on{display:flex}
+.sp-badge{
+  font-size:.5rem;padding:.25rem .6rem;border-radius:4px;
+  letter-spacing:.12em;opacity:.55;
+  transition:opacity .3s;
+}
+.sp-badge:hover{opacity:1}
+.sp-rolex{
+  font-family:'Times New Roman',serif;color:#c8a84b;
+  border:1px solid rgba(200,168,75,.3);
+  background:rgba(200,168,75,.06);
+}
+.sp-dhl{
+  font-family:var(--h);font-weight:700;color:#fc0;
+  background:#d40511;padding:.25rem .7rem;
+}
+.sp-aramco{
+  font-family:var(--h);color:#00a3e0;
+  border:1px solid rgba(0,163,224,.3);background:rgba(0,163,224,.06);
+}
+.sp-pirelli{
+  font-family:'Times New Roman',serif;color:#eee;
+  border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);
+}
+.sp-aws{
+  font-family:var(--h);color:#ff9900;
+  border:1px solid rgba(255,153,0,.25);background:rgba(255,153,0,.05);
+}
+
+/* ─────────────────────────────────────────────
+   CONFETTI
+───────────────────────────────────────────── */
+#cconf{position:fixed;inset:0;z-index:35;pointer-events:none;display:none}
+#cconf.on{display:block}
+
+/* ─────────────────────────────────────────────
+   PODIUM
+───────────────────────────────────────────── */
+#pod{
+  position:fixed;inset:0;z-index:45;
+  background:rgba(0,0,0,.93);
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;transition:opacity .75s;
+  overflow-y:auto;padding:2rem 1rem 3rem;
+}
+#pod.on{display:flex}
+#pod.vis{opacity:1}
+
+.pod-header{text-align:center;margin-bottom:1.8rem}
+.pod-flag{font-size:2.2rem;margin-bottom:.4rem}
+.pod-circ{font-family:var(--h);font-size:.5rem;letter-spacing:.35em;color:#444;margin-bottom:.3rem}
+.pod-h{
+  font-family:var(--h);font-size:clamp(1.5rem,4vw,2.5rem);
+  font-weight:900;letter-spacing:.12em;
+  background:linear-gradient(135deg,#ffd700,#ffaa00);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.pod-driver{font-family:var(--h);font-size:.65rem;letter-spacing:.2em;color:#555;margin-top:.3rem}
+
+.pod-stands{display:flex;align-items:flex-end;gap:.6rem;margin-bottom:2.5rem}
+.pblock{display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.pblock:hover .pcard{transform:translateY(-6px)}
+.pcard{
+  width:140px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.09);border-radius:10px;
+  padding:1rem .7rem .75rem;text-align:center;
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+  margin-bottom:.5rem;
+}
+.pblock:hover .pcard{border-color:var(--pc);box-shadow:0 12px 40px -8px var(--pc)}
+.pico{font-size:2rem;margin-bottom:.4rem}
+.plabel{font-family:var(--h);font-size:.42rem;letter-spacing:.12em;color:#333;margin-bottom:.25rem}
+.pname{font-size:.85rem;font-weight:600}
+.pstand{
+  width:140px;background:var(--pc);
+  border-radius:5px 5px 0 0;
+  display:flex;align-items:center;justify-content:center;
+}
+.p1s{height:85px}.p2s{height:58px}.p3s{height:40px}
+.ppos{font-family:var(--h);font-size:1.6rem;font-weight:900;color:rgba(0,0,0,.6)}
+
+/* Links below podium */
+.pod-links{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;justify-content:center}
+.pod-lnk{
+  font-family:var(--h);font-size:.55rem;letter-spacing:.18em;
+  padding:.6rem 1.6rem;border-radius:7px;
+  border:1px solid rgba(255,255,255,.12);color:#bbb;
+  text-decoration:none;transition:all .25s;
+}
+.pod-lnk:hover{background:var(--ac);border-color:var(--ac);color:#fff}
+
+.prestart{
+  font-family:var(--h);font-size:.6rem;letter-spacing:.2em;
+  background:none;border:1px solid rgba(255,255,255,.1);
+  color:#333;padding:.7rem 2.5rem;border-radius:7px;cursor:pointer;
+  transition:all .25s;
+}
+.prestart:hover{color:#fff;border-color:rgba(255,255,255,.35)}
+
+/* ─────────────────────────────────────────────
+   UTILS
+───────────────────────────────────────────── */
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
-<div id="loading">
-  <div class="ld-logo">INITIALIZING RACE SYSTEM</div>
-  <div class="ld-bar-wrap"><div class="ld-bar" id="ld-bar"></div></div>
-  <div class="ld-txt" id="ld-txt">LOADING TELEMETRY...</div>
+<canvas id="c"></canvas>
+<div id="ss"></div>
+
+<!-- ═══════════════ SELECTION ═══════════════ -->
+<div id="sel">
+  <div class="sel-eyebrow">2024 FIA Formula One World Championship</div>
+  <h1 class="sel-h1">PORTFOLIO<br>GRAND PRIX</h1>
+  <div class="sel-name">UTKARSH MANGAL</div>
+  <p class="sel-sub">CentraleSupélec × Mahindra University</p>
+
+  <div class="ticker-wrap">
+    <div class="ticker-inner" id="ticker"></div>
+  </div>
+
+  <div class="sel-ask">Select your favourite driver to begin</div>
+  <div class="dgrid" id="dgrid"></div>
 </div>
 
-<!-- SCAN + VIGNETTE -->
-<div id="scanlines"></div>
-<div id="vignette"></div>
-
-<!-- CANVAS -->
-<canvas id="cv"></canvas>
-
-<!-- HEADER -->
-<header id="hdr">
-  <div class="hdr-dot"></div>
-  <div class="hdr-name">UTKARSH MANGAL</div>
-  <div class="hdr-title">// Computational Mathematician · CentraleSupélec Paris</div>
-  <nav class="hdr-nav">
-    <button class="nav-pill" onclick="openSection('about')">ABOUT</button>
-    <button class="nav-pill" onclick="openSection('skills')">SKILLS</button>
-    <button class="nav-pill" onclick="openSection('exp')">EXP</button>
-    <button class="nav-pill" onclick="openSection('proj')">PROJECTS</button>
-    <button class="nav-pill" onclick="openSection('edu')">EDU</button>
-    <button class="nav-pill" onclick="openSection('contact')">CONTACT</button>
-    <a href="games.html" class="nav-pill games-pill">🎮 GAMES</a>
-  </nav>
-</header>
-
-<!-- HUD CORNERS -->
-<div class="corner in" id="c-tl"><svg width="60" height="60"><polyline class="c-tl-line" points="60,10 10,10 10,60"/></svg></div>
-<div class="corner in" id="c-tr"><svg width="60" height="60"><polyline style="stroke:var(--t);stroke-width:1.5;fill:none" points="0,10 50,10 50,60"/></svg></div>
-<div class="corner in" id="c-bl"><svg width="60" height="60"><polyline style="stroke:var(--t);stroke-width:1.5;fill:none" points="60,50 10,50 10,0"/></svg></div>
-<div class="corner in" id="c-br"><svg width="60" height="60"><polyline style="stroke:var(--r);stroke-width:1.5;fill:none" points="0,50 50,50 50,0"/></svg></div>
-
-<!-- CENTER HUD -->
-<div id="center-hud">
-  <h1 class="ch-name"><span class="line1">UTKARSH</span><span class="line2">MANGAL</span></h1>
-  <p class="ch-sub">COMPUTATIONAL MATHEMATICS · FORMULA 1 PORTFOLIO</p>
-  <div class="ch-line"></div>
-  <p class="ch-scroll">CLICK AN ORB TO EXPLORE</p>
+<!-- ═══════════════ LIGHTS ═══════════════ -->
+<div id="lgts">
+  <div class="radio-msg" id="radiointro">Waiting for the grid...</div>
+  <div class="lrow" id="lrow"></div>
+  <div class="gotext" id="gotxt">GO!</div>
 </div>
 
-<!-- FLOATING SECTION ORBS -->
-<div id="orbs">
-  <!-- positioned by JS -->
+<!-- ═══════════════ RACE HUD ═══════════════ -->
+<div id="topbar">
+  <span class="tb-flag" id="tb-flag"></span>
+  <span class="tb-circuit" id="tb-circuit">GRAND PRIX</span>
+  <div class="tb-sep"></div>
+  <span class="tb-driver" id="tb-driver">VER</span>
+  <div class="rolex-wrap">
+    <span class="rolex-crown">♛</span>
+    <span class="rolex-logo">ROLEX</span>
+    <span id="rtime">00:00:00</span>
+  </div>
+</div>
+<div id="progress"><div id="progfill"></div></div>
+
+<div id="lhud">
+  <div class="lhud-pos" id="lhud-pos">P1</div>
+  <div class="lhud-label">RACE POSITION</div>
+  <div class="lhud-tire">
+    <div class="tire-circle" id="tire-c"></div>
+    <span class="tire-name" id="tire-n">SOFT</span>
+  </div>
+  <div class="drs-btn" id="drs-btn">DRS</div>
+  <div class="gap-display">GAP AHEAD: <span class="gap-val" id="gap-val">—</span></div>
+  <div class="sectors" id="sectors">
+    <div class="sec" id="s1">S1</div>
+    <div class="sec" id="s2">S2</div>
+    <div class="sec" id="s3">S3</div>
+  </div>
+  <div class="lap-ctr">LAP <span class="lap-n" id="lapn">1</span> / 5</div>
 </div>
 
-<!-- CONTENT PANEL -->
-<div id="panel-wrap">
-  <div id="content-panel">
-    <button class="p-close" onclick="closePanel()">✕</button>
-    <div class="panel-scroll" id="panel-body"></div>
+<div id="rhud">
+  <div class="rpm-bar-wrap" id="rpmbar"></div>
+  <div id="spd-n">0</div>
+  <div class="spd-unit">KM/H</div>
+  <div id="gear-n">—</div>
+  <div class="pirelli-badge">
+    <div class="pir-circle" id="pir-c" style="border-color:#e10600;color:#e10600">S</div>
+    PIRELLI P ZERO
   </div>
 </div>
 
-<!-- STATUS BAR -->
-<div id="status">
-  <span class="st-item"><span class="st-dot green"></span>SYSTEM ONLINE</span>
-  <span class="st-item"><span class="st-dot red"></span>LAP TELEMETRY ACTIVE</span>
-  <span class="st-item"><span class="st-dot teal"></span>DRS ENABLED</span>
-  <span id="st-fps" class="st-item">60 FPS</span>
-  <span id="st-time"></span>
+<div id="sponsors">
+  <div class="sp-badge sp-rolex">♛ ROLEX — OFFICIAL TIMEPIECE</div>
+  <div class="sp-badge sp-pirelli">PIRELLI P ZERO™</div>
+  <div class="sp-badge sp-dhl">DHL — FASTEST LAP</div>
+  <div class="sp-badge sp-aramco">ARAMCO</div>
+  <div class="sp-badge sp-aws">Powered by AWS</div>
+</div>
+
+<div id="radio"><div class="radio-icon">📻 TEAM RADIO</div><div class="radio-txt" id="radio-txt"></div></div>
+<div id="hint"><div class="hint-t">↓ SCROLL · SPACE · ↑↓ ARROW KEYS</div></div>
+
+<!-- ═══════════════ PANEL ═══════════════ -->
+<div id="panel">
+  <button class="p-close" onclick="closePanel()">✕</button>
+  <div class="p-cat" id="ptag"></div>
+  <div class="p-title" id="ptit"></div>
+  <div class="p-body" id="pbod"></div>
+</div>
+
+<!-- ═══════════════ CONFETTI ═══════════════ -->
+<canvas id="cconf"></canvas>
+
+<!-- ═══════════════ PODIUM ═══════════════ -->
+<div id="pod">
+  <div class="pod-header">
+    <div class="pod-flag" id="pod-flag">🏆</div>
+    <div class="pod-circ" id="pod-circ">PORTFOLIO GRAND PRIX — RACE RESULT</div>
+    <div class="pod-h">CHEQUERED FLAG</div>
+    <div class="pod-driver" id="pod-driver"></div>
+  </div>
+  <div class="pod-stands">
+    <div class="pblock" style="--pc:#888">
+      <div class="pcard">
+        <div class="pico">⚙️</div>
+        <div class="plabel">P2 · RACE HISTORY</div>
+        <div class="pname">Projects</div>
+      </div>
+      <div class="pstand p2s"><span class="ppos">2</span></div>
+    </div>
+    <div class="pblock" style="--pc:#ffd700">
+      <div class="pcard" style="border-color:rgba(255,215,0,.25)">
+        <div class="pico">👤</div>
+        <div class="plabel">P1 · DRIVER PROFILE</div>
+        <div class="pname">About Me</div>
+      </div>
+      <div class="pstand p1s"><span class="ppos">1</span></div>
+    </div>
+    <div class="pblock" style="--pc:#cd7f32">
+      <div class="pcard">
+        <div class="pico">📡</div>
+        <div class="plabel">P3 · TEAM RADIO</div>
+        <div class="pname">Contact</div>
+      </div>
+      <div class="pstand p3s"><span class="ppos">3</span></div>
+    </div>
+  </div>
+  <div class="pod-links">
+    <a href="https://www.linkedin.com/in/utkarsh-mangal2" target="_blank" class="pod-lnk">💼 LinkedIn</a>
+    <a href="https://github.com/um26" target="_blank" class="pod-lnk">🐙 GitHub</a>
+    <a href="mailto:umangal2003@gmail.com" class="pod-lnk">📧 Email</a>
+    <a href="tel:+919784871049" class="pod-lnk">📞 +91-9784871049</a>
+  </div>
+  <button class="prestart" onclick="restart()">↺ &nbsp;NEW RACE</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-"use strict";
+'use strict';
 
-// ══════════════════════════════════════════════════════
-// CONTENT DATA
-// ══════════════════════════════════════════════════════
-const SECTIONS = {
-  about: {
-    color: "#e10600", colorRGB: "225,6,0", icon: "👤", label: "ABOUT ME",
-    html: () => `
-      <div class="p-tag">DRIVER PROFILE</div>
-      <div class="p-title">Utkarsh Mangal</div>
-      <div class="about-hero">
-        <div class="about-avatar">🏎</div>
-        <div class="about-info">
-          <div class="ai-name">Utkarsh Mangal</div>
-          <div class="ai-role">B.Tech Computational Mathematics<br>Mahindra University, Hyderabad</div>
-        </div>
-      </div>
-      <div style="font-family:var(--B);font-size:.8rem;color:#555;line-height:1.7;margin-bottom:.9rem">
-        Currently on <strong style="color:#aaa">Semester Exchange at CentraleSupélec, Paris</strong> — one of France's elite Grandes Écoles and a founding member of Université Paris-Saclay. Passionate about computational problem-solving, optimization theory, and building systems that matter at scale.
-      </div>
-      <div class="stat-grid">
-        <div class="stat-box"><div class="stat-v">9.83</div><div class="stat-l">CGPA · SEM 7</div></div>
-        <div class="stat-box"><div class="stat-v">8.3</div><div class="stat-l">OVERALL CGPA</div></div>
-        <div class="stat-box"><div class="stat-v">2022</div><div class="stat-l">MERIT SCHOLAR</div></div>
-        <div class="stat-box"><div class="stat-v">350+</div><div class="stat-l">EVENT PARTICIPANTS</div></div>
-      </div>
-      <div class="links-row">
-        <a href="https://www.linkedin.com/in/utkarsh-mangal" target="_blank" class="link-btn">💼 LinkedIn</a>
-        <a href="https://github.com/um26" target="_blank" class="link-btn">🐙 GitHub</a>
-        <a href="mailto:umangal2003@gmail.com" class="link-btn">📧 Email</a>
-        <a href="tel:+919784871049" class="link-btn">📞 Call</a>
-        <a href="games.html" class="link-btn" style="border-color:rgba(0,210,190,.25);color:var(--t)">🎮 Play Games</a>
-      </div>`
+// ═══════════════════════════════════════════════════════════════
+//  DRIVER DATA — 2024 F1 Top 10
+// ═══════════════════════════════════════════════════════════════
+const DRIVERS = {
+  verstappen:{
+    name:'MAX VERSTAPPEN',short:'VER',num:'1',
+    team:'ORACLE RED BULL RACING',flag:'🇳🇱',
+    dc:'#3671C6',dg:'rgba(54,113,198,.55)',
+    car:0x1a2c72,wing:0xff8000,floor:0x0d1940,
+    radio:'"P1, everything is in your hands. Box position understood. Go, go, go!"',
+    intro:'Outstanding work so far. Margin to P2 is growing every lap.',
+    pos:1,gap:'LEADER'
   },
-  skills: {
-    color: "#00d2be", colorRGB: "0,210,190", icon: "⚡", label: "SKILLS",
-    html: () => `
-      <div class="p-tag">TECHNICAL ARSENAL</div>
-      <div class="p-title">Skills & Stack</div>
-      <div class="skill-category">
-        <div class="skill-cat-label">LANGUAGES</div>
-        ${[["Java",92],["Python",88],["SQL",82],["MATLAB",78]].map(([n,v])=>`
-        <div class="skill-item">
-          <span class="skill-name">${n}</span>
-          <div class="skill-track"><div class="skill-fill" style="width:${v}%;background:linear-gradient(90deg,#00d2be,#00ff88)" data-pct="${v}"></div></div>
-          <span class="skill-pct">${v}%</span>
-        </div>`).join("")}
-      </div>
-      <div class="skill-category">
-        <div class="skill-cat-label">LIBRARIES & FRAMEWORKS</div>
-        ${[["NumPy",85],["Pandas",83],["Spring Boot",72],["Git",88]].map(([n,v])=>`
-        <div class="skill-item">
-          <span class="skill-name">${n}</span>
-          <div class="skill-track"><div class="skill-fill" style="width:${v}%;background:linear-gradient(90deg,#e10600,#ff8000)" data-pct="${v}"></div></div>
-          <span class="skill-pct">${v}%</span>
-        </div>`).join("")}
-      </div>
-      <div class="skill-cat-label" style="margin-bottom:.5rem">COURSES</div>
-      <div class="course-chips">
-        ${["DSA","OS","Networks","Stochastic Processes","Functional Analysis","Quantum Computing","PDE","Graph Algorithms","Number Theory","Cryptography","Optimization Theory","Linear Algebra"].map(c=>`<span class="cchip">${c}</span>`).join("")}
-      </div>`
+  norris:{
+    name:'LANDO NORRIS',short:'NOR',num:'4',
+    team:'MCLAREN FORMULA 1 TEAM',flag:'🇬🇧',
+    dc:'#FF8000',dg:'rgba(255,128,0,.55)',
+    car:0xff8000,wing:0x0093d0,floor:0xd46a00,
+    radio:'"Lando, car is mega. Tyres are in the window. Yesssss lets go!"',
+    intro:'You\'re on for fastest lap. Gap to Verstappen — 1.4 seconds.',
+    pos:2,gap:'GAP: 1.4s'
   },
-  exp: {
-    color: "#ff8c00", colorRGB: "255,140,0", icon: "💼", label: "EXPERIENCE",
-    html: () => `
-      <div class="p-tag">RACE HISTORY</div>
-      <div class="p-title">Experience</div>
-      <div class="exp-timeline">
-        <div class="exp-item">
-          <div class="exp-date">JUNE – AUGUST 2025</div>
-          <div class="exp-role">Growth & Strategy Intern</div>
-          <div class="exp-co">Bonanza Portfolio Ltd · Director's Office · Jaipur</div>
-          <div class="exp-body">Spearheaded strategic &amp; operational initiatives in the Director's office, including business expansion programs and digital integration workflows. Delivered competitor benchmarking reports and sector analysis supporting executive-level decisions. Streamlined cross-functional coordination processes reducing bottlenecks across departments.</div>
-          <div class="exp-chips">
-            ${["Strategy","Business Development","Competitor Analysis","Digital Integration","Market Research","Stakeholder Reporting"].map(c=>`<span class="exp-chip">${c}</span>`).join("")}
-          </div>
-        </div>
-        <div class="exp-item">
-          <div class="exp-date">2024 – PRESENT</div>
-          <div class="exp-role">Student Placement Coordinator</div>
-          <div class="exp-co">Mahindra University · Placement Cell</div>
-          <div class="exp-body">Conducted resume preparation workshops, technical interview prep sessions, and mock interviews for 100+ students. Bridged communication between students and recruiters, coordinating schedules across placement cycles.</div>
-          <div class="exp-chips">
-            ${["Career Coaching","Workshop Design","Recruitment Coordination","Student Mentoring"].map(c=>`<span class="exp-chip">${c}</span>`).join("")}
-          </div>
-        </div>
-        <div class="exp-item">
-          <div class="exp-date">2024 – 2025</div>
-          <div class="exp-role">President, Math Club</div>
-          <div class="exp-co">Mahindra University · Student Leadership</div>
-          <div class="exp-body">Led a 20+ member team executing major mathematical events. Conceptualised and launched the Math Club Stock Exchange (350+ participants, 16 clubs) — MU's first-ever student-run stock simulation. Also organised Euler's Quest, a campus-wide mathematical olympiad.</div>
-          <div class="exp-chips">
-            ${["Leadership","Event Management","Team Building","Strategic Planning","Cross-Club Coordination"].map(c=>`<span class="exp-chip">${c}</span>`).join("")}
-          </div>
-        </div>
-        <div class="exp-item">
-          <div class="exp-date">2025</div>
-          <div class="exp-role">Chief Organiser, Aeon Tech Fest</div>
-          <div class="exp-co">Mahindra University · Annual Technical Festival</div>
-          <div class="exp-body">Coordinated 15+ clubs across a university-wide tech festival. Managed scheduling, logistics, venue coordination, and post-event feedback systems end-to-end.</div>
-          <div class="exp-chips">
-            ${["Festival Organisation","Multi-club Coordination","Logistics","Event Operations"].map(c=>`<span class="exp-chip">${c}</span>`).join("")}
-          </div>
-        </div>
-      </div>`
+  leclerc:{
+    name:'CHARLES LECLERC',short:'LEC',num:'16',
+    team:'SCUDERIA FERRARI HP',flag:'🇲🇨',
+    dc:'#E8002D',dg:'rgba(232,0,45,.55)',
+    car:0xe8002d,wing:0xffd700,floor:0xb0001f,
+    radio:'"Charles, Forza Ferrari! The Tifosi are watching. Andiamo!"',
+    intro:'Monitor the right rear temperature. Otherwise everything perfect.',
+    pos:3,gap:'GAP: 3.7s'
   },
-  proj: {
-    color: "#e10600", colorRGB: "225,6,0", icon: "🚀", label: "PROJECTS",
-    html: () => `
-      <div class="p-tag">ENGINEERING LOG</div>
-      <div class="p-title">Key Projects</div>
-      <div class="proj-card">
-        <div class="proj-icon">🚗</div>
-        <div class="proj-name">CVRP Optimization Engine</div>
-        <div class="proj-desc">Studied Capacitated Vehicle Routing Problem formulations for real-world logistics. Implemented and compared Genetic Algorithms and Simulated Annealing heuristics. Applied to Uber, Ola, Zomato-scale routing problems, analysing convergence behaviour, solution quality tradeoffs, and computational complexity bounds.</div>
-        <div class="proj-chips">
-          ${["CVRP","Genetic Algorithms","Simulated Annealing","Combinatorial Optimization","Python","Operations Research"].map(c=>`<span class="proj-chip">${c}</span>`).join("")}
-        </div>
-      </div>
-      <div class="proj-card">
-        <div class="proj-icon">📈</div>
-        <div class="proj-name">Math Club Stock Exchange (MCSE)</div>
-        <div class="proj-desc">Designed and launched MU's first-ever student stock market simulation from scratch. Built a custom mathematical trading framework with real-time volatility triggers, 10 bank teams, and 16 competing clubs. Managed 350+ participants across 4 rounds with live leaderboards and dynamic market events.</div>
-        <div class="proj-chips">
-          ${["Market Design","Trading Systems","Event Design","Mathematical Modelling","350+ Participants","16 Clubs"].map(c=>`<span class="proj-chip">${c}</span>`).join("")}
-        </div>
-      </div>
-      <div class="proj-card">
-        <div class="proj-icon">🏎</div>
-        <div class="proj-name">F1 Portfolio Grand Prix (This Site)</div>
-        <div class="proj-desc">Built this interactive Three.js-powered portfolio from scratch — custom particle systems, GLSL-inspired shaders, real-time 3D scene with F1 car, star field, holographic UI, and games hub. Two-file deployment (index + games) with zero dependencies beyond Three.js.</div>
-        <div class="proj-chips">
-          ${["Three.js","WebGL","Creative Coding","Particle Systems","GLSL","Responsive Design"].map(c=>`<span class="proj-chip">${c}</span>`).join("")}
-        </div>
-      </div>`
+  piastri:{
+    name:'OSCAR PIASTRI',short:'PIA',num:'81',
+    team:'MCLAREN FORMULA 1 TEAM',flag:'🇦🇺',
+    dc:'#FF8000',dg:'rgba(255,128,0,.45)',
+    car:0xff8000,wing:0x0093d0,floor:0xd46a00,
+    radio:'"Oscar, tyre delta is looking really good. Consistent. Very nice."',
+    intro:'We\'re thinking about an early stop. Stay in the zone.',
+    pos:4,gap:'GAP: 5.1s'
   },
-  edu: {
-    color: "#ffd700", colorRGB: "255,215,0", icon: "🎓", label: "EDUCATION",
-    html: () => `
-      <div class="p-tag">CHAMPIONSHIP HISTORY</div>
-      <div class="p-title">Education</div>
-      <div class="edu-card">
-        <div class="edu-school">CentraleSupélec, Paris</div>
-        <div class="edu-deg">Semester Exchange — Engineering Sciences</div>
-        <div class="edu-meta">February 2026 – Present<br>Université Paris-Saclay · Paris, France<br>One of France's elite Grandes Écoles</div>
-        <span class="edu-badge">🇫🇷 CURRENTLY HERE</span>
-      </div>
-      <div class="edu-card">
-        <div class="edu-school">Mahindra University</div>
-        <div class="edu-deg">B.Tech – Computational Mathematics</div>
-        <div class="edu-meta">
-          2021 – Present · Hyderabad, India<br>
-          CGPA: <strong style="color:var(--y)">8.3</strong> overall &nbsp;|&nbsp; <strong style="color:var(--y)">9.83</strong> in Semester 7<br>
-          Merit Scholarship recipient: 2022, 2023, 2024
-        </div>
-        <span class="edu-badge">🏅 MERIT SCHOLAR</span>
-      </div>
-      <div style="font-family:var(--B);font-size:.78rem;color:#3a3a3a;line-height:1.7;margin-top:.8rem;padding:.75rem;border:1px solid rgba(255,215,0,.1);border-radius:8px;background:rgba(255,215,0,.03)">
-        Relevant coursework spans pure and applied mathematics: Algorithm Design, Operating Systems, Networks, Stochastic Processes, Functional Analysis, Quantum Computing, PDEs, Graph Algorithms, Number Theory &amp; Cryptography, Optimization Theory.
-      </div>`
+  sainz:{
+    name:'CARLOS SAINZ',short:'SAI',num:'55',
+    team:'SCUDERIA FERRARI HP',flag:'🇪🇸',
+    dc:'#E8002D',dg:'rgba(232,0,45,.4)',
+    car:0xe8002d,wing:0xffd700,floor:0xb0001f,
+    radio:'"Carlos, buen trabajo. Defending the undercut. Vamos!"',
+    intro:'Fuel delta is positive. Push now — window is open.',
+    pos:5,gap:'GAP: 8.8s'
   },
-  contact: {
-    color: "#00d2be", colorRGB: "0,210,190", icon: "📡", label: "CONTACT",
-    html: () => `
-      <div class="p-tag">TEAM RADIO</div>
-      <div class="p-title">Get in Touch</div>
-      <div class="contact-grid">
-        <a href="mailto:umangal2003@gmail.com" class="contact-item">
-          <span class="ci-ico">📧</span>
-          <span class="ci-lbl">EMAIL</span>
-          <span class="ci-val">umangal2003@gmail.com</span>
-        </a>
-        <a href="tel:+919784871049" class="contact-item">
-          <span class="ci-ico">📞</span>
-          <span class="ci-lbl">PHONE</span>
-          <span class="ci-val">+91 978 487 1049</span>
-        </a>
-        <a href="https://www.linkedin.com/in/utkarsh-mangal" target="_blank" class="contact-item">
-          <span class="ci-ico">💼</span>
-          <span class="ci-lbl">LINKEDIN</span>
-          <span class="ci-val">linkedin.com/in/utkarsh-mangal</span>
-        </a>
-        <a href="https://github.com/um26" target="_blank" class="contact-item">
-          <span class="ci-ico">🐙</span>
-          <span class="ci-lbl">GITHUB</span>
-          <span class="ci-val">github.com/um26</span>
-        </a>
-      </div>
-      <div class="contact-note">
-        Based in <strong>Paris, France</strong> (Feb–Jun 2026) · Open to internships, research collaborations, and full-time roles in quantitative finance, tech, and applied mathematics.
-      </div>
-      <div style="text-align:center;margin-top:.9rem">
-        <a href="games.html" class="link-btn" style="border-color:rgba(0,210,190,.25);color:var(--t);display:inline-flex">🎮 Check out my F1 Mini Games →</a>
-      </div>`
+  russell:{
+    name:'GEORGE RUSSELL',short:'RUS',num:'63',
+    team:'MERCEDES-AMG PETRONAS',flag:'🇬🇧',
+    dc:'#27F4D2',dg:'rgba(39,244,210,.5)',
+    car:0x00b4a0,wing:0x444444,floor:0x007e6e,
+    radio:'"George, we need every tenth. The pace is there. Maximise it."',
+    intro:'Overcut looks viable. Hamilton is 3 seconds behind.',
+    pos:6,gap:'GAP: 11.2s'
+  },
+  hamilton:{
+    name:'LEWIS HAMILTON',short:'HAM',num:'44',
+    team:'MERCEDES-AMG PETRONAS',flag:'🇬🇧',
+    dc:'#27F4D2',dg:'rgba(39,244,210,.45)',
+    car:0x00b4a0,wing:0x444444,floor:0x007e6e,
+    radio:'"Lewis, this is your moment. Everything you\'ve got, now."',
+    intro:'We believe. Every lap is building the gap. Hammer time.',
+    pos:7,gap:'GAP: 14.5s'
+  },
+  perez:{
+    name:'SERGIO PÉREZ',short:'PER',num:'11',
+    team:'ORACLE RED BULL RACING',flag:'🇲🇽',
+    dc:'#3671C6',dg:'rgba(54,113,198,.4)',
+    car:0x1a2c72,wing:0xff8000,floor:0x0d1940,
+    radio:'"Checo, gap to Hamilton is stable. Stay calm. Para México!"',
+    intro:'We\'re managing the situation. Tyre life looks okay.',
+    pos:8,gap:'GAP: 17.3s'
+  },
+  alonso:{
+    name:'FERNANDO ALONSO',short:'ALO',num:'14',
+    team:'ASTON MARTIN ARAMCO',flag:'🇪🇸',
+    dc:'#358C75',dg:'rgba(53,140,117,.55)',
+    car:0x005b4e,wing:0x00a36c,floor:0x003d34,
+    radio:'"Fernando — no attack, no glory. This is what we came for."',
+    intro:'Strategy call: push now before the VSC window closes.',
+    pos:9,gap:'GAP: 21.0s'
+  },
+  stroll:{
+    name:'LANCE STROLL',short:'STR',num:'18',
+    team:'ASTON MARTIN ARAMCO',flag:'🇨🇦',
+    dc:'#358C75',dg:'rgba(53,140,117,.45)',
+    car:0x005b4e,wing:0x00a36c,floor:0x003d34,
+    radio:'"Lance, everything is fine. Keep the car on the island."',
+    intro:'P10 is solid. Tyre management looking good from here.',
+    pos:10,gap:'GAP: 24.8s'
   }
 };
 
-// ORB positions (percentage of viewport)
-const ORB_POSITIONS = [
-  { section: "about",   x: 18, y: 38 },
-  { section: "skills",  x: 22, y: 65 },
-  { section: "exp",     x: 50, y: 80 },
-  { section: "proj",    x: 78, y: 65 },
-  { section: "edu",     x: 82, y: 38 },
-  { section: "contact", x: 50, y: 22 },
+// ═══════════════════════════════════════════════════════════════
+//  PORTFOLIO SECTIONS (billboard content)
+// ═══════════════════════════════════════════════════════════════
+const SECTIONS = [
+  {
+    id:'about',tag:'DRIVER PROFILE',title:'Utkarsh Mangal',
+    color:'#e10600',z:-100,
+    radio:'"Utkarsh coming through sector 1 — this is his home ground."',
+    body:`B.Tech Computational Mathematics at Mahindra University (CGPA 8.3/10, 9.83 in 7th Sem). Currently on a semester exchange at <strong style="color:#fff">CentraleSupélec, Paris</strong> — one of France's <em>Grandes Écoles</em>.
+<br><br>Merit Scholarship recipient (2022–2024). Math Club President, event organiser, and student placement coordinator — someone who builds things and brings people together.`,
+    chips:['CentraleSupélec Paris','Mahindra University','Merit Scholar','Math Club President'],
+    links:[
+      {label:'LinkedIn',href:'https://www.linkedin.com/in/utkarsh-mangal2'},
+      {label:'GitHub',href:'https://github.com/um26'},
+      {label:'Email',href:'mailto:umangal2003@gmail.com'}
+    ]
+  },
+  {
+    id:'education',tag:'TECHNICAL SPECS',title:'Education',
+    color:'#00d2be',z:-240,
+    radio:'"Sector 2 — onboard data looking exceptional. Education telemetry perfect."',
+    body:`<strong style="color:#fff">CentraleSupélec, Paris</strong> — Semester Exchange (Feb 2026 – Present)<br>
+<strong style="color:#fff">Mahindra University, Hyderabad</strong> — B.Tech Computational Mathematics (2022–Present)
+<br><br>Core coursework spans CS fundamentals, advanced mathematics, and ML theory: OS, Networks, DSA, Algorithms, Stochastic Processes, Functional Analysis, Quantum Computing, PDE, Graph Algorithms, and more.`,
+    chips:['Computer Science','Pure Mathematics','ML Theory','Quantum Computing','Cryptography'],
+    links:[]
+  },
+  {
+    id:'projects',tag:'RACE HISTORY',title:'Projects',
+    color:'#ffd700',z:-385,
+    radio:'"Pit window open — outstanding laps from the project portfolio."',
+    body:`<strong style="color:#fff">CVRP Optimization</strong> (Oct–Dec 2025)<br>
+Analysed Capacitated Vehicle Routing Problem formulations. Studied Genetic Algorithms & Simulated Annealing. Explored real-world applications in Uber, Ola, Zomato logistics at scale.
+<br><br><strong style="color:#fff">Math Club Stock Exchange (MCSE)</strong> (Feb–Apr 2025)<br>
+Conceptualised and launched Mahindra University's first-ever stock market simulation. 16 clubs, 350+ participants. Designed trading mechanics, mathematical framework, real-time volatility triggers, and managed 10 banks + reporters.`,
+    chips:['CVRP','Genetic Algorithms','Simulated Annealing','Stock Simulation','Event Design'],
+    links:[{label:'GitHub',href:'https://github.com/um26'}]
+  },
+  {
+    id:'skills',tag:'ENGINEERING SETUP',title:'Skills',
+    color:'#ff8c00',z:-520,
+    radio:'"Final sector — full throttle through the skills straight!"',
+    body:`<strong style="color:#fff">Languages:</strong> Java, Python, SQL, MATLAB<br>
+<strong style="color:#fff">Libraries:</strong> NumPy, Pandas, Spring Boot<br>
+<strong style="color:#fff">Tools:</strong> Git, Excel, Linux<br><br>
+<strong style="color:#fff">Soft Skills:</strong> Leadership, Team Coordination, Analytical Thinking, Communication<br><br>
+Also a Growth & Strategy Intern (Director's Office) at Bonanza Portfolio Ltd — driving business expansion, competitor benchmarking, and digital integration initiatives.`,
+    chips:['Java','Python','SQL','MATLAB','NumPy','Pandas','Spring Boot','Git'],
+    links:[]
+  },
+  {
+    id:'contact',tag:'TEAM RADIO',title:'Contact',
+    color:'#1f8ce0',z:-655,
+    radio:'"Final lap — team says copy your contact details loud and clear."',
+    body:`Open to interesting conversations — research collabs, internship opportunities, or just talking math, markets, and motorsport.
+<br><br>📧 <strong style="color:#fff">umangal2003@gmail.com</strong><br>
+📞 <strong style="color:#fff">+91-9784871049</strong><br>
+📍 <strong style="color:#fff">Paris, France</strong> (currently) / Jaipur, India`,
+    chips:['Available for Internships','Open to Collabs','Paris / India'],
+    links:[
+      {label:'Email Me',href:'mailto:umangal2003@gmail.com'},
+      {label:'LinkedIn',href:'https://www.linkedin.com/in/utkarsh-mangal2'},
+      {label:'GitHub',href:'https://github.com/um26'},
+      {label:'Call',href:'tel:+919784871049'}
+    ]
+  }
 ];
 
-// ══════════════════════════════════════════════════════
-// LOADING SIMULATION
-// ══════════════════════════════════════════════════════
-const LD_MSGS = ["CALIBRATING AERODYNAMICS...","LOADING TELEMETRY DATA...","INITIALIZING THREE.JS ENGINE...","WARMING UP TYRES...","BUILDING RACE CIRCUIT...","SYSTEMS GO — LIGHTS OUT!"];
-let ldIdx = 0, ldPct = 0;
-function progressLoading() {
-  const bar = document.getElementById("ld-bar");
-  const txt = document.getElementById("ld-txt");
-  const step = () => {
-    ldPct += Math.random() * 18 + 8;
-    if (ldPct > 100) ldPct = 100;
-    bar.style.width = ldPct + "%";
-    if (ldIdx < LD_MSGS.length) { txt.textContent = LD_MSGS[ldIdx++]; }
-    if (ldPct < 100) setTimeout(step, 180 + Math.random() * 120);
-  };
-  step();
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let renderer,scene,camera,animId;
+let trackGrp,carGrp,WHEELS=[];
+let BTRIG=[];
+let curDriver=null;
+let carZ=5,camZ=10,prevCarZ=5;
+let scrY=0,manS=0;
+let podDone=false;
+let activePanelIdx=-1;
+let raceStart=0;
+let lapN=1;
+const KEYS={};
+const FINISH_Z=-730;
+const RACE_LEN=FINISH_Z-5;
+
+// ═══════════════════════════════════════════════════════════════
+//  TICKER
+// ═══════════════════════════════════════════════════════════════
+function initTicker(){
+  const items=[
+    '🏁 LIGHTS OUT — 2024 CONSTRUCTORS: <span>McLaren</span> 666pts',
+    '⚡ DRS DETECTION POINT — ZONE ACTIVE',
+    '🔴 SOFT · 🟡 MEDIUM · ⚪ HARD — PIRELLI P ZERO™',
+    '⌛ FASTEST LAP — <span>1:23.456</span>',
+    '🏎️ GRID READY — SELECT YOUR DRIVER',
+    '🏆 2024 WDC: <span>Max Verstappen</span> — 437 points',
+    '📍 PORTFOLIO GRAND PRIX — <span>UTKARSH MANGAL</span>',
+    '🔧 ENGINEERS MONITORING — ALL SYSTEMS NOMINAL',
+  ];
+  const t=document.getElementById('ticker');
+  // Duplicate for seamless loop
+  const all=[...items,...items];
+  t.innerHTML=all.map(i=>`<span class="ticker-item">${i}</span>`).join('');
 }
-progressLoading();
 
-// ══════════════════════════════════════════════════════
-// THREE.JS SCENE
-// ══════════════════════════════════════════════════════
-let renderer, scene, camera, frameCount = 0, lastFPS = 0, fpsTimer = 0;
-let starField, raceTrackRing, f1Car, WHEELS_3D = [];
-let particleSystem, orbitRing1, orbitRing2;
-let mousX = 0, mousY = 0, targetCamX = 0, targetCamY = 0;
-let animRunning = false;
+// ═══════════════════════════════════════════════════════════════
+//  DRIVER GRID
+// ═══════════════════════════════════════════════════════════════
+function initDriverGrid(){
+  const g=document.getElementById('dgrid');
+  Object.entries(DRIVERS).forEach(([k,d])=>{
+    const el=document.createElement('div');
+    el.className='dcard';
+    el.style.cssText=`--dc:${d.dc};--dc-glow:${d.dg}`;
+    el.innerHTML=`
+      <span class="d-flag">${d.flag}</span>
+      <div class="d-num">${d.num}</div>
+      <div class="d-team">${d.team}</div>
+      <div class="d-name">${d.name}</div>
+      <div class="d-bar"></div>`;
+    el.onclick=()=>launch(k);
+    g.appendChild(el);
+  });
+}
 
-function initThree() {
-  // Renderer
-  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("cv"), antialias: true, powerPreference: "high-performance", alpha: false });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.8));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.95;
-  renderer.setClearColor(0x020204, 1);
+// ═══════════════════════════════════════════════════════════════
+//  LAUNCH SEQUENCE
+// ═══════════════════════════════════════════════════════════════
+function launch(key){
+  curDriver=key;
+  const d=DRIVERS[key];
+  setAccent(d.dc);
 
-  scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x020204, 0.028);
+  document.getElementById('sel').classList.add('out');
+  document.getElementById('c').style.display='block';
 
-  camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 500);
-  camera.position.set(0, 8, 32);
-  camera.lookAt(0, 0, 0);
+  if(!renderer) initThree();
+  buildScene(d);
 
-  window.addEventListener("resize", () => {
-    camera.aspect = innerWidth / innerHeight;
+  setTimeout(()=>startLights(key),600);
+}
+
+function setAccent(col){
+  document.documentElement.style.setProperty('--ac',col);
+}
+
+function startLights(key){
+  const d=DRIVERS[key];
+  const lgts=document.getElementById('lgts');
+  lgts.classList.add('on');
+
+  const ri=document.getElementById('radiointro');
+  ri.textContent=`${d.name} — Car #${d.num} — ${d.team}`;
+  setTimeout(()=>{ri.classList.add('active');ri.textContent=d.intro},400);
+
+  const row=document.getElementById('lrow');
+  row.innerHTML='';
+  for(let i=0;i<5;i++){
+    row.innerHTML+=`<div class="lcol">
+      <div class="lpost"></div>
+      <div class="ldot" id="ld${i}"></div>
+    </div>`;
+  }
+  for(let i=0;i<5;i++){
+    setTimeout(()=>document.getElementById(`ld${i}`).classList.add('on'),500*(i+1));
+  }
+  // Lights out
+  setTimeout(()=>{
+    document.querySelectorAll('.ldot').forEach(x=>x.classList.remove('on'));
+    setTimeout(()=>{
+      const g=document.getElementById('gotxt');
+      g.classList.add('on');
+      setTimeout(()=>{
+        lgts.classList.remove('on');
+        g.classList.remove('on');
+        startRace(key);
+      },950);
+    },180);
+  },4000);
+}
+
+function startRace(key){
+  const d=DRIVERS[key];
+  document.body.style.background='#050505';
+  document.body.style.overflow='auto';
+  scrY=0;manS=0;carZ=5;camZ=10;prevCarZ=5;
+  podDone=false;lapN=1;raceStart=Date.now();
+  window.scrollTo(0,0);
+
+  document.getElementById('ss').classList.add('on');
+
+  // HUD elements
+  ['topbar','lhud','rhud','sponsors','hint','progress'].forEach(id=>{
+    document.getElementById(id).classList.add('on');
+  });
+  document.getElementById('tb-flag').textContent=d.flag;
+  document.getElementById('tb-circuit').textContent=d.name.split(' ').pop()+' GRAND PRIX';
+  document.getElementById('tb-driver').textContent=d.short;
+  document.getElementById('lhud-pos').textContent='P'+d.pos;
+  document.getElementById('gap-val').textContent=d.gap;
+
+  // Tire: start on soft
+  setTire('S');
+
+  // RPM bar
+  const rb=document.getElementById('rpmbar');
+  rb.innerHTML='';
+  for(let i=0;i<16;i++){
+    const s=document.createElement('div');
+    s.className='rpm-seg';s.id=`rsg${i}`;
+    rb.appendChild(s);
+  }
+
+  BTRIG=SECTIONS.map((s,i)=>({z:s.z,shown:false,closed:false,i}));
+
+  // Build sectors random times
+  updateSectors(0);
+
+  if(!animId) tick();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  THREE.JS
+// ═══════════════════════════════════════════════════════════════
+function initThree(){
+  renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.1;
+  renderer.shadowMap.enabled=false;
+
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1400);
+  camera.position.set(0,4,10);
+
+  window.addEventListener('resize',()=>{
+    camera.aspect=innerWidth/innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-    positionOrbs();
+    renderer.setSize(innerWidth,innerHeight);
   });
-
-  window.addEventListener("mousemove", e => {
-    mousX = (e.clientX / innerWidth - 0.5) * 2;
-    mousY = (e.clientY / innerHeight - 0.5) * 2;
+  window.addEventListener('scroll',()=>{scrY=window.scrollY});
+  window.addEventListener('keydown',e=>{
+    KEYS[e.key]=true;
+    if([' ','ArrowDown','ArrowUp','PageDown','PageUp'].includes(e.key))e.preventDefault();
   });
-
-  // Lights
-  scene.add(new THREE.AmbientLight(0x080818, 1.2));
-  const rl = new THREE.PointLight(0xe10600, 4, 60);
-  rl.position.set(-12, 8, 0);
-  scene.add(rl);
-  const tl = new THREE.PointLight(0x00d2be, 3, 60);
-  tl.position.set(12, 8, 0);
-  scene.add(tl);
-  const topL = new THREE.DirectionalLight(0x8888ff, 0.4);
-  topL.position.set(0, 20, 10);
-  scene.add(topL);
-
-  buildStarField();
-  buildGrid();
-  buildOrbitRings();
-  buildCircularTrack();
-  buildF1Car();
-  buildParticleSystem();
-  buildCentralCore();
+  window.addEventListener('keyup',e=>{KEYS[e.key]=false});
 }
 
-function buildStarField() {
-  const count = 3000;
-  const geo = new THREE.BufferGeometry();
-  const positions = new Float32Array(count * 3);
-  const colors = new Float32Array(count * 3);
-  const sizes = new Float32Array(count);
-  for (let i = 0; i < count; i++) {
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    const r = 80 + Math.random() * 200;
-    positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-    positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
-    positions[i*3+2] = r * Math.cos(phi);
-    const t = Math.random();
-    if (t < 0.1) { colors[i*3]=1; colors[i*3+1]=.15; colors[i*3+2]=.05; } // red stars
-    else if (t < 0.18) { colors[i*3]=.05; colors[i*3+1]=.85; colors[i*3+2]=.75; } // teal
-    else { const b=.4+Math.random()*.6; colors[i*3]=b; colors[i*3+1]=b; colors[i*3+2]=b; }
-    sizes[i] = Math.random() < 0.05 ? 2.5 : 0.8 + Math.random() * 1.2;
+function buildScene(d){
+  scene.background=new THREE.Color('#050505');
+  scene.fog=new THREE.FogExp2(new THREE.Color('#050505'),.0035);
+
+  if(trackGrp){scene.remove(trackGrp)}
+  if(carGrp){scene.remove(carGrp)}
+  WHEELS=[];
+  scene.children.filter(o=>o.isLight).forEach(l=>scene.remove(l));
+
+  trackGrp=new THREE.Group();
+  scene.add(trackGrp);
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff,.3));
+  const sun=new THREE.DirectionalLight(0xfff8f0,.95);
+  sun.position.set(30,60,-100);scene.add(sun);
+  const ac=new THREE.Color(d.dc);
+  const fillL=new THREE.DirectionalLight(ac,.5);
+  fillL.position.set(-20,10,0);scene.add(fillL);
+
+  buildTrack(d);
+  buildGrandstand(d);
+  buildSponsors3D(d);
+  buildBillboards(d);
+  buildFinishLine(d);
+
+  carGrp=buildCar(d);
+  scene.add(carGrp);
+}
+
+// ─── TRACK ───────────────────────────────────────────────────
+function buildTrack(d){
+  const L=810,W=14;
+  const mid=-(L/2)+5;
+  const ac=new THREE.Color(d.dc);
+
+  // Runoff
+  const runoff=new THREE.Mesh(
+    new THREE.PlaneGeometry(W+24,L),
+    new THREE.MeshLambertMaterial({color:0x182418})
+  );
+  runoff.rotation.x=-Math.PI/2;runoff.position.set(0,-.02,mid);
+  trackGrp.add(runoff);
+
+  // Tarmac
+  const tarmac=new THREE.Mesh(
+    new THREE.PlaneGeometry(W,L),
+    new THREE.MeshLambertMaterial({color:0x131313})
+  );
+  tarmac.rotation.x=-Math.PI/2;tarmac.position.set(0,0,mid);
+  trackGrp.add(tarmac);
+
+  // White lines
+  [-W/2+.12,W/2-.12].forEach(x=>{
+    const m=new THREE.Mesh(
+      new THREE.PlaneGeometry(.28,L),
+      new THREE.MeshLambertMaterial({color:0xffffff})
+    );
+    m.rotation.x=-Math.PI/2;m.position.set(x,.002,mid);
+    trackGrp.add(m);
+  });
+
+  // Centre dash
+  for(let z=0;z>-L;z-=24){
+    const m=new THREE.Mesh(
+      new THREE.PlaneGeometry(.14,10),
+      new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:.18})
+    );
+    m.rotation.x=-Math.PI/2;m.position.set(0,.002,z-5);
+    trackGrp.add(m);
   }
-  geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-  geo.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
-  const mat = new THREE.ShaderMaterial({
-    uniforms: { time: { value: 0 } },
-    vertexShader: `
-      attribute float size;
-      attribute vec3 color;
-      varying vec3 vColor;
-      uniform float time;
-      void main(){
-        vColor=color;
-        vec4 mvPos=modelViewMatrix*vec4(position,1.);
-        gl_PointSize=size*(200./-mvPos.z)*(0.85+0.15*sin(time*2.+position.x));
-        gl_Position=projectionMatrix*mvPos;
-      }`,
-    fragmentShader: `
-      varying vec3 vColor;
-      void main(){
-        float d=length(gl_PointCoord-.5)*2.;
-        if(d>1.)discard;
-        float alpha=1.-smoothstep(.6,1.,d);
-        gl_FragColor=vec4(vColor,alpha);
-      }`,
-    transparent: true, vertexColors: true, depthWrite: false
-  });
-  starField = new THREE.Points(geo, mat);
-  scene.add(starField);
-}
 
-function buildGrid() {
-  // Neon grid floor
-  const size = 80, divs = 30;
-  const grid = new THREE.GridHelper(size, divs, 0x110022, 0x0a0014);
-  grid.position.y = -5;
-  grid.material.transparent = true;
-  grid.material.opacity = 0.5;
-  scene.add(grid);
-  // Glow lines on grid edges
-  const edgeMat = new THREE.LineBasicMaterial({ color: 0xe10600, transparent: true, opacity: 0.3 });
-  const edgeGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-40,0,0),new THREE.Vector3(40,0,0)]);
-  const edgeLine = new THREE.Line(edgeGeo, edgeMat);
-  edgeLine.position.y = -4.98;
-  scene.add(edgeLine);
-}
-
-function buildOrbitRings() {
-  // Decorative rings around the scene center
-  [14, 20].forEach((r, i) => {
-    const geo = new THREE.TorusGeometry(r, 0.04, 8, 128);
-    const mat = new THREE.MeshBasicMaterial({ color: i === 0 ? 0xe10600 : 0x00d2be, transparent: true, opacity: i === 0 ? 0.22 : 0.15 });
-    const ring = new THREE.Mesh(geo, mat);
-    ring.rotation.x = Math.PI / 2;
-    if (i === 0) orbitRing1 = ring; else orbitRing2 = ring;
-    scene.add(ring);
-  });
-}
-
-function buildCircularTrack() {
-  // Main race track ring
-  const trackGeo = new THREE.TorusGeometry(18, 1.2, 8, 100);
-  const trackMat = new THREE.MeshLambertMaterial({ color: 0x111118 });
-  raceTrackRing = new THREE.Mesh(trackGeo, trackMat);
-  raceTrackRing.rotation.x = Math.PI / 2;
-  raceTrackRing.position.y = -4;
-  scene.add(raceTrackRing);
-  // Kerb stripe (red/white alternating using points)
-  const kerbGeo = new THREE.TorusGeometry(19.25, 0.28, 6, 100);
-  const kerbMat = new THREE.MeshLambertMaterial({ color: 0xe10600 });
-  const kerb = new THREE.Mesh(kerbGeo, kerbMat);
-  kerb.rotation.x = Math.PI / 2;
-  kerb.position.y = -4;
-  scene.add(kerb);
-  // Track glow
-  const glowGeo = new THREE.TorusGeometry(18, 1.35, 8, 100);
-  const glowMat = new THREE.MeshBasicMaterial({ color: 0x00d2be, transparent: true, opacity: 0.04 });
-  const glow = new THREE.Mesh(glowGeo, glowMat);
-  glow.rotation.x = Math.PI / 2;
-  glow.position.y = -4;
-  scene.add(glow);
-}
-
-function buildF1Car() {
-  const g = new THREE.Group();
-  const red = new THREE.MeshLambertMaterial({ color: 0xe10600 });
-  const dark = new THREE.MeshLambertMaterial({ color: 0x0d0d0d });
-  const teal = new THREE.MeshLambertMaterial({ color: 0x00d2be });
-  const wht = new THREE.MeshLambertMaterial({ color: 0xeeeeee });
-
-  const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x,y,z); g.add(m); return m; };
-  // Body
-  add(new THREE.BoxGeometry(1.4, 0.36, 3.5), red, 0, 0.26, 0);
-  add(new THREE.BoxGeometry(0.44, 0.18, 1.0), red, 0, 0.14, -2.2);
-  add(new THREE.BoxGeometry(0.6, 0.28, 0.95), dark, 0, 0.5, 0.2);
-  // Front/rear wings
-  add(new THREE.BoxGeometry(1.9, 0.045, 0.5), teal, 0, 0.05, -2.35);
-  add(new THREE.BoxGeometry(1.45, 0.055, 0.38), teal, 0, 0.9, 1.62);
-  // Sidepods
-  [-1,1].forEach(s => add(new THREE.BoxGeometry(0.38, 0.27, 1.7), red, s*0.76, 0.14, 0.08));
-  // Wheels
-  [[-0.88,-1.35],[0.88,-1.35],[-0.88,1.3],[0.88,1.3]].forEach(([wx,wz]) => {
-    const piv = new THREE.Group();
-    piv.position.set(wx, 0.24, wz);
-    const t = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.3, 16), dark);
-    t.rotation.z = Math.PI / 2;
-    piv.add(t);
-    const r = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.32, 12), wht);
-    r.rotation.z = Math.PI / 2;
-    piv.add(r);
-    g.add(piv);
-    WHEELS_3D.push(piv);
-  });
-  // Halo
-  const hs = new THREE.Shape();
-  hs.absarc(0, 0, 0.46, 0, Math.PI, false);
-  const halo = new THREE.Mesh(new THREE.ShapeGeometry(hs, 10), dark);
-  halo.position.set(0, 0.55, 0.1);
-  halo.rotation.x = -Math.PI / 2;
-  g.add(halo);
-
-  g.scale.setScalar(0.7);
-  f1Car = g;
-  scene.add(f1Car);
-}
-
-function buildParticleSystem() {
-  // Floating particles around center
-  const count = 500;
-  const geo = new THREE.BufferGeometry();
-  const pos = new Float32Array(count * 3);
-  const col = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const dist = 3 + Math.random() * 10;
-    const height = (Math.random() - 0.5) * 12;
-    pos[i*3] = Math.cos(angle) * dist;
-    pos[i*3+1] = height;
-    pos[i*3+2] = Math.sin(angle) * dist;
-    if (Math.random() < 0.3) { col[i*3]=0.88; col[i*3+1]=0.02; col[i*3+2]=0; }
-    else if (Math.random() < 0.5) { col[i*3]=0; col[i*3+1]=0.82; col[i*3+2]=0.75; }
-    else { col[i*3]=0.3; col[i*3+1]=0.3; col[i*3+2]=0.3; }
+  // Kerbs
+  for(let z=0;z>-L;z-=5.2){
+    const alt=Math.floor(Math.abs(z)/5.2)%2;
+    [-W/2-.4,W/2+.4].forEach(x=>{
+      const kc=alt?0xe10600:0xffffff;
+      const m=new THREE.Mesh(
+        new THREE.PlaneGeometry(.72,5.1),
+        new THREE.MeshLambertMaterial({color:kc})
+      );
+      m.rotation.x=-Math.PI/2;m.position.set(x,.002,z-2.5);
+      trackGrp.add(m);
+    });
   }
-  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
-  const mat = new THREE.PointsMaterial({ size: 0.08, vertexColors: true, transparent: true, opacity: 0.6, depthWrite: false });
-  particleSystem = new THREE.Points(geo, mat);
-  scene.add(particleSystem);
-}
 
-function buildCentralCore() {
-  // Glowing central sphere
-  const coreMat = new THREE.MeshBasicMaterial({ color: 0xe10600, transparent: true, opacity: 0.06 });
-  const coreGeo = new THREE.SphereGeometry(2, 32, 32);
-  const core = new THREE.Mesh(coreGeo, coreMat);
-  scene.add(core);
-  // Inner wireframe
-  const wfGeo = new THREE.IcosahedronGeometry(1.6, 1);
-  const wfMat = new THREE.MeshBasicMaterial({ color: 0xe10600, wireframe: true, transparent: true, opacity: 0.15 });
-  const wf = new THREE.Mesh(wfGeo, wfMat);
-  scene.add(wf);
+  // Tyre barriers
+  const bmat=new THREE.MeshLambertMaterial({color:0x0e0e0e});
+  for(let z=2;z>-L+2;z-=1.55){
+    [-W/2-1.6,W/2+1.6].forEach(x=>{
+      const t=new THREE.Mesh(new THREE.CylinderGeometry(.65,.65,1.5,10),bmat);
+      t.position.set(x,.75,z-.77);
+      trackGrp.add(t);
+    });
+  }
 
-  // Three holographic hexagon rings
-  for (let ri = 0; ri < 3; ri++) {
-    const r = 4 + ri * 2;
-    const segments = 6;
-    const pts = [];
-    for (let i = 0; i <= segments; i++) {
-      const a = (i / segments) * Math.PI * 2;
-      pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
-    }
-    const hexGeo = new THREE.BufferGeometry().setFromPoints(pts);
-    const hexMat = new THREE.LineBasicMaterial({ color: ri === 0 ? 0xe10600 : ri === 1 ? 0x00d2be : 0xffd700, transparent: true, opacity: 0.22 - ri * 0.05 });
-    const hex = new THREE.Line(hexGeo, hexMat);
-    hex.rotation.y = ri * Math.PI / 6;
-    scene.add(hex);
+  // Armco behind barriers
+  [-W/2-2.5,W/2+2.5].forEach(x=>{
+    const m=new THREE.Mesh(
+      new THREE.BoxGeometry(.08,.7,L),
+      new THREE.MeshLambertMaterial({color:0x888888})
+    );
+    m.position.set(x,.35,mid);
+    trackGrp.add(m);
+  });
+
+  // DRS zone markings
+  const drsZones=[-120,-350,-500];
+  drsZones.forEach(z=>{
+    // Blue DRS line
+    const m=new THREE.Mesh(
+      new THREE.PlaneGeometry(W,.18),
+      new THREE.MeshLambertMaterial({color:0x0088ff})
+    );
+    m.rotation.x=-Math.PI/2;m.position.set(0,.003,z);
+    trackGrp.add(m);
+  });
+
+  // Grid boxes (start)
+  for(let i=0;i<10;i++){
+    const x=(i%2===0?-.7:.7)*2.5;
+    const gz=-i*4.5-2;
+    const gm=new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:.35});
+    const g1=new THREE.Mesh(new THREE.PlaneGeometry(2.5,.08),gm);
+    g1.rotation.x=-Math.PI/2;g1.position.set(x,.003,gz);
+    trackGrp.add(g1);
+    const g2=new THREE.Mesh(new THREE.PlaneGeometry(.08,3.5),gm);
+    g2.rotation.x=-Math.PI/2;g2.position.set(x,.003,gz-1.75);
+    trackGrp.add(g2);
   }
 }
 
-// ══════════════════════════════════════════════════════
-// ANIMATION LOOP
-// ══════════════════════════════════════════════════════
-let t = 0;
-function animate() {
-  requestAnimationFrame(animate);
-  t += 0.008;
-  frameCount++;
-
-  // FPS counter
-  fpsTimer += 0.008;
-  if (fpsTimer > 0.5) {
-    lastFPS = Math.round(frameCount / fpsTimer * 2);
-    document.getElementById("st-fps").textContent = lastFPS + " FPS";
-    frameCount = 0; fpsTimer = 0;
-  }
-
-  // Stars twinkle & slow rotation
-  if (starField) {
-    starField.material.uniforms.time.value = t;
-    starField.rotation.y = t * 0.015;
-  }
-
-  // Orbit rings counter-rotate
-  if (orbitRing1) orbitRing1.rotation.z = t * 0.22;
-  if (orbitRing2) orbitRing2.rotation.z = -t * 0.15;
-
-  // F1 car laps the track ring
-  if (f1Car) {
-    const carAngle = -t * 0.55;
-    const carR = 18;
-    f1Car.position.x = Math.cos(carAngle) * carR;
-    f1Car.position.y = -4 + 0.62;
-    f1Car.position.z = Math.sin(carAngle) * carR;
-    f1Car.rotation.y = carAngle + Math.PI / 2;
-    WHEELS_3D.forEach(w => { w.rotation.x -= 0.22; });
-    // Headlight glow pulse
-  }
-
-  // Particles orbit + drift
-  if (particleSystem) {
-    particleSystem.rotation.y = t * 0.06;
-    particleSystem.rotation.x = Math.sin(t * 0.12) * 0.08;
-  }
-
-  // Camera parallax from mouse
-  targetCamX += (mousX * 3.5 - targetCamX) * 0.04;
-  targetCamY += (-mousY * 2.5 - targetCamY) * 0.04;
-  camera.position.x = targetCamX;
-  camera.position.y = 8 + targetCamY;
-  camera.position.z = 32;
-  camera.lookAt(targetCamX * 0.2, targetCamY * 0.2, 0);
-
-  // Clock in status bar
-  const now = new Date();
-  document.getElementById("st-time").textContent = now.toLocaleTimeString("en-GB", {hour12:false}) + " UTC+1";
-
-  renderer.render(scene, camera);
-}
-
-// ══════════════════════════════════════════════════════
-// ORB BUTTONS
-// ══════════════════════════════════════════════════════
-function buildOrbs() {
-  const container = document.getElementById("orbs");
-  ORB_POSITIONS.forEach(({ section, x, y }) => {
-    const s = SECTIONS[section];
-    const btn = document.createElement("button");
-    btn.className = "orb-btn";
-    btn.id = "orb-" + section;
-    btn.style.left = x + "%";
-    btn.style.top = y + "%";
-    btn.style.setProperty("--oc", s.color);
-    btn.style.setProperty("--ocr", s.colorRGB);
-    btn.innerHTML = `<div class="orb-ring" id="orbring-${section}">${s.icon}</div><div class="orb-label">${s.label}</div>`;
-    btn.onclick = () => openSection(section);
-    // Stagger in
-    setTimeout(() => btn.classList.add("in"), 400 + ORB_POSITIONS.indexOf(ORB_POSITIONS.find(p=>p.section===section)) * 80);
-    container.appendChild(btn);
-  });
-}
-
-function positionOrbs() {
-  ORB_POSITIONS.forEach(({ section, x, y }) => {
-    const btn = document.getElementById("orb-" + section);
-    if (btn) { btn.style.left = x + "%"; btn.style.top = y + "%"; }
-  });
-}
-
-// ══════════════════════════════════════════════════════
-// PANEL / SECTION LOGIC
-// ══════════════════════════════════════════════════════
-let activeSection = null;
-
-function openSection(id) {
-  const s = SECTIONS[id];
-  if (!s) return;
-  // Update active orb
-  document.querySelectorAll(".orb-ring").forEach(r => r.classList.remove("active-orb"));
-  document.querySelectorAll(".nav-pill").forEach(p => p.classList.remove("active"));
-  const orbRing = document.getElementById("orbring-" + id);
-  if (orbRing) orbRing.classList.add("active-orb");
-
-  // Panel color
-  const panel = document.getElementById("content-panel");
-  panel.style.setProperty("--pc", s.color);
-  // Content
-  document.getElementById("panel-body").innerHTML = s.html();
-  panel.classList.add("open");
-  activeSection = id;
-
-  // Animate skill bars if skills section
-  if (id === "skills") {
-    requestAnimationFrame(() => {
-      document.querySelectorAll(".skill-fill").forEach(el => {
-        setTimeout(() => el.style.transform = "scaleX(1)", 100);
+// ─── GRANDSTAND ──────────────────────────────────────────────
+function buildGrandstand(d){
+  const ac=new THREE.Color(d.dc);
+  const rows=32;
+  for(let i=0;i<rows;i++){
+    const z=-i*25-8;
+    [-1,1].forEach(side=>{
+      const x=side*22;
+      // Stand body
+      const sm=new THREE.MeshLambertMaterial({
+        color:new THREE.Color(.04+Math.random()*.03,.04,.06+Math.random()*.04)
       });
+      const stand=new THREE.Mesh(new THREE.BoxGeometry(8,12+Math.random()*8,22),sm);
+      stand.position.set(x,stand.geometry.parameters.height/2,z);
+      trackGrp.add(stand);
+      // Roof
+      const rm=new THREE.MeshLambertMaterial({color:0x111111});
+      const roof=new THREE.Mesh(new THREE.BoxGeometry(8.5,.35,22.5),rm);
+      roof.position.set(x,stand.geometry.parameters.height+.17,z);
+      trackGrp.add(roof);
+      // Accent stripe
+      const acm=new THREE.MeshLambertMaterial({color:ac,emissive:ac,emissiveIntensity:.25});
+      const stripe=new THREE.Mesh(new THREE.BoxGeometry(.18,stand.geometry.parameters.height*.6,22),acm);
+      stripe.position.set(x-side*4.1,stand.geometry.parameters.height*.3,z);
+      trackGrp.add(stripe);
+      // Crowd dots (simplified)
+      if(i%2===0){
+        for(let ci=0;ci<6;ci++){
+          const cc=new THREE.MeshLambertMaterial({
+            color:new THREE.Color(Math.random()*.8+.2,Math.random()*.4,Math.random()*.4)
+          });
+          const crowd=new THREE.Mesh(new THREE.SphereGeometry(.3,4,4),cc);
+          crowd.position.set(
+            x+(Math.random()-0.5)*6,
+            stand.geometry.parameters.height*.3+Math.random()*3,
+            z+(Math.random()-0.5)*18
+          );
+          trackGrp.add(crowd);
+        }
+      }
     });
   }
 }
 
-function closePanel() {
-  document.getElementById("content-panel").classList.remove("open");
-  document.querySelectorAll(".orb-ring").forEach(r => r.classList.remove("active-orb"));
-  activeSection = null;
+// ─── 3D SPONSOR BOARDS ───────────────────────────────────────
+function buildSponsors3D(d){
+  const sponsors3d=[
+    {label:'PIRELLI',col:0xffffff,z:-55,side:1},
+    {label:'ROLEX',col:0xc8a84b,z:-160,side:-1},
+    {label:'DHL',col:0xffcc00,z:-290,side:1},
+    {label:'ARAMCO',col:0x00a3e0,z:-420,side:-1},
+    {label:'AWS',col:0xff9900,z:-560,side:1},
+    {label:'HEINEKEN',col:0x00a550,z:-610,side:-1},
+  ];
+  sponsors3d.forEach(sp=>{
+    const x=sp.side*(15.5);
+    const col=new THREE.Color(sp.col);
+    // Board backing
+    const bm=new THREE.MeshLambertMaterial({color:0x0a0a0a});
+    const board=new THREE.Mesh(new THREE.BoxGeometry(7,.22,1.8),bm);
+    board.position.set(x,.12,sp.z);
+    trackGrp.add(board);
+    // Colour band
+    const cm=new THREE.MeshLambertMaterial({color:col,emissive:col,emissiveIntensity:.6});
+    const band=new THREE.Mesh(new THREE.BoxGeometry(7,.24,1.8),cm);
+    band.position.set(x,.24,sp.z);
+    trackGrp.add(band);
+    // Glow light
+    const pt=new THREE.PointLight(col,1.5,25);
+    pt.position.set(x,1.5,sp.z);
+    trackGrp.add(pt);
+  });
 }
 
-// ══════════════════════════════════════════════════════
-// BOOT
-// ══════════════════════════════════════════════════════
-window.addEventListener("DOMContentLoaded", () => {
-  initThree();
-  buildOrbs();
-  animate();
+// ─── SECTION BILLBOARDS ──────────────────────────────────────
+function buildBillboards(d){
+  const ac=new THREE.Color(d.dc);
+  SECTIONS.forEach(s=>{
+    const grp=new THREE.Group();
+    const col=new THREE.Color(s.color);
 
-  // Finish loading after a beat
-  setTimeout(() => {
-    document.getElementById("loading").classList.add("done");
-    document.getElementById("hdr").classList.add("in");
-    document.getElementById("center-hud").classList.add("in");
-    document.getElementById("status").classList.add("in");
-  }, 1800);
-});
+    // Poles
+    const pm=new THREE.MeshLambertMaterial({color:0x2a2a2a});
+    [-2.6,2.6].forEach(px=>{
+      const pole=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,10,8),pm);
+      pole.position.set(px,5,0);grp.add(pole);
+    });
 
-window.addEventListener("keydown", e => { if (e.key === "Escape") closePanel(); });
+    // Board
+    const brd=new THREE.Mesh(
+      new THREE.BoxGeometry(6,3.4,.14),
+      new THREE.MeshLambertMaterial({color:0x060606})
+    );
+    brd.position.set(0,8,0);grp.add(brd);
+
+    // Colour header
+    const hm=new THREE.MeshLambertMaterial({color:col,emissive:col,emissiveIntensity:.6});
+    const hdr=new THREE.Mesh(new THREE.BoxGeometry(6,.55,.16),hm);
+    hdr.position.set(0,9.98,0);grp.add(hdr);
+
+    // LED strip at bottom
+    const lm=new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:.3});
+    const led=new THREE.Mesh(new THREE.BoxGeometry(6,.12,.15),lm);
+    led.position.set(0,6.32,0);grp.add(led);
+
+    // Glow
+    const pt=new THREE.PointLight(col,2.5,40);
+    pt.position.set(0,8,4);grp.add(pt);
+
+    grp.position.set(13,0,s.z);
+    grp.rotation.y=-Math.PI/6;
+    trackGrp.add(grp);
+  });
+}
+
+// ─── FINISH LINE ─────────────────────────────────────────────
+function buildFinishLine(d){
+  const FZ=-750;
+  const ac=new THREE.Color(d.dc);
+
+  // Chequered floor
+  for(let xi=0;xi<12;xi++){
+    for(let ri=0;ri<4;ri++){
+      const x=-7.5+xi*1.28+.64;
+      const isW=(xi+ri)%2===0;
+      const m=new THREE.Mesh(
+        new THREE.PlaneGeometry(1.22,1.45),
+        new THREE.MeshLambertMaterial({color:isW?0xffffff:0x111111})
+      );
+      m.rotation.x=-Math.PI/2;m.position.set(x,.003,FZ-ri*1.45-.72);
+      trackGrp.add(m);
+    }
+  }
+  // Gantry
+  const gm=new THREE.MeshLambertMaterial({color:0x1a1a1a});
+  [-11,11].forEach(x=>{
+    const u=new THREE.Mesh(new THREE.CylinderGeometry(.32,.32,16,8),gm);
+    u.position.set(x,8,FZ-5);trackGrp.add(u);
+  });
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,22.5,8),gm);
+  beam.rotation.z=Math.PI/2;beam.position.set(0,16,FZ-5);trackGrp.add(beam);
+
+  // Chequered on gantry
+  for(let bx=-9;bx<10;bx++){
+    for(let by=0;by<4;by++){
+      const isW=(bx+9+by)%2===0;
+      const bm=new THREE.Mesh(
+        new THREE.PlaneGeometry(.95,.95),
+        new THREE.MeshLambertMaterial({color:isW?0xffffff:0x111111,side:THREE.DoubleSide})
+      );
+      bm.position.set(bx+.5,15.5-by,FZ-5);trackGrp.add(bm);
+    }
+  }
+
+  // Accent lights
+  const lm=new THREE.MeshLambertMaterial({color:ac,emissive:ac,emissiveIntensity:1.4});
+  for(let lx=-10;lx<=10;lx+=2){
+    const l=new THREE.Mesh(new THREE.SphereGeometry(.24,8,8),lm);
+    l.position.set(lx,16.6,FZ-5);trackGrp.add(l);
+  }
+
+  // "POWERED BY F1" board on gantry
+  const boardM=new THREE.MeshLambertMaterial({color:0xe10600});
+  const podB=new THREE.Mesh(new THREE.BoxGeometry(6,.8,.12),boardM);
+  podB.position.set(0,14.5,FZ-5);trackGrp.add(podB);
+}
+
+// ─── F1 CAR ──────────────────────────────────────────────────
+function buildCar(d){
+  const grp=new THREE.Group();
+  const AM=new THREE.MeshLambertMaterial({color:new THREE.Color(d.car)});
+  const DK=new THREE.MeshLambertMaterial({color:0x0d0d0d});
+  const FL=new THREE.MeshLambertMaterial({color:new THREE.Color(d.floor)});
+  const WG=new THREE.MeshLambertMaterial({color:new THREE.Color(d.wing)});
+  const SV=new THREE.MeshLambertMaterial({color:0xcccccc});
+  const WH=new THREE.MeshLambertMaterial({color:0x0e0e0e});
+  const RIM=new THREE.MeshLambertMaterial({color:0xaaaaaa});
+
+  const add=(g,m,x,y,z,rx=0,ry=0,rz=0)=>{
+    const mesh=new THREE.Mesh(g,m);
+    mesh.position.set(x,y,z);
+    mesh.rotation.set(rx,ry,rz);
+    grp.add(mesh);return mesh;
+  };
+
+  // ── Body ──
+  add(new THREE.BoxGeometry(1.72,.45,4.2),AM,0,.32,0);
+  add(new THREE.BoxGeometry(1.72,.04,4.0),FL,0,.08,0);
+  // Nose cone
+  add(new THREE.BoxGeometry(.52,.22,1.2),AM,0,.16,-2.7);
+  add(new THREE.BoxGeometry(.28,.12,.7),AM,0,.12,-3.3);
+  // Cockpit
+  add(new THREE.BoxGeometry(.76,.34,1.2),DK,0,.59,.28);
+  // Halo
+  const hs=new THREE.Shape();
+  hs.absarc(0,0,.55,0,Math.PI,false);
+  add(new THREE.ShapeGeometry(hs,12),DK,0,.66,.1,-Math.PI/2);
+  // Sidepods
+  [-1,1].forEach(s=>{
+    add(new THREE.BoxGeometry(.46,.34,2.1),AM,s*.93,.18,.08);
+    // Intake
+    add(new THREE.BoxGeometry(.42,.2,.14),DK,s*.88,.28,.62);
+  });
+  // Front wing
+  add(new THREE.BoxGeometry(2.4,.06,.62),WG,0,.06,-2.9);
+  [-1.16,1.16].forEach(s=>{
+    add(new THREE.BoxGeometry(.06,.28,.68),DK,s,.17,-2.88);
+    add(new THREE.BoxGeometry(.06,.18,.68),WG,s*.7,.1,-2.88);
+  });
+  // Rear wing
+  add(new THREE.BoxGeometry(1.8,.08,.5),WG,0,1.12,1.92);
+  add(new THREE.BoxGeometry(1.8,.06,.38),WG,0,.95,1.82);
+  [-0.85,0.85].forEach(s=>{
+    add(new THREE.BoxGeometry(.06,.42,.56),DK,s,.94,1.9);
+  });
+  add(new THREE.BoxGeometry(.07,.58,.06),DK,0,.86,1.88);
+  // Airbox
+  add(new THREE.BoxGeometry(.36,.62,.62),DK,0,.75,.84);
+  add(new THREE.BoxGeometry(.32,.28,1.3),DK,0,.58,1.1);
+  // Exhaust glow
+  const eM=new THREE.MeshLambertMaterial({color:0xff5500,emissive:0xff4400,emissiveIntensity:1.4});
+  add(new THREE.CylinderGeometry(.06,.08,.3,8),eM,.19,.49,2.18,Math.PI/2);
+
+  // ── Wheels ──
+  const WP=[
+    {x:-1.05,z:-1.58},{x:1.05,z:-1.58},
+    {x:-1.05,z:1.42},{x:1.05,z:1.42}
+  ];
+  WP.forEach(wp=>{
+    const pivot=new THREE.Group();
+    pivot.position.set(wp.x,.31,wp.z);
+    // Tire
+    const t=new THREE.Mesh(new THREE.CylinderGeometry(.31,.31,.38,18),WH);
+    t.rotation.z=Math.PI/2;pivot.add(t);
+    // Rim
+    const r=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.4,14),RIM);
+    r.rotation.z=Math.PI/2;pivot.add(r);
+    // Hub nut
+    const h=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.41,6),SV);
+    h.rotation.z=Math.PI/2;pivot.add(h);
+    // Pirelli compound dot (soft=red)
+    const pM=new THREE.MeshLambertMaterial({color:0xe10600,emissive:0xe10600,emissiveIntensity:.5});
+    const pd=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.42,6),pM);
+    pd.rotation.z=Math.PI/2;pivot.add(pd);
+
+    grp.add(pivot);
+    WHEELS.push(pivot);
+  });
+
+  // Number board
+  const nbM=new THREE.MeshLambertMaterial({color:0xffffff});
+  add(new THREE.BoxGeometry(.55,.28,.025),nbM,0,.33,-3.36);
+
+  return grp;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════════
+let frameT=0;
+function tick(){
+  animId=requestAnimationFrame(tick);
+  frameT+=.016;
+
+  // Keys
+  if(KEYS['ArrowDown']||KEYS[' ']||KEYS['PageDown']) manS=Math.min(manS+16,9200);
+  if(KEYS['ArrowUp']||KEYS['PageUp']) manS=Math.max(manS-10,0);
+
+  const eff=Math.max(scrY,manS);
+
+  // Car position
+  const tCarZ=5-eff*.088;
+  carZ+=(tCarZ-carZ)*.09;
+  const vel=Math.abs(carZ-prevCarZ);
+  prevCarZ=carZ;
+
+  // Weave / snake feel
+  const weave=Math.sin(carZ*.018)*.55+Math.sin(carZ*.038)*.2;
+  const steer=(Math.sin(carZ*.018)*.018+Math.sin(carZ*.038)*.01);
+
+  if(carGrp){
+    carGrp.position.set(weave,0,carZ);
+    carGrp.rotation.y=steer+Math.PI;
+  }
+
+  // Camera
+  const tCamZ=carZ+10.5;
+  camZ+=(tCamZ-camZ)*.07;
+  camera.position.z=camZ;
+  camera.position.y=3.9+Math.sin(frameT*.4)*.08;
+  camera.position.x=weave*.3+Math.sin(frameT*.25)*.05;
+  camera.lookAt(weave*.45,.42,carZ-15);
+  camera.rotation.z=-weave*.013;
+
+  // Wheels
+  WHEELS.forEach(w=>{w.rotation.x-=.24});
+
+  // ── HUD ──
+  const spd=Math.min(95+vel*3800,345);
+  document.getElementById('spd-n').textContent=Math.round(spd);
+
+  // Gear sim
+  const gear=spd<50?1:spd<90?2:spd<130?3:spd<175?4:spd<220?5:spd<270?6:7;
+  document.getElementById('gear-n').textContent='G'+gear;
+
+  // RPM bar
+  const rpmRat=Math.min(vel*35,.98);
+  const rpmSegs=Math.floor(rpmRat*16);
+  for(let i=0;i<16;i++){
+    const s=document.getElementById(`rsg${i}`);
+    if(!s)continue;
+    s.className='rpm-seg'+(i<rpmSegs?' lit'+(i>12?' redline':i>9?' warn':''):'');
+  }
+
+  // Progress
+  const prog=Math.max(0,Math.min(1,(5-carZ)/Math.abs(FINISH_Z-5)));
+  document.getElementById('progfill').style.width=(prog*100)+'%';
+
+  // Lap counter (every ~20% progress)
+  const newLap=Math.min(5,Math.floor(prog*5)+1);
+  if(newLap!==lapN){lapN=newLap;document.getElementById('lapn').textContent=lapN}
+
+  // DRS sim
+  const drsOn=vel>0.12&&(carZ>-130&&carZ<-80||carZ>-365&&carZ<-310||carZ>-515&&carZ<-465);
+  document.getElementById('drs-btn').className='drs-btn'+(drsOn?' active':'');
+
+  // Sector colours
+  updateSectors(prog);
+
+  // Rolex clock
+  if(raceStart){
+    const el=Date.now()-raceStart;
+    const h=Math.floor(el/3600000).toString().padStart(2,'0');
+    const m=Math.floor((el%3600000)/60000).toString().padStart(2,'0');
+    const s=Math.floor((el%60000)/1000).toString().padStart(2,'0');
+    document.getElementById('rtime').textContent=`${h}:${m}:${s}`;
+  }
+
+  // Tire compound change
+  if(prog>.35&&prog<.42) setTire('M');
+  else if(prog>.7) setTire('H');
+
+  // Billboards
+  checkBoards(carZ);
+
+  // Finish
+  if(!podDone&&carZ<FINISH_Z+60){
+    podDone=true;
+    setTimeout(showPodium,800);
+  }
+
+  renderer.render(scene,camera);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TIRE COMPOUND
+// ═══════════════════════════════════════════════════════════════
+function setTire(compound){
+  const cfg={
+    S:{color:'#e10600',name:'SOFT',pirelliColor:'#e10600',pirelliLabel:'S'},
+    M:{color:'#ffd700',name:'MEDIUM',pirelliColor:'#ffd700',pirelliLabel:'M'},
+    H:{color:'#ffffff',name:'HARD',pirelliColor:'#ffffff',pirelliLabel:'H'}
+  };
+  const c=cfg[compound];
+  const tc=document.getElementById('tire-c');
+  tc.style.borderColor=c.color;tc.style.color=c.color;tc.textContent=compound;
+  document.getElementById('tire-n').textContent=c.name;
+  const pc=document.getElementById('pir-c');
+  pc.style.borderColor=c.pirelliColor;pc.style.color=c.pirelliColor;
+  pc.textContent=c.pirelliLabel;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SECTOR TIMING
+// ═══════════════════════════════════════════════════════════════
+const SEC_STATES=['purple','green','yellow',''];
+function updateSectors(prog){
+  const s1p=.3,s2p=.6,s3p=.9;
+  const s1c=prog>s1p?SEC_STATES[Math.floor(Math.random()*3)]:prog>s1p-.15?'yellow':'';
+  const s2c=prog>s2p?SEC_STATES[Math.floor(Math.random()*3)]:prog>s2p-.15?'yellow':'';
+  const s3c=prog>s3p?SEC_STATES[Math.floor(Math.random()*3)]:prog>s3p-.15?'yellow':'';
+  // Only update occasionally
+  if(Math.random()<.01){
+    if(prog>s1p)document.getElementById('s1').className='sec '+(Math.random()>.4?'purple':'green');
+    if(prog>s2p)document.getElementById('s2').className='sec '+(Math.random()>.5?'green':'purple');
+    if(prog>s3p)document.getElementById('s3').className='sec '+(Math.random()>.4?'purple':'green');
+  }
+  if(prog<.3)document.getElementById('s1').className='sec '+(prog>.15?'yellow':'');
+  if(prog<.6)document.getElementById('s2').className='sec '+(prog>.45?'yellow':'');
+  if(prog<.9)document.getElementById('s3').className='sec '+(prog>.75?'yellow':'');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PANELS
+// ═══════════════════════════════════════════════════════════════
+function checkBoards(z){
+  BTRIG.forEach(t=>{
+    const inRange=z<t.z+30&&z>t.z-70;
+    if(!t.closed&&!t.shown&&inRange){
+      t.shown=true;
+      showPanel(t.i);
+      showRadio(SECTIONS[t.i].radio);
+    }
+    if(t.shown&&!inRange){
+      t.shown=false;
+      if(activePanelIdx===t.i) hidePanel();
+    }
+  });
+}
+
+function showPanel(idx){
+  activePanelIdx=idx;
+  const s=SECTIONS[idx];
+  document.getElementById('ptag').textContent=s.tag;
+  document.getElementById('ptit').textContent=s.title;
+  const linksHtml=s.links.length?
+    `<div class="p-links">${s.links.map(l=>`<a class="p-link" href="${l.href}" target="_blank">${l.label}</a>`).join('')}</div>`:'';
+  document.getElementById('pbod').innerHTML=
+    `<p>${s.body}</p>
+     <div class="p-chips">${s.chips.map((c,i)=>`<span class="chip${i<2?' ac':''}">${c}</span>`).join('')}</div>
+     ${linksHtml}`;
+  document.getElementById('panel').style.borderLeftColor=s.color;
+  document.getElementById('panel').classList.add('on');
+}
+
+function hidePanel(){
+  activePanelIdx=-1;
+  document.getElementById('panel').classList.remove('on');
+}
+
+function closePanel(){
+  if(activePanelIdx>=0){BTRIG[activePanelIdx].closed=true;BTRIG[activePanelIdx].shown=false}
+  hidePanel();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RADIO
+// ═══════════════════════════════════════════════════════════════
+let radioTmr;
+function showRadio(msg){
+  clearTimeout(radioTmr);
+  document.getElementById('radio-txt').textContent=msg.replace(/"/g,'');
+  document.getElementById('radio').classList.add('on');
+  radioTmr=setTimeout(()=>document.getElementById('radio').classList.remove('on'),4500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PODIUM
+// ═══════════════════════════════════════════════════════════════
+function showPodium(){
+  hidePanel();
+  const d=DRIVERS[curDriver];
+  document.getElementById('pod-flag').textContent=d.flag;
+  document.getElementById('pod-driver').textContent=`${d.name} — #${d.num} — ${d.team}`;
+  startConfetti();
+  document.getElementById('cconf').classList.add('on');
+  const p=document.getElementById('pod');
+  p.classList.add('on');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.add('vis')));
+}
+
+function restart(){
+  document.getElementById('pod').classList.remove('vis','on');
+  document.getElementById('cconf').classList.remove('on');
+  stopConfetti();
+  hidePanel();
+  document.getElementById('radio').classList.remove('on');
+  ['topbar','lhud','rhud','sponsors','hint','progress'].forEach(id=>{
+    document.getElementById(id).classList.remove('on');
+  });
+  document.getElementById('ss').classList.remove('on');
+  document.body.style.overflow='hidden';
+  window.scrollTo(0,0);
+  if(animId){cancelAnimationFrame(animId);animId=null}
+  scrY=0;manS=0;carZ=5;camZ=10;podDone=false;
+  document.getElementById('sel').classList.remove('out');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════════════════════════════
+let cParts=[],cRaf;
+function startConfetti(){
+  const cv=document.getElementById('cconf');
+  cv.width=innerWidth;cv.height=innerHeight;
+  const ctx=cv.getContext('2d');
+  const cols=['#e10600','#ffd700','#00d2be','#1f8ce0','#ff6b35','#ffffff','#009246','#ff8000','#358C75'];
+  cParts=Array.from({length:200},()=>({
+    x:Math.random()*cv.width,y:-50-Math.random()*200,
+    w:4+Math.random()*8,h:8+Math.random()*7,
+    c:cols[Math.floor(Math.random()*cols.length)],
+    vx:-2+Math.random()*4,vy:2.5+Math.random()*4,
+    r:Math.random()*360,vr:-5+Math.random()*10
+  }));
+  const draw=()=>{
+    ctx.clearRect(0,0,cv.width,cv.height);
+    cParts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+      if(p.y>cv.height+30){p.y=-30;p.x=Math.random()*cv.width}
+      ctx.save();
+      ctx.translate(p.x,p.y);ctx.rotate(p.r*Math.PI/180);
+      ctx.fillStyle=p.c;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    cRaf=requestAnimationFrame(draw);
+  };
+  draw();
+}
+
+function stopConfetti(){
+  if(cRaf)cancelAnimationFrame(cRaf);
+  const cv=document.getElementById('cconf');
+  cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════════
+initTicker();
+initDriverGrid();
 </script>
 </body>
 </html>
