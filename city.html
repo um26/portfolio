@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Utkarsh Mangal — Open World</title>
+<meta name="description" content="An open-world take on Utkarsh Mangal's portfolio. Drive around, enter buildings, explore.">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root {
+  --r:#e10600; --g:#00e87a; --t:#00d2be; --y:#ffd700; --b:#0084ff;
+  --bg:#0a0a12; --panel:rgba(14,14,21,.90);
+  --H:'Orbitron',monospace; --M:'Share Tech Mono',monospace; --B:'Barlow',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --pink:#ff2e88; --cyan:#00f0ff; --purple:#7b2ff7;
+}
+* { box-sizing:border-box; margin:0; padding:0 }
+html, body { width:100%; height:100%; background:var(--bg); color:#fff; font-family:var(--B); overflow:hidden; cursor:default }
+#cv { position:fixed; inset:0; z-index:0; cursor:crosshair }
+#panel, #panel *, .contact-g, .pn-body, .proj-card, .c-item { cursor:auto }
+#panel a, #panel button, .proj-card, .c-item, .pnx { cursor:pointer }
+
+/* ═══ LOADING ═══ */
+#loading {
+  position:fixed; inset:0; z-index:200;
+  background:#07070c; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:1.6rem;
+  transition:opacity .8s ease, visibility .8s ease;
+}
+#loading.away { opacity:0; visibility:hidden }
+.ld-logo { font-family:var(--H); font-size:clamp(1rem,4vw,2rem); font-weight:900; letter-spacing:.14em; background:linear-gradient(90deg,var(--pink),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:ld-pulse 1s infinite alternate }
+@keyframes ld-pulse { from{opacity:.5} to{opacity:1} }
+.ld-track { width:clamp(220px,40vw,360px); height:2px; background:rgba(255,255,255,.06); border-radius:1px; overflow:hidden }
+.ld-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--pink),var(--cyan)); border-radius:1px; transition:width .2s }
+.ld-msg { font-family:var(--M); font-size:.62rem; color:#8a8a9a; letter-spacing:.1em }
+
+/* ═══ HUD ═══ */
+#topbar {
+  position:fixed; top:0; left:0; right:0; z-index:20;
+  display:flex; align-items:center; gap:.7rem;
+  padding:.55rem 1rem; background:linear-gradient(180deg,rgba(5,5,9,.85),transparent);
+}
+.tb-title { font-family:var(--H); font-weight:900; font-size:.68rem; letter-spacing:.14em; background:linear-gradient(90deg,var(--pink),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent }
+.tb-back { font-family:var(--H); font-size:.5rem; letter-spacing:.14em; color:#adadb9; text-decoration:none; border:1px solid rgba(255,255,255,.1); border-radius:4px; padding:.28rem .6rem; transition:all .2s var(--ease) }
+.tb-back:hover { border-color:var(--pink); color:#fff }
+.tb-sound { font-family:var(--H); font-size:.6rem; background:none; border:1px solid rgba(255,255,255,.1); border-radius:4px; padding:.24rem .5rem; cursor:pointer; color:#8f8f9c; transition:all .2s var(--ease); margin-left:auto }
+.tb-sound[aria-pressed="true"] { border-color:rgba(0,240,255,.35); color:var(--cyan); background:rgba(0,240,255,.06) }
+.tb-speed { font-family:var(--M); font-size:.62rem; color:#adadb9; letter-spacing:.06em }
+.tb-speed b { color:var(--cyan); font-size:.9rem }
+
+#hint {
+  position:fixed; bottom:1rem; left:50%; transform:translateX(-50%); z-index:15;
+  font-family:var(--M); font-size:.6rem; color:#8a8a9a; letter-spacing:.06em;
+  background:rgba(10,10,18,.6); border:1px solid rgba(255,255,255,.08); border-radius:6px;
+  padding:.4rem .9rem; text-align:center; animation:blink 2.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:.55} 50%{opacity:1} }
+
+#prompt {
+  position:fixed; bottom:5.2rem; left:50%; transform:translateX(-50%) translateY(10px); z-index:16;
+  font-family:var(--H); font-size:.62rem; letter-spacing:.1em; color:#fff;
+  background:rgba(0,0,0,.75); border:1px solid var(--cyan); border-radius:8px;
+  padding:.55rem 1.1rem; opacity:0; transition:all .25s var(--ease); pointer-events:none;
+  box-shadow:0 0 24px rgba(0,240,255,.25);
+}
+#prompt.on { opacity:1; transform:translateX(-50%) translateY(0) }
+
+#toast {
+  position:fixed; top:4.2rem; left:50%; transform:translateX(-50%) translateY(-14px); z-index:30;
+  font-family:var(--H); font-size:.58rem; letter-spacing:.08em; color:#fff;
+  background:rgba(20,10,10,.88); border:1px solid var(--r); border-radius:8px;
+  padding:.55rem 1.1rem; opacity:0; transition:all .3s var(--ease); pointer-events:none;
+}
+#toast.on { opacity:1; transform:translateX(-50%) translateY(0) }
+
+#minimap {
+  position:fixed; top:3.4rem; right:1rem; z-index:18;
+  width:132px; height:132px; border-radius:50%;
+  border:2px solid rgba(255,255,255,.15); background:rgba(5,5,10,.55);
+  box-shadow:0 6px 22px rgba(0,0,0,.5);
+}
+
+/* ═══ MOBILE CONTROLS ═══ */
+#mob-controls { display:none; position:fixed; inset:0; z-index:19; pointer-events:none }
+.mob-pad { position:fixed; bottom:1.2rem; left:1.2rem; width:150px; height:150px; pointer-events:none }
+.mob-btn2 {
+  position:absolute; width:52px; height:52px; border-radius:12px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+  display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#fff;
+  pointer-events:auto; -webkit-tap-highlight-color:transparent; user-select:none;
+}
+.mob-btn2:active, .mob-btn2.held { background:rgba(0,240,255,.18); border-color:var(--cyan) }
+.mob-up { top:0; left:49px } .mob-down { top:98px; left:49px }
+.mob-left { top:49px; left:0 } .mob-right { top:49px; left:98px }
+.mob-enter {
+  position:fixed; bottom:2.6rem; right:1.4rem; width:64px; height:64px; border-radius:50%;
+  background:rgba(0,240,255,.14); border:2px solid var(--cyan); color:#fff;
+  font-family:var(--H); font-size:.5rem; letter-spacing:.06em;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  pointer-events:auto; -webkit-tap-highlight-color:transparent; user-select:none; z-index:19;
+}
+@media (max-width:820px), (hover:none) { #mob-controls, .mob-enter { display:block } #hint { display:none } }
+
+/* ═══ PANEL SYSTEM (reused from F1 mode) ═══ */
+#panel {
+  position:fixed; right:0; top:50%; transform:translateY(-50%) translateX(110%);
+  z-index:25; width:min(400px,90vw);
+  background:var(--panel); border:1px solid rgba(255,255,255,.08);
+  border-left:3px solid var(--cyan); border-radius:14px 0 0 14px;
+  padding:clamp(1.1rem,2.8vw,1.6rem); transition:transform .5s cubic-bezier(.16,1,.3,1);
+  backdrop-filter:blur(40px); max-height:calc(100vh - 60px); overflow:hidden;
+}
+#panel.open { transform:translateY(-50%) translateX(0) }
+@keyframes pnRise { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+.pnx { position:absolute; top:.65rem; right:.65rem; background:none; border:1px solid rgba(255,255,255,.07); color:#8f8f9c; width:22px; height:22px; border-radius:4px; cursor:pointer; font-size:.75rem; transition:all .16s var(--ease) }
+.pnx:hover { color:#fff; border-color:rgba(255,255,255,.22) }
+.pn-scroll { overflow-y:auto; max-height:calc(100vh - 120px) }
+.pn-lap { font-family:var(--H); font-size:.36rem; letter-spacing:.3em; color:var(--cyan); margin-bottom:.22rem }
+.pn-h { font-family:var(--H); font-size:clamp(.82rem,2.2vw,1.1rem); font-weight:700; margin-bottom:.7rem }
+.pn-body { font-family:var(--B); font-size:clamp(.73rem,1.9vw,.86rem); color:#b4b4c0; line-height:1.72 }
+.sk-item { display:flex; align-items:center; gap:.55rem; margin-bottom:.38rem }
+.sk-track { flex:1; height:3px; background:rgba(255,255,255,.05); border-radius:2px; overflow:hidden }
+.sk-fill { height:100%; border-radius:2px; transform:scaleX(0); transform-origin:left; transition:transform .85s cubic-bezier(.16,1,.3,1) }
+.sk-n { font-family:var(--M); font-size:.6rem; color:#b4b4c0; width:72px; flex-shrink:0 }
+.sk-pct { font-family:var(--M); font-size:.5rem; color:#8f8f9c; width:28px; text-align:right }
+.chips { display:flex; flex-wrap:wrap; gap:.24rem; margin-top:.65rem }
+.chip { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:3px; padding:.12rem .42rem; font-size:.58rem; color:#8f8f9c; font-family:var(--M) }
+.proj-card { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:.85rem; margin-bottom:.6rem; cursor:pointer; transition:border-color .2s var(--ease), box-shadow .2s var(--ease), transform .2s var(--ease); box-shadow:0 4px 16px -8px rgba(0,0,0,.45) }
+.proj-card:hover { transform:translateY(-2px); border-color:rgba(0,240,255,.22); box-shadow:0 4px 22px rgba(0,240,255,.08) }
+.proj-ico { font-size:1.2rem; margin-bottom:.3rem }
+.proj-n { font-family:var(--H); font-size:.65rem; font-weight:700; margin-bottom:.26rem }
+.proj-d { font-size:.74rem; color:#b4b4c0; line-height:1.6; margin-bottom:.45rem }
+.proj-chips { display:flex; flex-wrap:wrap; gap:.2rem }
+.proj-chip { font-size:.5rem; padding:.1rem .36rem; border-radius:3px; background:rgba(0,240,255,.08); border:1px solid rgba(0,240,255,.16); color:rgba(0,240,255,.75) }
+.proj-shots { display:flex; gap:.5rem; margin:.5rem 0 .65rem; overflow-x:auto }
+.proj-shots img { height:150px; border-radius:8px; border:1px solid rgba(255,255,255,.12); box-shadow:0 6px 18px -6px rgba(0,0,0,.5); flex-shrink:0; transition:transform .22s var(--ease); }
+.proj-shots img:hover { transform:translateY(-3px) scale(1.02) }
+.links-r { display:flex; flex-wrap:wrap; gap:.36rem; margin-top:.8rem }
+.lbtn { font-family:var(--H); font-size:.36rem; letter-spacing:.1em; padding:.28rem .76rem; border-radius:4px; border:1px solid rgba(255,255,255,.09); color:#adadb9; text-decoration:none; display:inline-block; transition:all .18s var(--ease) }
+.lbtn:hover { background:var(--cyan); border-color:var(--cyan); color:#000 }
+.contact-g { display:grid; grid-template-columns:1fr 1fr; gap:.4rem; margin-bottom:.85rem }
+.c-item { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.11); border-radius:7px; padding:.65rem; text-decoration:none; display:flex; flex-direction:column; gap:.18rem; transition:all .2s var(--ease) }
+.c-item:hover { border-color:var(--cyan); background:rgba(0,240,255,.04) }
+.ci-ico { font-size:1.1rem }
+.ci-l { font-family:var(--H); font-size:.34rem; letter-spacing:.14em; color:#82828e }
+.ci-v { font-size:.68rem; color:#b4b4c0; word-break:break-all }
+.pn-btn-close { position:relative; margin-top:.9rem; width:100%; border-radius:4px; padding:.32rem 0; font-family:var(--H); font-size:.5rem; letter-spacing:.14em; background:none; color:#8f8f9c; border:1px solid rgba(255,255,255,.09); cursor:pointer; transition:all .2s var(--ease) }
+.pn-btn-close:hover { color:#fff; border-color:rgba(255,255,255,.25) }
+
+/* ═══ FILM GRAIN (reused) ═══ */
+#grain { position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:.4; mix-blend-mode:overlay; background-image:radial-gradient(rgba(255,255,255,.4) 1px,transparent 1px); background-size:3px 3px }
+</style>
+</head>
+<body>
+<div id="grain"></div>
+
+<div id="loading">
+  <div class="ld-logo">OPEN WORLD MODE</div>
+  <div class="ld-track"><div class="ld-fill" id="ld-fill"></div></div>
+  <div class="ld-msg" id="ld-msg">PAVING STREETS...</div>
+</div>
+
+<canvas id="cv"></canvas>
+
+<div id="topbar">
+  <span class="tb-title">🌆 UTKARSH CITY</span>
+  <span class="tb-speed"><b id="spd-v">0</b> km/h</span>
+  <a class="tb-back" href="index.html">🏎 F1 MODE</a>
+  <button class="tb-sound" id="tb-sound" onclick="toggleSound()" aria-pressed="false" title="Toggle sound">🔇</button>
+</div>
+
+<canvas id="minimap" width="132" height="132"></canvas>
+
+<div id="hint">WASD / ARROWS TO DRIVE &nbsp;·&nbsp; E TO ENTER A BUILDING</div>
+<div id="prompt"></div>
+<div id="toast"></div>
+
+<div id="mob-controls">
+  <div class="mob-pad">
+    <div class="mob-btn2 mob-up" data-k="up">▲</div>
+    <div class="mob-btn2 mob-down" data-k="down">▼</div>
+    <div class="mob-btn2 mob-left" data-k="left">◀</div>
+    <div class="mob-btn2 mob-right" data-k="right">▶</div>
+  </div>
+</div>
+<div class="mob-enter" id="mob-enter">ENTER</div>
+
+<div id="panel">
+  <button class="pnx" onclick="closePanel()">✕</button>
+  <div class="pn-scroll" id="panel-body"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  AUDIO — synthesized, opt-in, off by default (same engine as F1 mode)
+// ═══════════════════════════════════════════════════════════════
+let audioCtx=null;
+let soundOn=localStorage.getItem("gp_sound")==="1";
+function ensureAudio(){
+  if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
+  if(audioCtx.state==="suspended")audioCtx.resume();
+  return audioCtx;
+}
+function playTone(freq,dur,type="sine",vol=0.05,delay=0){
+  if(!soundOn)return;
+  const ctx=ensureAudio();if(!ctx)return;
+  const t0=ctx.currentTime+delay;
+  const osc=ctx.createOscillator(),gain=ctx.createGain();
+  osc.type=type;osc.frequency.setValueAtTime(freq,t0);
+  gain.gain.setValueAtTime(0,t0);
+  gain.gain.linearRampToValueAtTime(vol,t0+0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  osc.connect(gain);gain.connect(ctx.destination);
+  osc.start(t0);osc.stop(t0+dur+0.02);
+}
+function sfxEnter(){playTone(520,.09,"sine",.045);playTone(760,.11,"sine",.04,.05);}
+function sfxClose(){playTone(480,.08,"sine",.035);playTone(320,.1,"sine",.03,.04);}
+function sfxLocked(){playTone(220,.14,"square",.03);playTone(160,.16,"square",.025,.06);}
+function sfxClick(){playTone(700,.05,"square",.025);}
+function toggleSound(){
+  soundOn=!soundOn;
+  localStorage.setItem("gp_sound",soundOn?"1":"0");
+  const btn=document.getElementById("tb-sound");
+  btn.textContent=soundOn?"🔊":"🔇";
+  btn.setAttribute("aria-pressed",soundOn);
+  if(soundOn){ensureAudio();playTone(700,.08,"sine",.05);}
+}
+window.addEventListener("DOMContentLoaded",()=>{
+  if(soundOn){
+    const btn=document.getElementById("tb-sound");
+    if(btn){btn.textContent="🔊";btn.setAttribute("aria-pressed","true");}
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  PORTFOLIO CONTENT (same source of truth as the F1 mode)
+// ═══════════════════════════════════════════════════════════════
+const PANEL_CONTENT = {
+  about:{
+    lap:"ABOUT ME",
+    h:"Utkarsh Mangal",
+    body:`<strong>B.Tech Computational Mathematics</strong><br>Mahindra University · CGPA <strong style="color:var(--y)">8.28</strong><br><br>
+Academic Semester Exchange (Erasmus) at <strong>CentraleSupélec, Paris</strong> — Feb–June 2026<br><br>
+Computational problem-solver with a passion for optimization, machine learning, and building systems that operate at scale.`,
+    chips:["CentraleSupélec","Mahindra University","CGPA 8.28","Merit Scholar 2022–24","Math Club President"],
+    links:[{t:"LinkedIn",h:"https://www.linkedin.com/in/utkarsh-mangal"},{t:"GitHub",h:"https://github.com/um26"},{t:"Vercel",h:"https://portfolio-inky-nine-23.vercel.app"},{t:"Email",h:"mailto:umangal2003@gmail.com"},{t:"Call",h:"tel:+919784871049"}]
+  },
+  skills:{
+    lap:"SKILLS GYM",
+    h:"Technical Arsenal",
+    body:null,
+    skills:[["Python",92],["PyTorch",82],["FastAPI",80],["NGSolve/SciPy",80],["TypeScript",78],["Scikit-learn",76],["SQL",75]],
+    courses:["Data Structures & Algorithms","DBMS","Operating Systems","Computer Networks","Design & Analysis of Algorithms","Theory of Computation","Circuits & Logic Gates","Quantum Computing","Cryptography","Artificial Intelligence","Probability & Statistics","Linear Algebra","Numerical Methods","Stochastic Processes","Math. Foundations for ML","Optimization Techniques","Information Theory","Real Analysis","Financial Mathematics"],
+    chips:[],links:[]
+  },
+  projects:{
+    lap:"PROJECTS GARAGE",
+    h:"What I've Built",
+    body:null, chips:[],links:[]
+  },
+  exp:{
+    lap:"EXPERIENCE HQ",
+    h:"Race History",
+    body:`<strong>President, Math Club</strong> — Mahindra University<br><span style="color:#8f8f9c;font-size:.8em">Jul 2024 – Jun 2025</span><br><br>
+<strong>Student Placement Coordinator</strong> — Mahindra University<br><span style="color:#8f8f9c;font-size:.8em">Mar 2024 – Dec 2025</span><br><br>
+<strong>McKinsey Forward Program</strong> — Dec 2025<br><br>
+<strong>Introduction to MCP</strong> — Anthropic Certification, Aug 2025`,
+    chips:["Leadership","Placement Coordination","MCP Certified","McKinsey Forward"],
+    links:[{t:"LinkedIn",h:"https://www.linkedin.com/in/utkarsh-mangal"}]
+  },
+  contact:{ lap:"CONTACT", h:"Get In Touch", body:null, chips:[], links:[] }
+};
+
+function renderPanelBody(section){
+  const c=PANEL_CONTENT[section];
+  let html=`<div class="pn-lap">${c.lap}</div><div class="pn-h">${c.h}</div>`;
+  if(section==="skills"){
+    html+=`<div class="pn-body" style="margin-bottom:.7rem">Technical skills, revved up.</div>`;
+    html+=c.skills.map(([n,v])=>`<div class="sk-item"><span class="sk-n">${n}</span><div class="sk-track"><div class="sk-fill" style="background:linear-gradient(90deg,#00d2be,#00f0ff)" data-v="${v/100}"></div></div><span class="sk-pct">${v}%</span></div>`).join("");
+    html+=`<div style="font-family:var(--H);font-size:.36rem;letter-spacing:.2em;color:#82828e;margin:.7rem 0 .4rem">COURSES</div>`;
+    html+=`<div class="chips">${c.courses.map(x=>`<span class="chip">${x}</span>`).join("")}</div>`;
+  } else if(section==="projects"){
+    html+=`<div class="pn-body" style="margin-bottom:.8rem">Pull up to any project for the details.</div>`;
+    html+=`<div class="proj-card">
+      <div class="proj-ico">🚗</div>
+      <div class="proj-n">UniPool — University Carpooling</div>
+      <div class="proj-shots"><img src="shot-unipool-1.png" alt="UniPool pool feed screenshot" loading="lazy"><img src="shot-unipool-2.png" alt="UniPool matches screenshot" loading="lazy"></div>
+      <div class="proj-d">Rule-based travel matching system ranking compatible users by origin, destination, and travel-time proximity. Filters candidate requests and auto-identifies compatible travellers within a ±1-hour window, then sends automated notifications.</div>
+      <div class="proj-chips">${["Python","TypeScript","FastAPI","MongoDB","React Native"].map(x=>`<span class="proj-chip">${x}</span>`).join("")}</div>
+      <div class="links-r" style="margin-top:.55rem"><a class="lbtn" href="https://github.com/um26/UniPool" target="_blank">GitHub</a><a class="lbtn" href="https://uni-pool-ruddy.vercel.app" target="_blank">Live Demo</a></div>
+    </div>`;
+    html+=`<div class="proj-card">
+      <div class="proj-ico">🏛️</div>
+      <div class="proj-n">Scheme Navigator</div>
+      <div class="proj-d">Government scheme-discovery platform that organizes welfare information so users can identify relevant schemes based on their requirements and eligibility.</div>
+      <div class="proj-chips">${["Python","JavaScript","Data Processing","Vercel"].map(x=>`<span class="proj-chip">${x}</span>`).join("")}</div>
+      <div class="links-r" style="margin-top:.55rem"><a class="lbtn" href="https://github.com/um26/scheme-navigator" target="_blank">GitHub</a></div>
+    </div>`;
+    html+=`<div class="proj-card">
+      <div class="proj-ico">⚡</div>
+      <div class="proj-n">Topology Optimization — Transformer Flux</div>
+      <div class="proj-d">SIMP, BESO, and TOBS for electromagnetic topology optimization. BiGRU surrogate model (R² = 0.966) for sensitivity prediction. Built at CentraleSupélec.</div>
+      <div class="proj-chips">${["PyTorch","NGSolve","SciPy","FEA","Topology Optimization"].map(x=>`<span class="proj-chip">${x}</span>`).join("")}</div>
+      <div class="links-r" style="margin-top:.55rem"><a class="lbtn" href="https://github.com/um26/tobs" target="_blank">GitHub</a></div>
+    </div>`;
+    html+=`<div class="proj-card">
+      <div class="proj-ico">📈</div>
+      <div class="proj-n">Math Club Stock Exchange</div>
+      <div class="proj-d">MU's first student-run stock market simulation — 350+ participants, 16 clubs, and a 20+ member organizing team.</div>
+      <div class="proj-chips">${["Probability","Data Analysis","Excel","Market Design"].map(x=>`<span class="proj-chip">${x}</span>`).join("")}</div>
+    </div>`;
+  } else if(section==="contact"){
+    html+=`<div class="contact-g">
+      <a href="mailto:umangal2003@gmail.com" class="c-item"><span class="ci-ico">📧</span><span class="ci-l">EMAIL</span><span class="ci-v">umangal2003@gmail.com</span></a>
+      <a href="tel:+919784871049" class="c-item"><span class="ci-ico">📞</span><span class="ci-l">PHONE</span><span class="ci-v">+91 978 487 1049</span></a>
+      <a href="https://www.linkedin.com/in/utkarsh-mangal" target="_blank" class="c-item"><span class="ci-ico">💼</span><span class="ci-l">LINKEDIN</span><span class="ci-v">linkedin.com/in/utkarsh-mangal</span></a>
+      <a href="https://github.com/um26" target="_blank" class="c-item"><span class="ci-ico">🐙</span><span class="ci-l">GITHUB</span><span class="ci-v">github.com/um26</span></a>
+      <a href="https://portfolio-inky-nine-23.vercel.app" target="_blank" class="c-item" style="grid-column:span 2"><span class="ci-ico">▲</span><span class="ci-l">VERCEL</span><span class="ci-v">portfolio-inky-nine-23.vercel.app</span></a>
+    </div>`;
+  } else {
+    if(c.body) html+=`<div class="pn-body">${c.body}</div>`;
+    if(c.chips?.length) html+=`<div class="chips">${c.chips.map(x=>`<span class="chip">${x}</span>`).join("")}</div>`;
+    if(c.links?.length) html+=`<div class="links-r">${c.links.map(l=>`<a href="${l.h}" target="_blank" class="lbtn">${l.t}</a>`).join("")}</div>`;
+  }
+  html+=`<button class="pn-btn-close" onclick="closePanel()">CLOSE ✕</button>`;
+  return html;
+}
+
+let panelActive=null;
+function openPanel(section){
+  sfxEnter();
+  panelActive=section;
+  const p=document.getElementById("panel");
+  const body=document.getElementById("panel-body");
+  body.innerHTML=renderPanelBody(section);
+  p.classList.add("open");
+  Array.from(body.children).forEach((el,i)=>{
+    el.style.opacity="0";
+    el.style.animation="pnRise .45s var(--ease) forwards";
+    el.style.animationDelay=`${Math.min(i*0.05,0.4)}s`;
+  });
+  if(section==="skills"){
+    requestAnimationFrame(()=>{
+      document.querySelectorAll(".sk-fill").forEach(el=>{
+        const v=parseFloat(el.dataset.v||0);
+        setTimeout(()=>{el.style.transform=`scaleX(${v})`;},100);
+      });
+    });
+  }
+}
+function closePanel(){
+  if(panelActive){sfxClose();}
+  panelActive=null;
+  document.getElementById("panel").classList.remove("open");
+}
+
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("on");
+  clearTimeout(showToast._h);
+  showToast._h=setTimeout(()=>t.classList.remove("on"),2200);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  THREE.JS SCENE
+// ═══════════════════════════════════════════════════════════════
+let renderer, scene, camera, carGrp, WHEELS=[];
+const KEYS={};
+let carX=0, carZ=40, carHeading=0, carSpeed=0;
+const MAX_SPEED=0.62, ACCEL=0.016, TURN_RATE=0.038, FRICTION=0.985, BRAKE_FRICTION=0.9;
+
+const BUILDINGS = [
+  {id:"about",    label:"ABOUT ME",        sub:"APARTMENT",   x:-26, z:0,   w:10, h:16, d:10, color:0xff2e88, locked:false},
+  {id:"skills",   label:"SKILLS GYM",      sub:"FITNESS",     x:26,  z:0,   w:10, h:12, d:10, color:0x00f0ff, locked:false},
+  {id:"projects", label:"PROJECTS GARAGE", sub:"WORKSHOP",    x:-26, z:-70, w:12, h:9,  d:12, color:0xffd700, locked:false},
+  {id:"exp",      label:"EXPERIENCE HQ",   sub:"OFFICE",      x:26,  z:-70, w:11, h:20, d:11, color:0x7b2ff7, locked:false},
+  {id:"contact",  label:"CONTACT",         sub:"PAYPHONE",    x:0,   z:-115,w:6,  h:7,  d:6,  color:0x00e87a, locked:false},
+  {id:"f1",       label:"F1 CIRCUIT",      sub:"RACE TRACK",  x:0,   z:80,  w:14, h:6,  d:14, color:0xe10600, locked:false, portal:true},
+  {id:"insta",    label:"INSTAGRAM CLUB",  sub:"COMING SOON", x:-55, z:-35, w:9,  h:11, d:9,  color:0x888888, locked:true},
+  {id:"discord",  label:"DISCORD ARCADE",  sub:"COMING SOON", x:55,  z:-35, w:9,  h:11, d:9,  color:0x888888, locked:true},
+  {id:"linkedin", label:"LINKEDIN TOWER",  sub:"COMING SOON", x:-55, z:35,  w:9,  h:22, d:9,  color:0x888888, locked:true},
+];
+
+function makeLabelSprite(text, sub, color, locked){
+  const cv=document.createElement("canvas"); cv.width=512; cv.height=180;
+  const ctx=cv.getContext("2d");
+  ctx.clearRect(0,0,512,180);
+  ctx.textAlign="center";
+  const hex="#"+color.toString(16).padStart(6,"0");
+  ctx.font="900 46px Arial";
+  ctx.fillStyle=locked?"#999999":hex;
+  ctx.shadowColor=hex; ctx.shadowBlur=locked?0:22;
+  ctx.fillText(text, 256, 78);
+  ctx.shadowBlur=0;
+  ctx.font="600 26px Arial";
+  ctx.fillStyle=locked?"#666666":"#ffffff";
+  ctx.fillText((locked?"🔒 ":"")+sub, 256, 122);
+  const tex=new THREE.CanvasTexture(cv);
+  const mat=new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false});
+  const spr=new THREE.Sprite(mat);
+  spr.scale.set(14,5,1);
+  return spr;
+}
+
+function buildCityCar(){
+  const g=new THREE.Group();
+  const AM=new THREE.MeshLambertMaterial({color:0x00f0ff});
+  const DK=new THREE.MeshLambertMaterial({color:0x0d0d0d});
+  const WH=new THREE.MeshLambertMaterial({color:0x0e0e0e});
+  const RIM=new THREE.MeshLambertMaterial({color:0xaaaaaa});
+  const add=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);g.add(m);return m};
+  add(new THREE.BoxGeometry(1.8,0.5,4.0),AM,0,0.4,0);
+  add(new THREE.BoxGeometry(1.5,0.5,2.0),DK,0,0.85,0.2);
+  add(new THREE.BoxGeometry(0.3,0.5,0.5),new THREE.MeshLambertMaterial({color:0xff5533,emissive:0xff2200,emissiveIntensity:0.8}),0,0.4,-2.05);
+  [[-0.95,-1.3],[0.95,-1.3],[-0.95,1.3],[0.95,1.3]].forEach(([wx,wz])=>{
+    const piv=new THREE.Group();piv.position.set(wx,0.32,wz);
+    const t=new THREE.Mesh(new THREE.CylinderGeometry(0.33,0.33,0.38,16),WH);t.rotation.z=Math.PI/2;piv.add(t);
+    const r=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,0.4,12),RIM);r.rotation.z=Math.PI/2;piv.add(r);
+    g.add(piv);WHEELS.push(piv);
+  });
+  return g;
+}
+
+function buildPalm(x,z){
+  const g=new THREE.Group();
+  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.4,6,6), new THREE.MeshLambertMaterial({color:0x5a3d2b}));
+  trunk.position.y=3; trunk.rotation.z=0.06; g.add(trunk);
+  const leafMat=new THREE.MeshLambertMaterial({color:0x1fae5e});
+  for(let i=0;i<6;i++){
+    const leaf=new THREE.Mesh(new THREE.ConeGeometry(0.5,3.2,5), leafMat);
+    leaf.position.set(0,6.2,0);
+    leaf.rotation.z=Math.PI/2.3;
+    leaf.rotation.y=(i/6)*Math.PI*2;
+    g.add(leaf);
+  }
+  g.position.set(x,0,z);
+  return g;
+}
+
+function initScene(){
+  const canvas=document.getElementById("cv");
+  renderer=new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:"high-performance"});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setClearColor(0x1a0a2e,1);
+
+  scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x2a1150, 0.012);
+
+  camera=new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 600);
+  camera.position.set(carX - Math.sin(carHeading)*11, 5.5, carZ - Math.cos(carHeading)*11);
+  camera.lookAt(carX, 1.4, carZ);
+
+  // Sunset sky gradient (large backdrop plane behind everything)
+  const skyGeo=new THREE.SphereGeometry(400,16,16);
+  const skyMat=new THREE.ShaderMaterial({
+    uniforms:{},
+    side:THREE.BackSide,
+    vertexShader:`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader:`varying vec3 vPos; void main(){
+      float h=normalize(vPos).y*0.5+0.5;
+      vec3 top=vec3(0.10,0.05,0.28);
+      vec3 mid=vec3(0.62,0.13,0.45);
+      vec3 bot=vec3(1.0,0.45,0.25);
+      vec3 col=mix(bot,mid,smoothstep(0.0,0.35,h));
+      col=mix(col,top,smoothstep(0.35,0.85,h));
+      gl_FragColor=vec4(col,1.0);
+    }`
+  });
+  scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0x5533aa, 1.1));
+  const sun=new THREE.DirectionalLight(0xffaa66, 0.9);
+  sun.position.set(-30,40,-20); scene.add(sun);
+  const pink=new THREE.PointLight(0xff2e88, 3, 90); pink.position.set(-26,10,0); scene.add(pink);
+  const cyan=new THREE.PointLight(0x00f0ff, 3, 90); cyan.position.set(26,10,0); scene.add(cyan);
+
+  // Ground (asphalt street + sidewalk edges)
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(240,300), new THREE.MeshLambertMaterial({color:0x1c1a26}));
+  ground.rotation.x=-Math.PI/2; scene.add(ground);
+  // Lane markings down the main street
+  for(let z=90;z>-140;z-=10){
+    const dash=new THREE.Mesh(new THREE.PlaneGeometry(0.4,4), new THREE.MeshBasicMaterial({color:0xffe37a}));
+    dash.rotation.x=-Math.PI/2; dash.position.set(0,0.02,z); scene.add(dash);
+  }
+
+  // Buildings
+  BUILDINGS.forEach(b=>{
+    const mat=new THREE.MeshLambertMaterial({color:b.locked?0x2a2a34:0x18131f});
+    const mesh=new THREE.Mesh(new THREE.BoxGeometry(b.w,b.h,b.d), mat);
+    mesh.position.set(b.x, b.h/2, b.z);
+    scene.add(mesh);
+    // Neon edge trim
+    const edges=new THREE.EdgesGeometry(mesh.geometry);
+    const line=new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:b.color, transparent:true, opacity:b.locked?0.35:0.9}));
+    line.position.copy(mesh.position);
+    scene.add(line);
+    // Label sprite above building
+    const label=makeLabelSprite(b.label, b.sub, b.color, b.locked);
+    label.position.set(b.x, b.h+3.4, b.z);
+    scene.add(label);
+    b._pos=new THREE.Vector3(b.x,0,b.z);
+  });
+
+  // Palm trees scattered around
+  [[-40,20],[40,20],[-40,-100],[40,-100],[-14,60],[14,60],[-14,-130],[14,-130]].forEach(([x,z])=>scene.add(buildPalm(x,z)));
+
+  // Player car
+  carGrp=buildCityCar();
+  scene.add(carGrp);
+
+  window.addEventListener("resize", onResize);
+  animate();
+}
+
+function onResize(){
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+}
+
+// ═══ Input ═══
+document.addEventListener("keydown", e=>{
+  KEYS[e.key.toLowerCase()]=true;
+  if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(e.key.toLowerCase()))e.preventDefault();
+  if(e.key.toLowerCase()==="e") tryEnter();
+});
+document.addEventListener("keyup", e=>{KEYS[e.key.toLowerCase()]=false;});
+
+document.querySelectorAll(".mob-btn2").forEach(btn=>{
+  const k=btn.dataset.k;
+  const on=ev=>{ev.preventDefault();KEYS["__"+k]=true;btn.classList.add("held");};
+  const off=()=>{KEYS["__"+k]=false;btn.classList.remove("held");};
+  btn.addEventListener("touchstart",on);btn.addEventListener("touchend",off);btn.addEventListener("touchcancel",off);
+  btn.addEventListener("mousedown",on);btn.addEventListener("mouseup",off);btn.addEventListener("mouseleave",off);
+});
+document.getElementById("mob-enter").addEventListener("click",()=>{sfxClick();tryEnter();});
+
+let nearBuilding=null;
+function tryEnter(){
+  if(!nearBuilding)return;
+  if(nearBuilding.locked){
+    sfxLocked();
+    showToast("🔒 "+nearBuilding.label+" — COMING SOON");
+    return;
+  }
+  if(nearBuilding.portal){
+    sfxEnter();
+    setTimeout(()=>{window.location.href="index.html";},260);
+    return;
+  }
+  openPanel(nearBuilding.id);
+}
+
+function updateCar(){
+  const up=KEYS["w"]||KEYS["arrowup"]||KEYS["__up"];
+  const down=KEYS["s"]||KEYS["arrowdown"]||KEYS["__down"];
+  const left=KEYS["a"]||KEYS["arrowleft"]||KEYS["__left"];
+  const right=KEYS["d"]||KEYS["arrowright"]||KEYS["__right"];
+
+  if(up) carSpeed=Math.min(carSpeed+ACCEL, MAX_SPEED);
+  else if(down) carSpeed=Math.max(carSpeed-ACCEL, -MAX_SPEED*0.55);
+  else carSpeed*= (Math.abs(carSpeed)>0.002?FRICTION:0);
+  if(!up&&!down) carSpeed*=BRAKE_FRICTION;
+
+  const turnFactor=Math.min(Math.abs(carSpeed)/(MAX_SPEED*0.5),1);
+  if(left) carHeading += TURN_RATE*turnFactor*(carSpeed<0?-1:1);
+  if(right) carHeading -= TURN_RATE*turnFactor*(carSpeed<0?-1:1);
+
+  carX += Math.sin(carHeading)*carSpeed;
+  carZ += Math.cos(carHeading)*carSpeed;
+  carX = Math.max(-95, Math.min(95, carX));
+  carZ = Math.max(-150, Math.min(115, carZ));
+
+  carGrp.position.set(carX, 0, carZ);
+  carGrp.rotation.y = carHeading;
+  WHEELS.forEach(w=>{w.rotation.x += carSpeed*1.4;});
+
+  document.getElementById("spd-v").textContent = Math.round(Math.abs(carSpeed)*180);
+
+  // Camera chase
+  const camDist=11, camHeight=5.5;
+  const desiredX = carX - Math.sin(carHeading)*camDist;
+  const desiredZ = carZ - Math.cos(carHeading)*camDist;
+  camera.position.x += (desiredX-camera.position.x)*0.09;
+  camera.position.z += (desiredZ-camera.position.z)*0.09;
+  camera.position.y += (camHeight-camera.position.y)*0.09;
+  camera.lookAt(carX, 1.4, carZ);
+
+  // Proximity check
+  let closest=null, closestDist=Infinity;
+  BUILDINGS.forEach(b=>{
+    const dx=carX-b.x, dz=carZ-b.z;
+    const dist=Math.sqrt(dx*dx+dz*dz);
+    if(dist<closestDist){closestDist=dist;closest=b;}
+  });
+  const promptEl=document.getElementById("prompt");
+  if(closest && closestDist < Math.max(closest.w,closest.d)*0.85){
+    nearBuilding=closest;
+    promptEl.textContent = closest.locked ? `🔒 ${closest.label} (locked)` : closest.portal ? `Drive in to launch ${closest.label}` : `Press E to enter ${closest.label}`;
+    promptEl.classList.add("on");
+  } else {
+    nearBuilding=null;
+    promptEl.classList.remove("on");
+  }
+
+  drawMinimap();
+}
+
+function drawMinimap(){
+  const cv=document.getElementById("minimap");
+  const ctx=cv.getContext("2d");
+  ctx.clearRect(0,0,132,132);
+  ctx.save();
+  ctx.beginPath();ctx.arc(66,66,64,0,Math.PI*2);ctx.clip();
+  ctx.fillStyle="#0d0a16";ctx.fillRect(0,0,132,132);
+  const scale=0.42;
+  const toMap=(x,z)=>[66+(x-carX)*scale, 66+(z-carZ)*scale];
+  BUILDINGS.forEach(b=>{
+    const [mx,my]=toMap(b.x,b.z);
+    if(mx<-6||mx>138||my<-6||my>138)return;
+    ctx.fillStyle=b.locked?"#555":"#"+b.color.toString(16).padStart(6,"0");
+    ctx.beginPath();ctx.arc(mx,my,4,0,Math.PI*2);ctx.fill();
+  });
+  // player arrow at center
+  ctx.save();
+  ctx.translate(66,66); ctx.rotate(carHeading);
+  ctx.fillStyle="#00f0ff";
+  ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(5,6); ctx.lineTo(-5,6); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  ctx.restore();
+  ctx.strokeStyle="rgba(255,255,255,.15)"; ctx.lineWidth=1;
+  ctx.beginPath();ctx.arc(66,66,64,0,Math.PI*2);ctx.stroke();
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  updateCar();
+  renderer.render(scene, camera);
+}
+
+// ═══ Loading sequence ═══
+window.addEventListener("load", ()=>{
+  const msgs=["PAVING STREETS...","PLANTING PALM TREES...","WIRING NEON SIGNS...","PARKING YOUR CAR..."];
+  let p=0;
+  const fill=document.getElementById("ld-fill");
+  const msg=document.getElementById("ld-msg");
+  const iv=setInterval(()=>{
+    p+=8+Math.random()*14;
+    if(p>=100){
+      p=100; clearInterval(iv);
+      fill.style.width="100%";
+      setTimeout(()=>{
+        document.getElementById("loading").classList.add("away");
+        initScene();
+      },300);
+      return;
+    }
+    fill.style.width=p+"%";
+    msg.textContent=msgs[Math.min(Math.floor(p/26),msgs.length-1)];
+  },140);
+});
+</script>
+</body>
+</html>
