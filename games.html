@@ -581,8 +581,8 @@ function renderQ() {
     let msg, col;
     if(pct>=90){msg="Outstanding! You live and breathe Formula 1. Pole position!";col="var(--g)"}
     else if(pct>=70){msg="Strong result! You clearly know your F1. Top-5 finish!";col="var(--y)"}
-    else if(pct>=50){msg="Decent effort — midfield result. Keep learning!";col:"#888"}
-    else{msg="Keep watching races — you'll get there!";col:"var(--r)"}
+    else if(pct>=50){msg="Decent effort — midfield result. Keep learning!";col="#888"}
+    else{msg="Keep watching races — you'll get there!";col="var(--r)"}
     area.innerHTML = `<div class="trivia-final"><div class="tf-score" style="color:${col}">${qScore}/10</div><div style="font-family:var(--H);font-size:.5rem;letter-spacing:.2em;color:${col};margin-bottom:.5rem">${pct}% CORRECT</div><div class="tf-msg">${msg}</div></div>`;
     document.getElementById("qnext-btn").style.display = "none";
     return;
