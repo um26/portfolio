@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Utkarsh Mangal — Open World</title>
-<meta name="description" content="An open-world take on Utkarsh Mangal's portfolio. Drive around, enter buildings, explore.">
+<meta name="description" content="An open-world take on Utkarsh Mangal's portfolio. Walk around, enter buildings, explore.">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -168,14 +168,14 @@ html, body { width:100%; height:100%; background:var(--bg); color:#fff; font-fam
 
 <div id="topbar">
   <span class="tb-title">🌆 UTKARSH CITY</span>
-  <span class="tb-speed"><b id="spd-v">0</b> km/h</span>
+  <span class="tb-speed" id="spd-wrap">🚶 walking</span>
   <a class="tb-back" href="index.html">🏎 F1 MODE</a>
   <button class="tb-sound" id="tb-sound" onclick="toggleSound()" aria-pressed="false" title="Toggle sound">🔇</button>
 </div>
 
 <canvas id="minimap" width="132" height="132"></canvas>
 
-<div id="hint">WASD / ARROWS TO DRIVE &nbsp;·&nbsp; E TO ENTER A BUILDING</div>
+<div id="hint">WASD / ARROWS TO WALK &nbsp;·&nbsp; E TO ENTER A BUILDING</div>
 <div id="prompt"></div>
 <div id="toast"></div>
 
@@ -221,6 +221,7 @@ function sfxEnter(){playTone(520,.09,"sine",.045);playTone(760,.11,"sine",.04,.0
 function sfxClose(){playTone(480,.08,"sine",.035);playTone(320,.1,"sine",.03,.04);}
 function sfxLocked(){playTone(220,.14,"square",.03);playTone(160,.16,"square",.025,.06);}
 function sfxClick(){playTone(700,.05,"square",.025);}
+function sfxCar(){playTone(180,.22,"sawtooth",.05);playTone(140,.28,"sawtooth",.045,.08);}
 function toggleSound(){
   soundOn=!soundOn;
   localStorage.setItem("gp_sound",soundOn?"1":"0");
@@ -284,7 +285,7 @@ function renderPanelBody(section){
     html+=`<div style="font-family:var(--H);font-size:.36rem;letter-spacing:.2em;color:#82828e;margin:.7rem 0 .4rem">COURSES</div>`;
     html+=`<div class="chips">${c.courses.map(x=>`<span class="chip">${x}</span>`).join("")}</div>`;
   } else if(section==="projects"){
-    html+=`<div class="pn-body" style="margin-bottom:.8rem">Pull up to any project for the details.</div>`;
+    html+=`<div class="pn-body" style="margin-bottom:.8rem">Walk up to any project for the details.</div>`;
     html+=`<div class="proj-card">
       <div class="proj-ico">🚗</div>
       <div class="proj-n">UniPool — University Carpooling</div>
@@ -369,21 +370,23 @@ function showToast(msg){
 // ═══════════════════════════════════════════════════════════════
 //  THREE.JS SCENE
 // ═══════════════════════════════════════════════════════════════
-let renderer, scene, camera, carGrp, WHEELS=[];
+let renderer, scene, camera;
+let person, WALK_PARTS = {};
 const KEYS={};
 let carX=0, carZ=40, carHeading=0, carSpeed=0;
-const MAX_SPEED=0.62, ACCEL=0.016, TURN_RATE=0.038, FRICTION=0.985, BRAKE_FRICTION=0.9;
+let walkPhase=0;
+const WALK_SPEED=0.135, WALK_ACCEL=0.012, WALK_FRICTION=0.80, TURN_RATE=0.062;
 
 const BUILDINGS = [
-  {id:"about",    label:"ABOUT ME",        sub:"APARTMENT",   x:-26, z:0,   w:10, h:16, d:10, color:0xff2e88, locked:false},
-  {id:"skills",   label:"SKILLS GYM",      sub:"FITNESS",     x:26,  z:0,   w:10, h:12, d:10, color:0x00f0ff, locked:false},
-  {id:"projects", label:"PROJECTS GARAGE", sub:"WORKSHOP",    x:-26, z:-70, w:12, h:9,  d:12, color:0xffd700, locked:false},
-  {id:"exp",      label:"EXPERIENCE HQ",   sub:"OFFICE",      x:26,  z:-70, w:11, h:20, d:11, color:0x7b2ff7, locked:false},
-  {id:"contact",  label:"CONTACT",         sub:"PAYPHONE",    x:0,   z:-115,w:6,  h:7,  d:6,  color:0x00e87a, locked:false},
-  {id:"f1",       label:"F1 CIRCUIT",      sub:"RACE TRACK",  x:0,   z:80,  w:14, h:6,  d:14, color:0xe10600, locked:false, portal:true},
-  {id:"insta",    label:"INSTAGRAM CLUB",  sub:"COMING SOON", x:-55, z:-35, w:9,  h:11, d:9,  color:0x888888, locked:true},
-  {id:"discord",  label:"DISCORD ARCADE",  sub:"COMING SOON", x:55,  z:-35, w:9,  h:11, d:9,  color:0x888888, locked:true},
-  {id:"linkedin", label:"LINKEDIN TOWER",  sub:"COMING SOON", x:-55, z:35,  w:9,  h:22, d:9,  color:0x888888, locked:true},
+  {id:"about",    label:"ABOUT ME",        sub:"APARTMENT",   x:-26, z:0,   w:10, h:16, d:10, color:0xff2e88, tier:true,  locked:false},
+  {id:"skills",   label:"SKILLS GYM",      sub:"FITNESS",     x:26,  z:0,   w:10, h:12, d:10, color:0x00f0ff, tier:false, locked:false},
+  {id:"projects", label:"PROJECTS GARAGE", sub:"WORKSHOP",    x:-26, z:-70, w:12, h:9,  d:12, color:0xffd700, tier:false, locked:false},
+  {id:"exp",      label:"EXPERIENCE HQ",   sub:"OFFICE",      x:26,  z:-70, w:11, h:20, d:11, color:0x7b2ff7, tier:true,  locked:false},
+  {id:"contact",  label:"CONTACT",         sub:"PAYPHONE",    x:0,   z:-115,w:6,  h:7,  d:6,  color:0x00e87a, tier:false, locked:false},
+  {id:"f1",       label:"F1 CIRCUIT",      sub:"RACE TRACK",  x:0,   z:80,  w:14, h:6,  d:14, color:0xe10600, tier:false, locked:false, portal:true},
+  {id:"insta",    label:"INSTAGRAM CLUB",  sub:"COMING SOON", x:-55, z:-35, w:9,  h:11, d:9,  color:0x888888, tier:false, locked:true},
+  {id:"discord",  label:"DISCORD ARCADE",  sub:"COMING SOON", x:55,  z:-35, w:9,  h:11, d:9,  color:0x888888, tier:false, locked:true},
+  {id:"linkedin", label:"LINKEDIN TOWER",  sub:"COMING SOON", x:-55, z:35,  w:9,  h:22, d:9,  color:0x888888, tier:true,  locked:true},
 ];
 
 function makeLabelSprite(text, sub, color, locked){
@@ -407,23 +410,288 @@ function makeLabelSprite(text, sub, color, locked){
   return spr;
 }
 
-function buildCityCar(){
+// ─── Window-lit building facade textures (a small reusable palette) ───
+const WINDOW_TEX_CACHE = [];
+function buildWindowTexturePalette(){
+  const baseTones = [[10,10,22],[16,10,26],[8,14,24],[18,8,18]];
+  const litColors = ["#ffd27a","#ffe9b0","#8fe9ff","#ff9fce"];
+  baseTones.forEach((base,i)=>{
+    const cv=document.createElement("canvas"); cv.width=128; cv.height=128;
+    const ctx=cv.getContext("2d");
+    ctx.fillStyle=`rgb(${base[0]},${base[1]},${base[2]})`;
+    ctx.fillRect(0,0,128,128);
+    const cols=8, rows=8, cw=128/cols, rh=128/rows;
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        const lit = Math.random()<0.38;
+        ctx.fillStyle = lit ? litColors[(i+c+r)%litColors.length] : "rgba(0,0,0,0.4)";
+        const pad=cw*0.2;
+        ctx.fillRect(c*cw+pad, r*rh+pad, cw-pad*2, rh-pad*2);
+      }
+    }
+    const tex=new THREE.CanvasTexture(cv);
+    tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+    WINDOW_TEX_CACHE.push(tex);
+  });
+}
+
+function buildPerson(){
   const g=new THREE.Group();
-  const AM=new THREE.MeshLambertMaterial({color:0x00f0ff});
+  const SKIN=new THREE.MeshLambertMaterial({color:0xe0ad82});
+  const SHIRT=new THREE.MeshLambertMaterial({color:0x00d2be});
+  const PANTS=new THREE.MeshLambertMaterial({color:0x1a1a2e});
+  const SHOES=new THREE.MeshLambertMaterial({color:0x111111});
+  const HAIR=new THREE.MeshLambertMaterial({color:0x271a10});
+
+  const head=new THREE.Mesh(new THREE.SphereGeometry(0.26,14,12),SKIN);
+  head.position.set(0,1.6,0); g.add(head);
+  const hair=new THREE.Mesh(new THREE.SphereGeometry(0.275,14,10,0,Math.PI*2,0,Math.PI*0.5),HAIR);
+  hair.position.set(0,1.66,0); g.add(hair);
+
+  const torso=new THREE.Mesh(new THREE.CylinderGeometry(0.21,0.25,0.6,10),SHIRT);
+  torso.position.set(0,1.13,0); g.add(torso);
+
+  const armGeo=new THREE.CylinderGeometry(0.065,0.055,0.52,8);
+  const leftArmPivot=new THREE.Group(); leftArmPivot.position.set(-0.28,1.4,0);
+  leftArmPivot.add(Object.assign(new THREE.Mesh(armGeo,SHIRT),{position:new THREE.Vector3(0,-0.26,0)}));
+  g.add(leftArmPivot);
+  const rightArmPivot=new THREE.Group(); rightArmPivot.position.set(0.28,1.4,0);
+  rightArmPivot.add(Object.assign(new THREE.Mesh(armGeo,SHIRT),{position:new THREE.Vector3(0,-0.26,0)}));
+  g.add(rightArmPivot);
+
+  const legGeo=new THREE.CylinderGeometry(0.085,0.075,0.6,8);
+  const shoeGeo=new THREE.BoxGeometry(0.13,0.09,0.24);
+  const leftLegPivot=new THREE.Group(); leftLegPivot.position.set(-0.1,0.8,0);
+  const leftLeg=new THREE.Mesh(legGeo,PANTS); leftLeg.position.set(0,-0.3,0); leftLegPivot.add(leftLeg);
+  const leftShoe=new THREE.Mesh(shoeGeo,SHOES); leftShoe.position.set(0,-0.62,0.05); leftLegPivot.add(leftShoe);
+  g.add(leftLegPivot);
+  const rightLegPivot=new THREE.Group(); rightLegPivot.position.set(0.1,0.8,0);
+  const rightLeg=new THREE.Mesh(legGeo,PANTS); rightLeg.position.set(0,-0.3,0); rightLegPivot.add(rightLeg);
+  const rightShoe=new THREE.Mesh(shoeGeo,SHOES); rightShoe.position.set(0,-0.62,0.05); rightLegPivot.add(rightShoe);
+  g.add(rightLegPivot);
+
+  return {group:g, leftArmPivot, rightArmPivot, leftLegPivot, rightLegPivot};
+}
+
+function buildTieredBuilding(w,h,d,windowTex){
+  const g=new THREE.Group();
+  const repeat = Math.max(1, Math.round(h/6));
+  const sideTex = windowTex.clone(); sideTex.needsUpdate=true; sideTex.repeat.set(Math.max(1,Math.round(w/4)), repeat);
+  const sideMat=new THREE.MeshLambertMaterial({map:sideTex});
+  const roofMat=new THREE.MeshLambertMaterial({color:0x14141c});
+  const materials=[sideMat,sideMat,roofMat,roofMat,sideMat,sideMat];
+  const base=new THREE.Mesh(new THREE.BoxGeometry(w,h*0.62,d),materials);
+  base.position.y=h*0.31; g.add(base);
+  const mid=new THREE.Mesh(new THREE.BoxGeometry(w*0.72,h*0.26,d*0.72),materials);
+  mid.position.y=h*0.62+h*0.13; g.add(mid);
+  const top=new THREE.Mesh(new THREE.BoxGeometry(w*0.4,h*0.12,d*0.4),roofMat);
+  top.position.y=h*0.88+h*0.06; g.add(top);
+  const antenna=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,2.4,6), new THREE.MeshLambertMaterial({color:0x333333}));
+  antenna.position.y=h+1.2; g.add(antenna);
+  const beacon=new THREE.Mesh(new THREE.SphereGeometry(0.12,8,8), new THREE.MeshLambertMaterial({color:0xff2200,emissive:0xff2200,emissiveIntensity:1}));
+  beacon.position.y=h+2.3; g.add(beacon);
+  return g;
+}
+
+function buildSimpleBuilding(w,h,d,windowTex,locked){
+  const repeat = Math.max(1, Math.round(h/6));
+  const sideTex = locked ? null : windowTex.clone();
+  let sideMat;
+  if(locked){
+    sideMat=new THREE.MeshLambertMaterial({color:0x24242e});
+  } else {
+    sideTex.needsUpdate=true; sideTex.repeat.set(Math.max(1,Math.round(w/4)), repeat);
+    sideMat=new THREE.MeshLambertMaterial({map:sideTex});
+  }
+  const roofMat=new THREE.MeshLambertMaterial({color:0x14141c});
+  const materials=[sideMat,sideMat,roofMat,roofMat,sideMat,sideMat];
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),materials);
+  mesh.position.y=h/2;
+  return mesh;
+}
+
+function buildStreetlight(x,z){
+  const g=new THREE.Group();
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.11,4.2,8), new THREE.MeshLambertMaterial({color:0x2a2a30}));
+  pole.position.y=2.1; g.add(pole);
+  const arm=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.9,6), new THREE.MeshLambertMaterial({color:0x2a2a30}));
+  arm.rotation.z=Math.PI/2.4; arm.position.set(0.35,4.05,0); g.add(arm);
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.16,10,10), new THREE.MeshLambertMaterial({color:0xffdca0,emissive:0xffdca0,emissiveIntensity:1.2}));
+  bulb.position.set(0.68,4.3,0); g.add(bulb);
+  const lt=new THREE.PointLight(0xffcf8a, 1.1, 11);
+  lt.position.set(0.68,4.3,0); g.add(lt);
+  g.position.set(x,0,z);
+  return g;
+}
+
+function buildParkedCar(x,z,heading,color){
+  const g=new THREE.Group();
+  const AM=new THREE.MeshLambertMaterial({color});
   const DK=new THREE.MeshLambertMaterial({color:0x0d0d0d});
   const WH=new THREE.MeshLambertMaterial({color:0x0e0e0e});
-  const RIM=new THREE.MeshLambertMaterial({color:0xaaaaaa});
-  const add=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);g.add(m);return m};
-  add(new THREE.BoxGeometry(1.8,0.5,4.0),AM,0,0.4,0);
-  add(new THREE.BoxGeometry(1.5,0.5,2.0),DK,0,0.85,0.2);
-  add(new THREE.BoxGeometry(0.3,0.5,0.5),new THREE.MeshLambertMaterial({color:0xff5533,emissive:0xff2200,emissiveIntensity:0.8}),0,0.4,-2.05);
-  [[-0.95,-1.3],[0.95,-1.3],[-0.95,1.3],[0.95,1.3]].forEach(([wx,wz])=>{
-    const piv=new THREE.Group();piv.position.set(wx,0.32,wz);
-    const t=new THREE.Mesh(new THREE.CylinderGeometry(0.33,0.33,0.38,16),WH);t.rotation.z=Math.PI/2;piv.add(t);
-    const r=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,0.4,12),RIM);r.rotation.z=Math.PI/2;piv.add(r);
-    g.add(piv);WHEELS.push(piv);
+  const body=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.48,3.8),AM); body.position.y=0.4; g.add(body);
+  const cabin=new THREE.Mesh(new THREE.BoxGeometry(1.4,0.42,1.9),DK); cabin.position.set(0,0.82,0.1); g.add(cabin);
+  [[-0.9,-1.2],[0.9,-1.2],[-0.9,1.2],[0.9,1.2]].forEach(([wx,wz])=>{
+    const w=new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.32,0.32,12),WH);
+    w.rotation.z=Math.PI/2; w.position.set(wx,0.32,wz); g.add(w);
   });
+  g.position.set(x,0,z); g.rotation.y=heading;
   return g;
+}
+
+function buildSidewalkAndRoad(){
+  const g=new THREE.Group();
+  const road=new THREE.Mesh(new THREE.PlaneGeometry(20,300), new THREE.MeshLambertMaterial({color:0x1c1a26}));
+  road.rotation.x=-Math.PI/2; g.add(road);
+  const sideMat=new THREE.MeshLambertMaterial({color:0x35323f});
+  [-13,13].forEach(x=>{
+    const sw=new THREE.Mesh(new THREE.PlaneGeometry(6,300), sideMat);
+    sw.rotation.x=-Math.PI/2; sw.position.set(x,0.01,0); g.add(sw);
+  });
+  for(let z=90;z>-140;z-=10){
+    const dash=new THREE.Mesh(new THREE.PlaneGeometry(0.4,4), new THREE.MeshBasicMaterial({color:0xffe37a}));
+    dash.rotation.x=-Math.PI/2; dash.position.set(0,0.02,z); g.add(dash);
+  }
+  return g;
+}
+
+function buildCrosswalk(x,z,horizontal){
+  const g=new THREE.Group();
+  const mat=new THREE.MeshBasicMaterial({color:0xdedee6});
+  for(let i=-3;i<=3;i++){
+    const s=new THREE.Mesh(new THREE.PlaneGeometry(horizontal?0.7:5.5, horizontal?5.5:0.7), mat);
+    s.rotation.x=-Math.PI/2;
+    if(horizontal) s.position.set(x+i*1, 0.015, z);
+    else s.position.set(x, 0.015, z+i*1);
+    g.add(s);
+  }
+  return g;
+}
+
+function buildMoonAndStars(){
+  const g=new THREE.Group();
+  const moon=new THREE.Mesh(new THREE.SphereGeometry(9,20,20), new THREE.MeshBasicMaterial({color:0xfff3d6}));
+  moon.position.set(-90,110,-220); g.add(moon);
+  const glow=new THREE.Sprite(new THREE.SpriteMaterial({
+    map:(()=>{
+      const cv=document.createElement("canvas"); cv.width=256; cv.height=256;
+      const ctx=cv.getContext("2d");
+      const grad=ctx.createRadialGradient(128,128,0,128,128,128);
+      grad.addColorStop(0,"rgba(255,244,214,0.55)");
+      grad.addColorStop(1,"rgba(255,244,214,0)");
+      ctx.fillStyle=grad; ctx.fillRect(0,0,256,256);
+      return new THREE.CanvasTexture(cv);
+    })(),
+    transparent:true, depthTest:false
+  }));
+  glow.scale.set(60,60,1); glow.position.copy(moon.position);
+  g.add(glow);
+
+  const count=1400;
+  const pos=new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+    const theta=Math.random()*Math.PI*2, phi=Math.acos(Math.random()*0.5);
+    const r=260+Math.random()*80;
+    pos[i*3]=r*Math.sin(phi)*Math.cos(theta);
+    pos[i*3+1]=Math.abs(r*Math.cos(phi))+40;
+    pos[i*3+2]=r*Math.sin(phi)*Math.sin(theta)-100;
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(pos,3));
+  const mat=new THREE.PointsMaterial({size:1.1, color:0xffffff, transparent:true, opacity:0.75, depthWrite:false});
+  g.add(new THREE.Points(geo,mat));
+  return g;
+}
+
+function initScene(){
+  const canvas=document.getElementById("cv");
+  renderer=new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:"high-performance"});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setClearColor(0x1a0a2e,1);
+
+  scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x2a1150, 0.011);
+
+  camera=new THREE.PerspectiveCamera(58, innerWidth/innerHeight, 0.1, 600);
+  camera.position.set(carX - Math.sin(carHeading)*6.2, 3.1, carZ - Math.cos(carHeading)*6.2);
+  camera.lookAt(carX, 1.2, carZ);
+
+  const skyGeo=new THREE.SphereGeometry(400,16,16);
+  const skyMat=new THREE.ShaderMaterial({
+    side:THREE.BackSide,
+    vertexShader:`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader:`varying vec3 vPos; void main(){
+      float h=normalize(vPos).y*0.5+0.5;
+      vec3 top=vec3(0.05,0.03,0.16);
+      vec3 mid=vec3(0.34,0.09,0.34);
+      vec3 bot=vec3(0.55,0.22,0.28);
+      vec3 col=mix(bot,mid,smoothstep(0.0,0.35,h));
+      col=mix(col,top,smoothstep(0.35,0.85,h));
+      gl_FragColor=vec4(col,1.0);
+    }`
+  });
+  scene.add(new THREE.Mesh(skyGeo, skyMat));
+  scene.add(buildMoonAndStars());
+
+  scene.add(new THREE.AmbientLight(0x5533aa, 1.0));
+  const sun=new THREE.DirectionalLight(0xffaa66, 0.55);
+  sun.position.set(-30,40,-20); scene.add(sun);
+  const pink=new THREE.PointLight(0xff2e88, 3, 90); pink.position.set(-26,10,0); scene.add(pink);
+  const cyan=new THREE.PointLight(0x00f0ff, 3, 90); cyan.position.set(26,10,0); scene.add(cyan);
+
+  buildWindowTexturePalette();
+
+  scene.add(buildSidewalkAndRoad());
+  [[0,-8],[0,-52],[0,-95]].forEach(([x,z])=>scene.add(buildCrosswalk(x,z,true)));
+
+  BUILDINGS.forEach((b,i)=>{
+    let mesh;
+    const tex = WINDOW_TEX_CACHE[i % WINDOW_TEX_CACHE.length];
+    if(b.locked){
+      mesh=buildSimpleBuilding(b.w,b.h,b.d,tex,true);
+    } else if(b.tier){
+      mesh=buildTieredBuilding(b.w,b.h,b.d,tex);
+    } else {
+      mesh=buildSimpleBuilding(b.w,b.h,b.d,tex,false);
+    }
+    mesh.position.x=b.x; mesh.position.z=b.z;
+    scene.add(mesh);
+
+    const edges=new THREE.EdgesGeometry(new THREE.BoxGeometry(b.w,b.h,b.d));
+    const line=new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:b.color, transparent:true, opacity:b.locked?0.35:0.85}));
+    line.position.set(b.x,b.h/2,b.z);
+    scene.add(line);
+
+    const label=makeLabelSprite(b.label, b.sub, b.color, b.locked);
+    label.position.set(b.x, b.h+3.4, b.z);
+    scene.add(label);
+    b._pos=new THREE.Vector3(b.x,0,b.z);
+  });
+
+  // Streetlights down both sides of the main street
+  for(let z=70; z>-130; z-=22){
+    scene.add(buildStreetlight(-15.5,z));
+    scene.add(buildStreetlight(15.5,z));
+  }
+
+  // Parked cars for street life
+  const carColors=[0xff2e88,0x00f0ff,0xffd700,0x7b2ff7,0x00e87a];
+  [[-15.6,-18,0],[15.6,-40,Math.PI],[-15.6,55,0],[15.6,-100,Math.PI],[-15.6,-125,0]].forEach(([x,z,h],i)=>{
+    scene.add(buildParkedCar(x,z,h,carColors[i%carColors.length]));
+  });
+
+  // Palm trees
+  [[-40,20],[40,20],[-40,-100],[40,-100],[-14,60],[14,60],[-14,-130],[14,-130]].forEach(([x,z])=>scene.add(buildPalm(x,z)));
+
+  // Player character
+  const p=buildPerson();
+  person=p.group;
+  WALK_PARTS={leftArm:p.leftArmPivot, rightArm:p.rightArmPivot, leftLeg:p.leftLegPivot, rightLeg:p.rightLegPivot};
+  scene.add(person);
+
+  window.addEventListener("resize", onResize);
+  animate();
 }
 
 function buildPalm(x,z){
@@ -440,83 +708,6 @@ function buildPalm(x,z){
   }
   g.position.set(x,0,z);
   return g;
-}
-
-function initScene(){
-  const canvas=document.getElementById("cv");
-  renderer=new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:"high-performance"});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setClearColor(0x1a0a2e,1);
-
-  scene=new THREE.Scene();
-  scene.fog=new THREE.FogExp2(0x2a1150, 0.012);
-
-  camera=new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 600);
-  camera.position.set(carX - Math.sin(carHeading)*11, 5.5, carZ - Math.cos(carHeading)*11);
-  camera.lookAt(carX, 1.4, carZ);
-
-  // Sunset sky gradient (large backdrop plane behind everything)
-  const skyGeo=new THREE.SphereGeometry(400,16,16);
-  const skyMat=new THREE.ShaderMaterial({
-    uniforms:{},
-    side:THREE.BackSide,
-    vertexShader:`varying vec3 vPos; void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
-    fragmentShader:`varying vec3 vPos; void main(){
-      float h=normalize(vPos).y*0.5+0.5;
-      vec3 top=vec3(0.10,0.05,0.28);
-      vec3 mid=vec3(0.62,0.13,0.45);
-      vec3 bot=vec3(1.0,0.45,0.25);
-      vec3 col=mix(bot,mid,smoothstep(0.0,0.35,h));
-      col=mix(col,top,smoothstep(0.35,0.85,h));
-      gl_FragColor=vec4(col,1.0);
-    }`
-  });
-  scene.add(new THREE.Mesh(skyGeo, skyMat));
-
-  // Lighting
-  scene.add(new THREE.AmbientLight(0x5533aa, 1.1));
-  const sun=new THREE.DirectionalLight(0xffaa66, 0.9);
-  sun.position.set(-30,40,-20); scene.add(sun);
-  const pink=new THREE.PointLight(0xff2e88, 3, 90); pink.position.set(-26,10,0); scene.add(pink);
-  const cyan=new THREE.PointLight(0x00f0ff, 3, 90); cyan.position.set(26,10,0); scene.add(cyan);
-
-  // Ground (asphalt street + sidewalk edges)
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(240,300), new THREE.MeshLambertMaterial({color:0x1c1a26}));
-  ground.rotation.x=-Math.PI/2; scene.add(ground);
-  // Lane markings down the main street
-  for(let z=90;z>-140;z-=10){
-    const dash=new THREE.Mesh(new THREE.PlaneGeometry(0.4,4), new THREE.MeshBasicMaterial({color:0xffe37a}));
-    dash.rotation.x=-Math.PI/2; dash.position.set(0,0.02,z); scene.add(dash);
-  }
-
-  // Buildings
-  BUILDINGS.forEach(b=>{
-    const mat=new THREE.MeshLambertMaterial({color:b.locked?0x2a2a34:0x18131f});
-    const mesh=new THREE.Mesh(new THREE.BoxGeometry(b.w,b.h,b.d), mat);
-    mesh.position.set(b.x, b.h/2, b.z);
-    scene.add(mesh);
-    // Neon edge trim
-    const edges=new THREE.EdgesGeometry(mesh.geometry);
-    const line=new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:b.color, transparent:true, opacity:b.locked?0.35:0.9}));
-    line.position.copy(mesh.position);
-    scene.add(line);
-    // Label sprite above building
-    const label=makeLabelSprite(b.label, b.sub, b.color, b.locked);
-    label.position.set(b.x, b.h+3.4, b.z);
-    scene.add(label);
-    b._pos=new THREE.Vector3(b.x,0,b.z);
-  });
-
-  // Palm trees scattered around
-  [[-40,20],[40,20],[-40,-100],[40,-100],[-14,60],[14,60],[-14,-130],[14,-130]].forEach(([x,z])=>scene.add(buildPalm(x,z)));
-
-  // Player car
-  carGrp=buildCityCar();
-  scene.add(carGrp);
-
-  window.addEventListener("resize", onResize);
-  animate();
 }
 
 function onResize(){
@@ -550,8 +741,9 @@ function tryEnter(){
     return;
   }
   if(nearBuilding.portal){
-    sfxEnter();
-    setTimeout(()=>{window.location.href="index.html";},260);
+    sfxCar();
+    showToast("🏎 Hopping in the car...");
+    setTimeout(()=>{window.location.href="index.html";},420);
     return;
   }
   openPanel(nearBuilding.id);
@@ -563,36 +755,41 @@ function updateCar(){
   const left=KEYS["a"]||KEYS["arrowleft"]||KEYS["__left"];
   const right=KEYS["d"]||KEYS["arrowright"]||KEYS["__right"];
 
-  if(up) carSpeed=Math.min(carSpeed+ACCEL, MAX_SPEED);
-  else if(down) carSpeed=Math.max(carSpeed-ACCEL, -MAX_SPEED*0.55);
-  else carSpeed*= (Math.abs(carSpeed)>0.002?FRICTION:0);
-  if(!up&&!down) carSpeed*=BRAKE_FRICTION;
+  if(up) carSpeed=Math.min(carSpeed+WALK_ACCEL, WALK_SPEED);
+  else if(down) carSpeed=Math.max(carSpeed-WALK_ACCEL, -WALK_SPEED*0.6);
+  else carSpeed*= (Math.abs(carSpeed)>0.002?WALK_FRICTION:0);
 
-  const turnFactor=Math.min(Math.abs(carSpeed)/(MAX_SPEED*0.5),1);
-  if(left) carHeading += TURN_RATE*turnFactor*(carSpeed<0?-1:1);
-  if(right) carHeading -= TURN_RATE*turnFactor*(carSpeed<0?-1:1);
+  if(left) carHeading += TURN_RATE*(carSpeed<0?-1:1);
+  if(right) carHeading -= TURN_RATE*(carSpeed<0?-1:1);
 
   carX += Math.sin(carHeading)*carSpeed;
   carZ += Math.cos(carHeading)*carSpeed;
   carX = Math.max(-95, Math.min(95, carX));
   carZ = Math.max(-150, Math.min(115, carZ));
 
-  carGrp.position.set(carX, 0, carZ);
-  carGrp.rotation.y = carHeading;
-  WHEELS.forEach(w=>{w.rotation.x += carSpeed*1.4;});
+  person.position.set(carX, 0, carZ);
+  person.rotation.y = carHeading;
 
-  document.getElementById("spd-v").textContent = Math.round(Math.abs(carSpeed)*180);
+  const moving = Math.abs(carSpeed) > 0.006;
+  if(moving) walkPhase += Math.abs(carSpeed)*5.2;
+  const swing = moving ? Math.sin(walkPhase)*0.55 : 0;
+  const bob = moving ? Math.abs(Math.sin(walkPhase))*0.05 : 0;
+  WALK_PARTS.leftArm.rotation.x = swing;
+  WALK_PARTS.rightArm.rotation.x = -swing;
+  WALK_PARTS.leftLeg.rotation.x = -swing;
+  WALK_PARTS.rightLeg.rotation.x = swing;
+  person.position.y = bob;
 
-  // Camera chase
-  const camDist=11, camHeight=5.5;
+  document.getElementById("spd-wrap").textContent = moving ? (Math.abs(carSpeed)>WALK_SPEED*0.7 ? "🏃 running" : "🚶 walking") : "🧍 standing";
+
+  const camDist=6.2, camHeight=3.1;
   const desiredX = carX - Math.sin(carHeading)*camDist;
   const desiredZ = carZ - Math.cos(carHeading)*camDist;
-  camera.position.x += (desiredX-camera.position.x)*0.09;
-  camera.position.z += (desiredZ-camera.position.z)*0.09;
-  camera.position.y += (camHeight-camera.position.y)*0.09;
-  camera.lookAt(carX, 1.4, carZ);
+  camera.position.x += (desiredX-camera.position.x)*0.1;
+  camera.position.z += (desiredZ-camera.position.z)*0.1;
+  camera.position.y += (camHeight-camera.position.y)*0.1;
+  camera.lookAt(carX, 1.2, carZ);
 
-  // Proximity check
   let closest=null, closestDist=Infinity;
   BUILDINGS.forEach(b=>{
     const dx=carX-b.x, dz=carZ-b.z;
@@ -602,7 +799,7 @@ function updateCar(){
   const promptEl=document.getElementById("prompt");
   if(closest && closestDist < Math.max(closest.w,closest.d)*0.85){
     nearBuilding=closest;
-    promptEl.textContent = closest.locked ? `🔒 ${closest.label} (locked)` : closest.portal ? `Drive in to launch ${closest.label}` : `Press E to enter ${closest.label}`;
+    promptEl.textContent = closest.locked ? `🔒 ${closest.label} (locked)` : closest.portal ? `Walk in to hop in the car → F1 mode` : `Press E to enter ${closest.label}`;
     promptEl.classList.add("on");
   } else {
     nearBuilding=null;
@@ -627,7 +824,6 @@ function drawMinimap(){
     ctx.fillStyle=b.locked?"#555":"#"+b.color.toString(16).padStart(6,"0");
     ctx.beginPath();ctx.arc(mx,my,4,0,Math.PI*2);ctx.fill();
   });
-  // player arrow at center
   ctx.save();
   ctx.translate(66,66); ctx.rotate(carHeading);
   ctx.fillStyle="#00f0ff";
@@ -646,7 +842,7 @@ function animate(){
 
 // ═══ Loading sequence ═══
 window.addEventListener("load", ()=>{
-  const msgs=["PAVING STREETS...","PLANTING PALM TREES...","WIRING NEON SIGNS...","PARKING YOUR CAR..."];
+  const msgs=["PAVING STREETS...","PLANTING PALM TREES...","WIRING NEON SIGNS...","LIGHTING UP WINDOWS...","PARKING CARS ON THE STREET..."];
   let p=0;
   const fill=document.getElementById("ld-fill");
   const msg=document.getElementById("ld-msg");
@@ -662,7 +858,7 @@ window.addEventListener("load", ()=>{
       return;
     }
     fill.style.width=p+"%";
-    msg.textContent=msgs[Math.min(Math.floor(p/26),msgs.length-1)];
+    msg.textContent=msgs[Math.min(Math.floor(p/22),msgs.length-1)];
   },140);
 });
 </script>

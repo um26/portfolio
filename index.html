@@ -172,7 +172,7 @@ canvas#cv { position:fixed; inset:0; z-index:0 }
 /* ════════════════════════════════════════════════
    RACE SCROLL SPACE
 ════════════════════════════════════════════════ */
-#scroll-space { display:none; height:50000px; position:relative; z-index:-1 }
+#scroll-space { display:none; height:21000px; position:relative; z-index:-1 }
 #scroll-space.on { display:block }
 
 /* ════════════════════════════════════════════════
@@ -1407,11 +1407,11 @@ function raceLoop() {
   const throttle = KEYS[" "]||KEYS["ArrowDown"]||KEYS["s"]||KEYS["S"]||mobThrottle;
   const brake = KEYS["ArrowUp"]||KEYS["w"]||KEYS["W"];
   const accel = boost ? 28 : 16;
-  if (throttle) manS = Math.min(manS+accel, 50000);
+  if (throttle) manS = Math.min(manS+accel, 21000);
   if (brake) manS = Math.max(manS-10, 0);
 
   const eff = Math.max(scrollY, manS);
-  const targetZ = 5 - eff*0.115;
+  const targetZ = 5 - eff*0.28;
   carZ += (targetZ-carZ)*0.09;
   const vel = Math.abs(carZ-prevCarZ);
   prevCarZ = carZ;
