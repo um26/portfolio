@@ -453,10 +453,12 @@ function buildPerson(){
 
   const armGeo=new THREE.CylinderGeometry(0.065,0.055,0.52,8);
   const leftArmPivot=new THREE.Group(); leftArmPivot.position.set(-0.28,1.4,0);
-  leftArmPivot.add(Object.assign(new THREE.Mesh(armGeo,SHIRT),{position:new THREE.Vector3(0,-0.26,0)}));
+  const leftArmMesh=new THREE.Mesh(armGeo,SHIRT); leftArmMesh.position.set(0,-0.26,0);
+  leftArmPivot.add(leftArmMesh);
   g.add(leftArmPivot);
   const rightArmPivot=new THREE.Group(); rightArmPivot.position.set(0.28,1.4,0);
-  rightArmPivot.add(Object.assign(new THREE.Mesh(armGeo,SHIRT),{position:new THREE.Vector3(0,-0.26,0)}));
+  const rightArmMesh=new THREE.Mesh(armGeo,SHIRT); rightArmMesh.position.set(0,-0.26,0);
+  rightArmPivot.add(rightArmMesh);
   g.add(rightArmPivot);
 
   const legGeo=new THREE.CylinderGeometry(0.085,0.075,0.6,8);
