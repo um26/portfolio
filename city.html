@@ -383,10 +383,10 @@ const BUILDINGS = [
   {id:"projects", label:"PROJECTS GARAGE", sub:"WORKSHOP",    x:-26, z:-70, w:12, h:9,  d:12, color:0xffd700, tier:false, locked:false},
   {id:"exp",      label:"EXPERIENCE HQ",   sub:"OFFICE",      x:26,  z:-70, w:11, h:20, d:11, color:0x7b2ff7, tier:true,  locked:false},
   {id:"contact",  label:"CONTACT",         sub:"PAYPHONE",    x:0,   z:-115,w:6,  h:7,  d:6,  color:0x00e87a, tier:false, locked:false},
-  {id:"f1",       label:"F1 CIRCUIT",      sub:"RACE TRACK",  x:0,   z:80,  w:14, h:6,  d:14, color:0xe10600, tier:false, locked:false, portal:true},
+  {id:"f1",       label:"F1 CIRCUIT",      sub:"RACE TRACK",  x:0,   z:80,  w:14, h:6,  d:14, color:0xe10600, tier:false, locked:false, portal:true, href:"index.html", enterMsg:"🏎 Hopping in the car..."},
   {id:"insta",    label:"INSTAGRAM CLUB",  sub:"COMING SOON", x:-55, z:-35, w:9,  h:11, d:9,  color:0x888888, tier:false, locked:true},
   {id:"discord",  label:"DISCORD ARCADE",  sub:"COMING SOON", x:55,  z:-35, w:9,  h:11, d:9,  color:0x888888, tier:false, locked:true},
-  {id:"linkedin", label:"LINKEDIN TOWER",  sub:"COMING SOON", x:-55, z:35,  w:9,  h:22, d:9,  color:0x888888, tier:true,  locked:true},
+  {id:"linkedin", label:"LINKEDIN TOWER",  sub:"PROFESSIONAL NETWORK", x:-55, z:35,  w:9,  h:22, d:9,  color:0x1868b7, tier:true,  locked:false, portal:true, href:"linkedin.html", enterMsg:"💼 Entering professional mode..."},
 ];
 
 function makeLabelSprite(text, sub, color, locked){
@@ -744,8 +744,8 @@ function tryEnter(){
   }
   if(nearBuilding.portal){
     sfxCar();
-    showToast("🏎 Hopping in the car...");
-    setTimeout(()=>{window.location.href="index.html";},420);
+    showToast(nearBuilding.enterMsg || "Entering...");
+    setTimeout(()=>{window.location.href=nearBuilding.href;},420);
     return;
   }
   openPanel(nearBuilding.id);
@@ -801,7 +801,7 @@ function updateCar(){
   const promptEl=document.getElementById("prompt");
   if(closest && closestDist < Math.max(closest.w,closest.d)*0.85){
     nearBuilding=closest;
-    promptEl.textContent = closest.locked ? `🔒 ${closest.label} (locked)` : closest.portal ? `Walk in to hop in the car → F1 mode` : `Press E to enter ${closest.label}`;
+    promptEl.textContent = closest.locked ? `🔒 ${closest.label} (locked)` : closest.portal ? `Walk in to enter ${closest.label}` : `Press E to enter ${closest.label}`;
     promptEl.classList.add("on");
   } else {
     nearBuilding=null;
