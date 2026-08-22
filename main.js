@@ -5,12 +5,14 @@
     const T = window.THREE;
     const canvas = document.getElementById("cv") || document.querySelector("canvas");
     if (!canvas) return;
+
+    /* ---------- cinematic background ---------- */
     const scene = new T.Scene();
     scene.background = new T.Color(0x05050a);
     scene.fog = new T.FogExp2(0x05050a, 0.012);
     const camera = new T.PerspectiveCamera(58, innerWidth / innerHeight, 0.1, 1400);
     camera.position.set(0, 4.8, 17);
-    const renderer = new T.WebGLRenderer({ canvas, antialias:true, alpha:true, powerPreference:"high-performance" });
+    const renderer = new T.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:"high-performance"});
     renderer.setPixelRatio(Math.min(devicePixelRatio,1.65));
     renderer.setSize(innerWidth,innerHeight);
     renderer.shadowMap.enabled = true;
@@ -55,6 +57,7 @@
     const ring=new T.Mesh(new T.TorusGeometry(3.25,.018,8,140),new T.MeshBasicMaterial({color:0x00d2be,transparent:true,opacity:.6}));
     ring.rotation.x=Math.PI/2.25; ring.position.set(0,1.1,-2.5); scene.add(ring);
     const ring2=ring.clone(); ring2.material=ring.material.clone(); ring2.material.color.setHex(0xe10600); ring2.material.opacity=.35; ring2.rotation.x=Math.PI/1.92; ring2.scale.setScalar(1.28); scene.add(ring2);
+
     const mouse=new T.Vector2(), smoothMouse=new T.Vector2(); let scrollProgress=0,turbo=false; const clock=new T.Clock();
     addEventListener("pointermove",e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight*2-1);});
     addEventListener("pointerdown",()=>turbo=true); addEventListener("pointerup",()=>turbo=false);
@@ -62,7 +65,62 @@
     addEventListener("scroll",()=>{const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);scrollProgress=Math.min(1,Math.max(0,scrollY/max));},{passive:true});
     const resize=()=>{camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth<700?64:58;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.65));};
     addEventListener("resize",resize);
+
+    /* ---------- living UI layer ---------- */
+    const root=document.documentElement;
+    const style=document.createElement("style");
+    style.textContent=`
+      #um-progress{position:fixed;left:0;top:0;height:2px;width:100%;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,#e10600,#ff6b5f 45%,#00d2be);z-index:100;box-shadow:0 0 18px rgba(0,210,190,.45);pointer-events:none}
+      #um-command{position:fixed;inset:0;background:rgba(2,3,7,.66);backdrop-filter:blur(18px);z-index:90;display:none;align-items:flex-start;justify-content:center;padding-top:13vh}
+      #um-command.open{display:flex}.um-cmd-box{width:min(720px,92vw);background:rgba(12,14,21,.96);border:1px solid rgba(255,255,255,.14);border-radius:22px;box-shadow:0 40px 120px rgba(0,0,0,.65);overflow:hidden}.um-cmd-top{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}.um-cmd-top span{color:#00d2be;font:11px 'Share Tech Mono',monospace}.um-cmd-input{flex:1;background:none;border:0;outline:0;color:#fff;font:16px 'Share Tech Mono',monospace}.um-cmd-list{padding:8px;max-height:55vh;overflow:auto}.um-cmd-item{display:flex;align-items:center;justify-content:space-between;padding:14px 15px;border-radius:12px;color:#b8bdc8;cursor:pointer;font:11px 'Share Tech Mono',monospace}.um-cmd-item:hover,.um-cmd-item.active{background:rgba(255,255,255,.07);color:#fff}.um-cmd-item small{color:#606876}.um-hint{padding:11px 18px;color:#555d6b;border-top:1px solid rgba(255,255,255,.07);font:9px 'Share Tech Mono',monospace;letter-spacing:.08em}
+      .format-card,.project,.btn,.nav a{will-change:transform}.um-live{position:fixed;right:20px;bottom:20px;z-index:14;padding:9px 12px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(5,5,10,.6);backdrop-filter:blur(12px);font:9px 'Share Tech Mono',monospace;color:#727987;letter-spacing:.12em}.um-live i{display:inline-block;width:5px;height:5px;border-radius:50%;background:#00d2be;box-shadow:0 0 10px #00d2be;margin-right:7px}.um-live b{color:#dce0e8;font-weight:500}
+      .um-reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}.um-reveal.in{opacity:1;transform:none}.um-tilt{transform-style:preserve-3d;transition:transform .15s ease}.um-tilt>*{transform:translateZ(10px)}
+      .um-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;z-index:120;background:#f2f2f4;color:#09090d;border-radius:999px;padding:12px 18px;font:10px 'Share Tech Mono',monospace;box-shadow:0 18px 60px rgba(0,0,0,.45);transition:.3s}.um-toast.show{opacity:1;transform:translate(-50%,0)}
+      @media(max-width:700px){.um-live{display:none}.um-cmd-box{border-radius:16px}}
+    `;
+    document.head.appendChild(style);
+
+    const progress=document.createElement("div"); progress.id="um-progress"; document.body.appendChild(progress);
+    const live=document.createElement("div"); live.className="um-live"; live.innerHTML='<i></i> SYSTEM <b>ONLINE</b> · <span id="um-clock">--:--</span>'; document.body.appendChild(live);
+    const toast=document.createElement("div"); toast.className="um-toast"; document.body.appendChild(toast);
+    const notify=(text)=>{toast.textContent=text;toast.classList.add("show");clearTimeout(notify.t);notify.t=setTimeout(()=>toast.classList.remove("show"),1800)};
+
+    /* command center: press / or cmd/ctrl+k */
+    const overlay=document.createElement("div"); overlay.id="um-command"; overlay.innerHTML=`<div class="um-cmd-box"><div class="um-cmd-top"><span>⌘</span><input class="um-cmd-input" placeholder="Search the portfolio…" autocomplete="off"></div><div class="um-cmd-list"></div><div class="um-hint">ESC CLOSE · ↑↓ NAVIGATE · ENTER OPEN</div></div>`; document.body.appendChild(overlay);
+    const input=overlay.querySelector("input"), list=overlay.querySelector(".um-cmd-list");
+    const commands=[
+      ["Work","Jump to selected work","#work"],["Formats","Open the format lab","#formats"],["About","Read the story","#about"],["Stack","See the toolbox","#stack"],["Contact","Start a conversation","#contact"],
+      ["LinkedIn","Open professional profile","linkedin.html"],["Instagram","Open visual profile","instagram.html"],["Netflix","Browse project catalogue","netflix.html"],["GitHub","Open repositories","https://github.com/um26"],["UniPool","Open the live product","https://uni-pool-ruddy.vercel.app/"],["Scheme Navigator","Open the live product","https://scheme-navigator-ten.vercel.app/"]
+    ];
+    let filtered=commands.slice(), active=0;
+    const renderCommands=()=>{list.innerHTML=filtered.map((c,i)=>`<div class="um-cmd-item ${i===active?'active':''}" data-i="${i}"><span>${c[0]}</span><small>${c[1]}</small></div>`).join("");list.querySelectorAll(".um-cmd-item").forEach(el=>el.onclick=()=>runCommand(+el.dataset.i));};
+    const openCommands=()=>{overlay.classList.add("open");input.value="";filtered=commands.slice();active=0;renderCommands();setTimeout(()=>input.focus(),30)};
+    const closeCommands=()=>overlay.classList.remove("open");
+    const runCommand=(i)=>{const target=filtered[i]?.[2];if(!target)return;closeCommands();if(target.startsWith("#")){document.querySelector(target)?.scrollIntoView({behavior:"smooth"});}else{window.location.href=target;}};
+    input.oninput=()=>{const q=input.value.toLowerCase().trim();filtered=commands.filter(c=>(c[0]+c[1]).toLowerCase().includes(q));active=0;renderCommands();};
+    addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openCommands();return}if(e.key==="/"&&document.activeElement!==input){e.preventDefault();openCommands();return}if(!overlay.classList.contains("open"))return;if(e.key==="Escape")closeCommands();if(e.key==="ArrowDown"){e.preventDefault();active=Math.min(filtered.length-1,active+1);renderCommands()}if(e.key==="ArrowUp"){e.preventDefault();active=Math.max(0,active-1);renderCommands()}if(e.key==="Enter")runCommand(active)});
+    overlay.addEventListener("click",e=>{if(e.target===overlay)closeCommands()});
+
+    /* subtle tilt: cards respond to the cursor rather than behaving like dead rectangles */
+    const tiltTargets=[...document.querySelectorAll(".format-card,.project,.hero-card")];
+    tiltTargets.forEach(el=>{el.classList.add("um-tilt");el.addEventListener("pointermove",e=>{if(innerWidth<800)return;const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;el.style.transform=`perspective(900px) rotateX(${(-y*5).toFixed(2)}deg) rotateY(${(x*6).toFixed(2)}deg) translateY(-4px)`});el.addEventListener("pointerleave",()=>el.style.transform="")});
+
+    /* reveal sections as the page is explored */
+    const reveal=[...document.querySelectorAll(".section,.format-hub,.marquee")]; reveal.forEach(x=>x.classList.add("um-reveal"));
+    const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("in")}),{threshold:.12}); reveal.forEach(x=>observer.observe(x));
+
+    /* live clock + telemetry */
+    const clockEl=document.getElementById("um-clock");
+    setInterval(()=>{if(clockEl)clockEl.textContent=new Intl.DateTimeFormat([], {hour:"2-digit",minute:"2-digit",second:"2-digit"}).format(new Date())},1000);
+
+    /* magnetic CTA feedback */
+    document.querySelectorAll(".btn,.nav-cta,.clean-links a").forEach(el=>{el.addEventListener("pointermove",e=>{const r=el.getBoundingClientRect();el.style.transform=`translate(${((e.clientX-r.left)/r.width-.5)*7}px,${((e.clientY-r.top)/r.height-.5)*5}px)`});el.addEventListener("pointerleave",()=>el.style.transform="")});
+
+    /* tiny keyboard easter egg */
+    let seq=""; addEventListener("keydown",e=>{if(e.key.length===1){seq=(seq+e.key.toLowerCase()).slice(-8);if(seq.endsWith("matrix")){notify("MATRIX MODE: KEEP BUILDING.");document.body.animate([{filter:"brightness(1)"},{filter:"brightness(1.8)"},{filter:"brightness(1)"}],{duration:650});}}});
+
     const animate=()=>{requestAnimationFrame(animate);const t=clock.getElapsedTime();smoothMouse.lerp(mouse,.065);const boost=turbo?2.2:1,distance=scrollProgress*110;
+      progress.style.transform=`scaleX(${scrollProgress})`;
       camera.position.x+=((smoothMouse.x*2.8)-camera.position.x)*.032;
       camera.position.y+=((4.8+smoothMouse.y*1.2+Math.sin(t*.55)*.11)-camera.position.y)*.03;
       camera.position.z+=((17-distance*.14)-camera.position.z)*.05;
