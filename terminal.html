@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>~/utkarsh — terminal</title>
+<meta name="description" content="An interactive terminal easter egg for Utkarsh Mangal's portfolio.">
+<link rel="icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{ --g:#00ff41; --g-dim:#0a8f2e; --cyan:#43e6ff; --bg:#020402; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);overflow:hidden;font-family:'Share Tech Mono',monospace}
+#crt{position:fixed;inset:0;background:var(--bg);color:var(--g);padding:1.2rem 1.4rem;overflow-y:auto;
+  font-size:14px;line-height:1.5;text-shadow:0 0 4px rgba(0,255,65,.55);cursor:text}
+#crt::-webkit-scrollbar{width:8px}
+#crt::-webkit-scrollbar-thumb{background:var(--g-dim);border-radius:4px}
+
+/* scanlines + flicker for the CRT feel */
+#scanlines{position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0px,rgba(0,0,0,.18) 1px,transparent 2px,transparent 3px);
+  mix-blend-mode:multiply}
+#vignette{position:fixed;inset:0;pointer-events:none;z-index:49;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+@keyframes flicker{0%,100%{opacity:.98}50%{opacity:1}52%{opacity:.94}54%{opacity:1}}
+#crt{animation:flicker 6s infinite}
+
+.line{white-space:pre-wrap;word-break:break-word}
+.prompt-row{display:flex;gap:.4rem;flex-wrap:wrap}
+.ps1{color:var(--cyan);flex-shrink:0}
+.cmdline{color:var(--g);flex:1;min-width:80px}
+.dim{color:var(--g-dim)}
+.err{color:#ff5c5c}
+.cyan{color:var(--cyan)}
+.white{color:#eafff0}
+.bold{font-weight:700}
+#input-row{display:flex;gap:.4rem;align-items:center}
+#hidden-input{position:absolute;opacity:0;pointer-events:none}
+.cursor{display:inline-block;width:8px;height:15px;background:var(--g);margin-left:2px;
+  animation:blink 1s steps(1) infinite;vertical-align:text-bottom}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+.bar{display:inline-block}
+#matrix-cv{position:fixed;inset:0;z-index:40;display:none;background:#000}
+#matrix-cv.on{display:block}
+
+a.tlink{color:var(--cyan);text-decoration:underline}
+</style>
+</head>
+<body>
+<div id="crt" tabindex="0"><div id="output"></div>
+  <div class="prompt-row" id="prompt-row">
+    <span class="ps1">guest@utkarsh-mangal:~$</span>
+    <span class="cmdline" id="typed"></span><span class="cursor"></span>
+  </div>
+</div>
+<canvas id="matrix-cv"></canvas>
+<div id="scanlines"></div>
+<div id="vignette"></div>
+<input id="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+
+<script>
+// ═══ AUDIO — synthesized, opt-in via first keypress (terminal sounds are core to the vibe, so default ON but silent-safe) ═══
+let audioCtx=null,soundReady=false;
+function ensureAudio(){ if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}} if(audioCtx.state==="suspended")audioCtx.resume(); return audioCtx; }
+function playTone(freq,dur,type="square",vol=0.02,delay=0){
+  const ctx=ensureAudio();if(!ctx)return;
+  const t0=ctx.currentTime+delay;
+  const osc=ctx.createOscillator(),gain=ctx.createGain();
+  osc.type=type;osc.frequency.setValueAtTime(freq,t0);
+  gain.gain.setValueAtTime(0,t0);
+  gain.gain.linearRampToValueAtTime(vol,t0+0.005);
+  gain.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  osc.connect(gain);gain.connect(ctx.destination);
+  osc.start(t0);osc.stop(t0+dur+0.02);
+}
+function sfxKey(){playTone(220+Math.random()*60,.02,"square",.015);}
+function sfxBeep(){playTone(880,.08,"sine",.03);}
+function sfxError(){playTone(160,.15,"sawtooth",.03);}
+function sfxSuccess(){[523,659,784,1047].forEach((f,i)=>playTone(f,.2,"sine",.04,i*.12));}
+
+// ═══ DATA (same source of truth as the rest of the site) ═══
+const SKILLS=[["Python",92],["PyTorch",82],["FastAPI",80],["NGSolve/SciPy",80],["TypeScript",78],["Scikit-learn",76],["SQL",75]];
+const PROJECTS=[
+  {n:"UniPool",d:"Rule-based university carpooling platform. Matches travellers within a ±1hr window, auto-notifies.",stack:"Python · TypeScript · FastAPI · MongoDB · React Native",link:"https://github.com/um26/UniPool"},
+  {n:"Scheme Navigator",d:"Government welfare scheme discovery platform — searchable, filterable eligibility data.",stack:"Python · JavaScript · Vercel",link:"https://github.com/um26/scheme-navigator"},
+  {n:"Transformer Flux Topology Optimization",d:"SIMP/BESO/TOBS optimization. BiGRU surrogate model (R²=0.966). Built at CentraleSupélec.",stack:"PyTorch · NGSolve · SciPy · FEA",link:"https://github.com/um26/tobs"},
+  {n:"Math Club Stock Exchange",d:"MU's first student-run stock market simulation — 350+ participants, 16 clubs.",stack:"Probability · Market Design",link:null},
+];
+
+// ═══ TERMINAL STATE ═══
+const out=document.getElementById("output");
+const crt=document.getElementById("crt");
+const typedEl=document.getElementById("typed");
+const hiddenInput=document.getElementById("hidden-input");
+let history=[],histIdx=-1,typed="",booted=false,matrixOn=false;
+let konami=[],konamiSeq=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+
+function print(html,cls){
+  const d=document.createElement("div");
+  d.className="line"+(cls?" "+cls:"");
+  d.innerHTML=html;
+  out.appendChild(d);
+  crt.scrollTop=crt.scrollHeight;
+}
+function printBar(label,pct){
+  const filled=Math.round(pct/5);
+  const bar="█".repeat(filled)+"░".repeat(20-filled);
+  print(`  ${label.padEnd(16,' ')} <span class="cyan bar">${bar}</span> ${pct}%`);
+}
+
+const BOOT_LINES=[
+  "BIOS v4.28.26 — UTKARSH-OS",
+  "Initializing computational mathematics core... OK",
+  "Loading machine learning subsystem... OK",
+  "Mounting /dev/coffee... OK",
+  "Checking for imposter syndrome... [detected — ignoring]",
+  "Starting portfolio daemon (pid 2026)...",
+  "Connection to CentraleSupélec-Paris established.",
+  "Connection to Mahindra-University established.",
+  "",
+];
+
+const ASCII_LOGO = `<span class="cyan">
+██╗   ██╗███╗   ███╗
+██║   ██║████╗ ████║
+██║   ██║██╔████╔██║
+██║   ██║██║╚██╔╝██║
+╚██████╔╝██║ ╚═╝ ██║
+ ╚═════╝ ╚═╝     ╚═╝</span>
+<span class="white bold">UTKARSH MANGAL — TERMINAL v1.0</span>
+<span class="dim">Type 'help' to see available commands.</span>
+`;
+
+function boot(){
+  let i=0;
+  const step=()=>{
+    if(i<BOOT_LINES.length){
+      print(`<span class="dim">${BOOT_LINES[i]}</span>`);
+      sfxBeep();
+      i++;
+      setTimeout(step,90);
+    } else {
+      print(ASCII_LOGO);
+      booted=true;
+      focusInput();
+    }
+  };
+  step();
+}
+
+function focusInput(){ hiddenInput.focus(); }
+crt.addEventListener("click", focusInput);
+window.addEventListener("load", ()=>{ setTimeout(boot,200); });
+
+// ═══ COMMANDS ═══
+const FILES={
+  "about.txt":()=>`<span class="cyan bold">ABOUT</span>
+B.Tech Computational Mathematics — Mahindra University (CGPA 8.28)
+Academic Semester Exchange (Erasmus) — CentraleSupélec, Paris (Feb–Jun 2026)
+Computational problem-solver: optimization, ML, scientific computing.`,
+  "skills.txt":()=>{SKILLS.forEach(([n,v])=>printBar(n,v));return null;},
+  "experience.txt":()=>`<span class="cyan bold">EXPERIENCE</span>
+President, Math Club — Mahindra University (Jul 2024–Jun 2025)
+Student Placement Coordinator — Mahindra University (Mar 2024–Dec 2025)
+McKinsey Forward Program (Dec 2025)
+Introduction to MCP — Anthropic Certification (Aug 2025)`,
+  "contact.txt":()=>`<span class="cyan bold">CONTACT</span>
+email    umangal2003@gmail.com
+phone    +91 978 487 1049
+github   github.com/um26
+site     <a class="tlink" href="https://portfolio-inky-nine-23.vercel.app" target="_blank">portfolio-inky-nine-23.vercel.app</a>`,
+};
+
+const DIRS={ "/":["about.txt","skills.txt","experience.txt","contact.txt","projects/","secrets/"],
+  "/projects":PROJECTS.map(p=>p.n.toLowerCase().replace(/[^a-z0-9]+/g,"-")+".txt"),
+  "/secrets":["coffee.txt","easter_egg.txt","dont_read_this.txt"] };
+let cwd="/";
+
+const SECRET_FILES={
+  "coffee.txt":()=>`<span class="err">ERROR: Coffee levels critical.</span>\nPlease supply caffeine to continue building things.`,
+  "easter_egg.txt":()=>`You found it. Try the command <span class="cyan">matrix</span>, or the Konami code (↑↑↓↓←→←→ b a).`,
+  "dont_read_this.txt":()=>`Okay fine, since you're curious: I built this whole terminal because a portfolio should be as fun to discover as it was to build. Try <span class="cyan">sudo hire-me</span>.`,
+};
+
+function help(){
+  print(`<span class="cyan bold">AVAILABLE COMMANDS</span>
+  help                 show this list
+  whoami               who am I, really
+  about                short bio
+  skills               proficiency readout
+  projects             list of things I've built
+  experience           work & leadership history
+  education            academic background
+  contact              how to reach me
+  resume               download a plaintext résumé
+  ls / cd / cat         poke around the filesystem
+  scan / nmap          discover other hosts on the network
+  connect <host>       jump to a discovered host
+  matrix               ...you know what this does
+  sudo hire-me         <span class="dim">(try it)</span>
+  clear                clear the screen
+  history              show command history`);
+}
+
+function whoami(){
+  print(`<span class="cyan">guest</span> — you, a curious visitor.
+<span class="cyan">utkarsh-mangal</span> — computational mathematics × machine learning × scientific computing.
+One of these should probably hire the other.`);
+}
+
+function projects(){
+  print(`<span class="cyan bold">PROJECTS</span>`);
+  PROJECTS.forEach((p,i)=>{
+    print(`  <span class="white bold">${i+1}. ${p.n}</span>
+     ${p.d}
+     <span class="dim">stack:</span> ${p.stack}${p.link?`  <a class="tlink" href="${p.link}" target="_blank">${p.link}</a>`:""}`);
+  });
+}
+
+function education(){
+  print(`<span class="cyan bold">EDUCATION</span>
+CentraleSupélec, Paris — Academic Semester Exchange (Erasmus), Feb–Jun 2026
+Mahindra University — B.Tech Computational Mathematics, CGPA 8.28, Sept 2022–Jun 2026`);
+}
+
+function resume(){
+  const content=`UTKARSH MANGAL — RÉSUMÉ SNAPSHOT\n${"=".repeat(50)}\n\nEDUCATION\n---------\nCentraleSupélec, Paris — Erasmus Exchange, Feb–June 2026\nMahindra University — B.Tech Computational Mathematics, CGPA 8.28\n\nPROJECTS\n--------\n${PROJECTS.map(p=>p.n).join("\\n")}\n\nCONTACT\n-------\nEmail: umangal2003@gmail.com\nPhone: +91 978 487 1049\nGitHub: github.com/um26\n`;
+  const blob=new Blob([content],{type:"text/plain"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="Utkarsh_Mangal_Summary.txt";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  print(`<span class="dim">Downloading Utkarsh_Mangal_Summary.txt...</span>`);
+}
+
+function ls(arg){
+  const dir = arg==="secrets"||arg==="/secrets" ? "/secrets" : arg==="projects"||arg==="/projects" ? "/projects" : cwd;
+  const files = DIRS[dir] || DIRS["/"];
+  print(files.join("   "));
+}
+
+function cd(arg){
+  if(!arg||arg==="/"||arg===".."||arg==="~"){ cwd="/"; return print(`<span class="dim">→ /</span>`); }
+  const target = arg.replace(/^\.\//,"").replace(/\/$/,"");
+  if(DIRS["/"+target]){ cwd="/"+target; print(`<span class="dim">→ ${cwd}</span>`); }
+  else { print(`<span class="err">cd: no such directory: ${arg}</span>`); sfxError(); }
+}
+
+function cat(arg){
+  if(!arg){ return print(`<span class="err">cat: missing file operand</span>`); }
+  const name=arg.trim();
+  if(cwd==="/secrets" && SECRET_FILES[name]) return print(SECRET_FILES[name]());
+  if(FILES[name]){ const r=FILES[name](); if(r) print(r); return; }
+  const proj = PROJECTS.find(p=>name.startsWith(p.n.toLowerCase().replace(/[^a-z0-9]+/g,"-")));
+  if(cwd==="/projects" && proj){
+    return print(`<span class="cyan bold">${proj.n}</span>\n${proj.d}\n<span class="dim">stack:</span> ${proj.stack}${proj.link?`  <a class="tlink" href="${proj.link}" target="_blank">${proj.link}</a>`:""}`);
+  }
+  print(`<span class="err">cat: ${name}: No such file or directory</span>`);
+  sfxError();
+}
+
+function sudoHireMe(){
+  print(`<span class="dim">[sudo] password for guest: ********</span>`);
+  setTimeout(()=>{
+    print(`<span class="cyan">Authenticating...</span>`);
+  },350);
+  setTimeout(()=>{
+    print(`<span class="white bold">ACCESS GRANTED.</span>`);
+    sfxSuccess();
+    print(`
+<span class="cyan bold">   ╔═══════════════════════════════════════╗
+   ║   RECRUITMENT PROTOCOL: ENGAGED        ║
+   ╚═══════════════════════════════════════╝</span>
+
+Candidate: <span class="white bold">Utkarsh Mangal</span>
+Status: <span class="cyan">Open to internships & full-time roles</span>
+Focus: ML · Software Engineering · Applied Mathematics
+
+<span class="dim">→</span> email: umangal2003@gmail.com
+<span class="dim">→</span> type <span class="cyan">resume</span> to download a summary
+<span class="dim">→</span> or just reply to whichever email led you here 🙂`);
+  },900);
+}
+
+function matrix(){
+  matrixOn=!matrixOn;
+  const cv=document.getElementById("matrix-cv");
+  cv.classList.toggle("on",matrixOn);
+  if(matrixOn){
+    print(`<span class="dim">Entering the Matrix. Press any key or type 'matrix' again to exit.</span>`);
+    startMatrixRain();
+  } else {
+    print(`<span class="dim">Back to reality.</span>`);
+  }
+}
+
+let matrixRAF=null;
+function startMatrixRain(){
+  const cv=document.getElementById("matrix-cv");
+  const ctx=cv.getContext("2d");
+  cv.width=innerWidth;cv.height=innerHeight;
+  const cols=Math.floor(cv.width/16);
+  const drops=new Array(cols).fill(0);
+  const chars="アイウエオカキクケコ01UTKARSHMANGAL$#@%";
+  function draw(){
+    ctx.fillStyle="rgba(0,0,0,.08)";
+    ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.fillStyle="#00ff41";
+    ctx.font="14px monospace";
+    drops.forEach((y,i)=>{
+      const ch=chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillText(ch, i*16, y*16);
+      if(y*16>cv.height && Math.random()>0.975) drops[i]=0;
+      else drops[i]=y+1;
+    });
+    if(matrixOn) matrixRAF=requestAnimationFrame(draw);
+  }
+  draw();
+}
+function stopMatrixIfRunning(){
+  if(matrixOn){ matrixOn=false; document.getElementById("matrix-cv").classList.remove("on"); }
+  if(matrixRAF) cancelAnimationFrame(matrixRAF);
+}
+
+function sl(){
+  print(`<span class="cyan">      ====        ________                ___________
+  _D _|  |_______/        \\__I_I_____===__|_________|
+   |(_)---  |   H\\________/ |   |        =|___ ___|
+   /     |  |   H  |  |     |   |         ||_| |_||
+  |      |  |   H  |__--------------------| [___] |
+  | ________|___H__/__|_____/[][]~\\_______|       |
+  |/ |   |-----------I_____I [][] []  D   |=======|__</span>
+<span class="dim">choo choo. (this is a real Unix easter egg, by the way)</span>`);
+}
+
+function clearScreen(){ out.innerHTML=""; }
+
+
+// ═══ NETWORK SCAN + CONNECT (ties the terminal into the rest of the site) ═══
+const HOSTS = [
+  ["10.0.0.1","linkedin","linkedin.host","professional-network","linkedin.html"],
+  ["10.0.0.2","instagram","instagram.host","visual-archive","instagram.html"],
+  ["10.0.0.3","netflix","netflix.host","media-catalogue","netflix.html"],
+  ["10.0.0.4","whatsapp","whatsapp.host","messaging-direct","whatsapp.html"],
+  ["10.0.0.5","reddit","reddit.host","communities","reddit.html"],
+  ["10.0.0.6","spotify","spotify.host","audio-soundtrack","spotify.html"],
+  ["10.0.0.7","office","office.host","workspace-docs","office.html"],
+  ["10.0.0.8","github","github.host","live-code-activity","github.html"],
+  ["10.0.0.9","portfolio","home.host","main-portfolio","index.html"],
+];
+
+function scan(){
+  print(`<span class="dim">Scanning local network...</span>`);
+  setTimeout(()=>{
+    print(`<span class="cyan">[==========] 100%</span>`);
+    print(`<span class="white bold">DISCOVERED HOSTS:</span>`);
+    HOSTS.forEach(([ip,name,host,desc])=>{
+      print(`  ${ip.padEnd(12,' ')} <span class="cyan">${host.padEnd(18,' ')}</span> <span class="white">[ONLINE]</span>  ${desc}`);
+    });
+    print(`  10.0.0.99    <span class="err">mainframe.host</span>     [<span class="err">???</span>]     <span class="dim">encrypted</span>`);
+    print(`<span class="dim">Type 'connect &lt;host&gt;' to jump in. Or... 'connect mainframe' if you dare.</span>`);
+  },500);
+}
+
+function connect(arg){
+  if(!arg) return print(`<span class="err">connect: specify a host</span>`);
+  const target=arg.toLowerCase().replace(/\.host$/,"");
+  if(target==="mainframe") return startHack();
+  const host=HOSTS.find(h=>h[1]===target);
+  if(!host) return print(`<span class="err">connect: unknown host '${escapeHtml(arg)}'</span>`);
+  print(`<span class="cyan">Connecting to ${host[2]}...</span>`);
+  sfxBeep();
+  setTimeout(()=>{ window.location.href=host[4]; }, 500);
+}
+
+// ═══ HACK MINIGAME — deepest easter egg ═══
+let hackState=null;
+const HACK_CHARS="ABCDEF0123456789";
+function randHex(len){
+  let s="";
+  for(let i=0;i<len;i++) s+=HACK_CHARS[Math.floor(Math.random()*HACK_CHARS.length)];
+  return s;
+}
+function startHack(){
+  print(`<span class="err bold">⚠ BREACH PROTOCOL INITIATED ⚠</span>
+<span class="dim">Type each code exactly before it expires. 3 rounds.</span>`);
+  hackState={round:0,total:3};
+  nextHackRound();
+}
+function nextHackRound(){
+  if(!hackState) return;
+  hackState.round++;
+  if(hackState.round>hackState.total) return finishHack(true);
+  const len=4+hackState.round;
+  hackState.target=randHex(len);
+  print(`<span class="cyan">ROUND ${hackState.round}/${hackState.total}</span>  target code: <span class="white bold">${hackState.target}</span>`);
+  clearTimeout(hackState.timeoutId);
+  hackState.timeoutId=setTimeout(()=>{ if(hackState) finishHack(false); }, 4500);
+}
+function finishHack(success){
+  if(!hackState) return;
+  clearTimeout(hackState.timeoutId);
+  hackState=null;
+  if(success){
+    sfxSuccess();
+    print(`<span class="white bold">ACCESS GRANTED — MAINFRAME BREACHED.</span>
+<span class="cyan">You found the deepest easter egg. Respect.</span>
+<span class="dim">(There's nothing else hidden after this. You can stop looking. Or not.)</span>`);
+  } else {
+    sfxError();
+    print(`<span class="err bold">CONNECTION TERMINATED.</span> <span class="dim">Type 'connect mainframe' to try again.</span>`);
+  }
+}
+
+const COMMANDS = {
+  help, whoami, about:()=>print(FILES["about.txt"]()), skills:()=>FILES["skills.txt"](),
+  projects, experience:()=>print(FILES["experience.txt"]()), education, contact:()=>print(FILES["contact.txt"]()),
+  resume, matrix, clear:clearScreen, sl,
+  history:()=>print(history.length?history.join("\n"):"<span class=\"dim\">(empty)</span>"),
+  ls, cd, cat,
+  scan, nmap:scan, connect, hack:startHack,
+  exit:()=>print(`<span class="err">There is no escape.</span> <span class="dim">(closing the browser tab is allowed though)</span>`),
+  echo:(arg)=>print(arg||""),
+  date:()=>print(new Date().toString()),
+};
+
+function runCommand(raw){
+  const trimmed=raw.trim();
+  if(hackState){
+    print(`<div class="prompt-row"><span class="ps1">guest@utkarsh-mangal:${cwd}$</span> <span class="white">${escapeHtml(trimmed)}</span></div>`);
+    if(trimmed.toUpperCase()===hackState.target){
+      print(`<span class="cyan">✓ correct</span>`);
+      clearTimeout(hackState.timeoutId);
+      nextHackRound();
+    } else {
+      print(`<span class="err">✗ wrong code</span>`);
+      finishHack(false);
+    }
+    return;
+  }
+  if(!trimmed) return;
+  history.push(trimmed);
+  histIdx=history.length;
+  print(`<div class="prompt-row"><span class="ps1">guest@utkarsh-mangal:${cwd}$</span> <span class="white">${escapeHtml(trimmed)}</span></div>`);
+
+  const parts=trimmed.split(/\s+/);
+  const cmd=parts[0].toLowerCase();
+  const arg=parts.slice(1).join(" ");
+
+  if(cmd==="sudo" && arg.replace(/-/g,"")==="hireme"){ return sudoHireMe(); }
+  if(cmd==="sudo"){ print(`<span class="err">Nice try. This isn't that kind of terminal.</span>`); sfxError(); return; }
+  if(cmd==="rm" || cmd==="del"){ print(`<span class="err">Permission denied. (Also, no.)</span>`); sfxError(); return; }
+
+  if(COMMANDS[cmd]){
+    COMMANDS[cmd](arg);
+  } else {
+    print(`<span class="err">command not found: ${escapeHtml(cmd)}</span> <span class="dim">— try 'help'</span>`);
+    sfxError();
+  }
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ═══ INPUT HANDLING ═══
+hiddenInput.addEventListener("keydown",(e)=>{
+  if(!booted) return;
+  if(matrixOn && e.key!=="Enter"){ matrix(); return; }
+  if(e.key==="Enter"){
+    e.preventDefault();
+    const val=hiddenInput.value;
+    hiddenInput.value="";
+    typed="";
+    typedEl.textContent="";
+    runCommand(val);
+    return;
+  }
+  if(e.key==="ArrowUp"){ e.preventDefault(); if(histIdx>0){histIdx--;hiddenInput.value=history[histIdx]||"";typedEl.textContent=hiddenInput.value;} return; }
+  if(e.key==="ArrowDown"){ e.preventDefault(); if(histIdx<history.length){histIdx++;hiddenInput.value=history[histIdx]||"";typedEl.textContent=hiddenInput.value;} return; }
+  sfxKey();
+
+  // Konami code tracking
+  konami.push(e.key);
+  if(konami.length>konamiSeq.length) konami.shift();
+  if(konami.length===konamiSeq.length && konami.every((k,i)=>k.toLowerCase()===konamiSeq[i].toLowerCase())){
+    print(`<span class="cyan bold">🎮 KONAMI CODE ACCEPTED — 30 lives granted (portfolio does not contain lives, this is symbolic)</span>`);
+    sfxSuccess();
+    konami=[];
+  }
+});
+hiddenInput.addEventListener("input",()=>{ typedEl.textContent=hiddenInput.value; });
+</script>
+</body>
+</html>
