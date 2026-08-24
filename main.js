@@ -1,6 +1,7 @@
 (() => {
   "use strict";
   const boot = () => {
+    try{
     if (!window.THREE) return;
     const T = window.THREE;
     const canvas = document.getElementById("cv") || document.querySelector("canvas");
@@ -75,6 +76,7 @@
       renderer.render(scene,camera);
     };
     resize(); animate();
+    }catch(e){console.warn("Ambient background unavailable:",e);}
   };
   if(window.THREE) boot(); else {const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";s.onload=boot;document.head.appendChild(s);}
 })();
